@@ -9,7 +9,8 @@ class Threshold(Ingredient):
         self.lower_threshold = lower_threshold
         self.mix_pixel = mix_pixel
 
-    def mix(self, pixel: Pixel):
+    def mix(self, pixel: Ingredient):
+        # not correct
         if pixel.intensity > self.upper_threshold:
             self.mix_pixel = Pixel(255, 255, 255, 255)
             
@@ -18,4 +19,4 @@ class Threshold(Ingredient):
 
         super().mix(pixel)
 
-        return pixel
+        yield Ingredient

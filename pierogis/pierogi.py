@@ -16,14 +16,14 @@ class Pierogi(Ingredient):
     """
 
     def __init__(self, image: Image):
-        super.__init__(image.size)
         self.input = image.convert('RGBA')
-        self.input = image.convert('RGBA')
-        self.pixel_map = self.image.load()
+        pixel_array = self.__load(image)
+        super.__init__(pixel_array)
         # self.__grid = self.__load(image)
         self.ingredients = []
-        self.width, self.height = self.image.size
-        self._pixel_array = [[Pixel(0,0,0,0, x, y) for y in range(self.height)] for x in range(self.width)]
+
+    def __load(self, image):
+        pixel_array
 
     # def __load(self, image: Image):
     #     # grid = DataFrame(index=range(self.width), columns=range(self.height))

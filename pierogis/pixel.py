@@ -25,4 +25,5 @@ class Pixel:
     #     self.b = round((self.b * (100 - opacity) / 100) + (b * opacity / 100))
     #     self.a = round((self.a * (100 - opacity) / 100) + (a * opacity / 100))
 
-    
+    def place(self, x, y):
+        return Pixel(*self.tuple, x, y)
