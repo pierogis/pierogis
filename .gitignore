@@ -1,0 +1,9 @@
+# generated
+*.pyc
+*.egg-info
+
+# venv
+venv
+
+# vscode
+.vscode
