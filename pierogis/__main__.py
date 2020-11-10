@@ -2,7 +2,9 @@ from PIL import Image
 
 from . import Pierogi
 from . import Threshold
-from . import Recipe
+from .recipe import Recipe
+from . import Mix
+from .dish import Dish
 
 image = Image.open('/Users/kyle/Desktop/input1.png')
 pierogi = Pierogi(image)
@@ -10,11 +12,16 @@ pierogi = Pierogi(image)
 threshold = Threshold(lower_threshold=100, upper_threshold=120)
 
 # pass in lists to be mixed
-recipe = Recipe().add([pierogi, threshold])
+mix = Mix([pierogi, threshold])
+# recipe = Recipe(mix)
 
-for pierogi in recipe.cook():
+dish = Dish(mix, size=pierogi.size)
+
+for pierogi in dish.serve():
     cooked_pierogi = pierogi
     pass
+
+
 
 bites = cooked_pierogi.to_bytes()
 
