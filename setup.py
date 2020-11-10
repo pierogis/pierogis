@@ -5,6 +5,7 @@ setup(
     packages=['pierogis'],
     include_package_data=True,
     install_requires=[
-        'Pillow'
+        'Pillow',
+        'numpy'
     ],
 )

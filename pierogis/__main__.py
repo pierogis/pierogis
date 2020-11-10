@@ -17,13 +17,13 @@ mix = Mix([pierogi, threshold])
 
 dish = Dish(mix, size=pierogi.size)
 
-for pierogi in dish.serve():
-    cooked_pierogi = pierogi
+for dish in dish.serve():
+
     pass
 
 
 
-bites = cooked_pierogi.to_bytes()
+bites = dish.to_bytes()
 
 cooked_image = Image.frombytes("RGBA", image.size, bites)
 
