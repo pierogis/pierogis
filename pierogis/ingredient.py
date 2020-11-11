@@ -2,50 +2,59 @@ from abc import ABC
 from abc import abstractmethod
 
 import numpy as np
+from PIL import Image
 
 from .pixel import Pixel
 
+
 class Ingredient(ABC):
-    default_pixel = Pixel(0,0,0,0)
+    default_pixel = Pixel()
 
-    def __init__(self, size=(0,0), pixels: np.ndarray=None, opacity: int=100):
-        self.width, self.height = size
-
-        if pixels:
-            self.pixels = pixels
-            self.width, self.height = pixels
-        else:
-            # self.pixel_array = [[self.default_pixel.place(x, y) for y in range(self.height)] for x in range(self.width)]
-
-            self.pixels = np.full((self.width, self.height), self.default_pixel)
-
+    def __init__(self, pixels: np.ndarray = None, width=0, height=0, opacity: int = 100, **kwargs):
+        self.pixels = pixels
+        self.width = width
+        self.height = height
         self.opacity = opacity
+
+        self.prep(**kwargs)
+
+        if self.pixels is not None:
+            self.width, self.height = self.pixels.shape[:2]
+        else:
+            self.pixels = np.full((self.height, self.width, 3), self.default_pixel)
+
+            # self.pixels = np.full((1, 1), self.default_pixel)
 
     @property
     def size(self):
         """(width, height)
         """
-        return (self.width, self.height)
+        return self.width, self.height
 
-    def cook(self, pixel: Pixel, x: int, y: int):
-        under_pixel = pixel
-
-        x, y = under_pixel.location
-        over_pixel = self.pixels[x][y]
-
-        cooked_pixel = under_pixel.mix(over_pixel, self.opacity)
-
-        return cooked_pixel
-
-    def season(self):
+    @abstractmethod
+    def prep(self, **kwargs):
         pass
-    
-    def to_bytes(self):
-        for ingredient in self.ingredients:
-            self.layer(ingredient)
-        self.input.show()
-        ret = []
-        for column in self.pixels:
-            for pixel in column:
-                ret.extend(pixel.tuple)
-        return bytes(ret)
+
+    @abstractmethod
+    def cook(self, under_pixel: Pixel, x, y):
+        pass
+
+    # def season(self):
+    #     pass
+    #
+    # def to_bytes(self):
+    #     for ingredient in self.ingredients:
+    #         self.layer(ingredient)
+    #     self.input.show()
+    #     ret = []
+    #     for column in self.pixels:
+    #         for pixel in column:
+    #             ret.extend(pixel.tuple)
+    #     return bytes(ret)
+
+    @property
+    def image(self):
+        return Image.fromarray(self.pixels, 'RGB')
+
+    def show(self):
+        self.image.show()
