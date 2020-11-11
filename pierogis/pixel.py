@@ -1,8 +1,11 @@
 from dataclasses import dataclass
 from collections.abc import Sequence
 
+
 @dataclass
 class Pixel(Sequence):
+    """Just a named list with some helper functions
+    """
     r: int = 0
     g: int = 0
     b: int = 0
@@ -43,7 +46,7 @@ class Pixel(Sequence):
         return 3
 
     @classmethod
-    def mix(cls, under_pixel: 'Pixel', over_pixel: 'Pixel', opacity=100):
+    def mix(cls, under_pixel: 'Pixel', over_pixel: 'Pixel', opacity: int = 100) -> 'Pixel':
         cooked_rgba = []
 
         for i in range(len(under_pixel)):
@@ -51,7 +54,7 @@ class Pixel(Sequence):
 
             cooked_rgba.append(cooked_val)
 
-        cls(*cooked_rgba)
+        return cls(*cooked_rgba)
 
     @staticmethod
     def mix_channel(under_val, over_val, opacity=100):

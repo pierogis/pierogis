@@ -7,10 +7,9 @@ from .pixel import Pixel
 class Dish(Ingredient):
     """Cook an entire recipe for all pixels
     """
-    
-    def __init__(self, mix: Mix, **kwargs):
-        super().__init__(**kwargs)
-        self.mix = mix
+
+    def prep(self, **kwargs):
+        self.mix = kwargs.pop('mix')
 
     def cook(self, pixel: Pixel, x: int, y: int):
         for pixel in self.mix.cook(pixel, x, y):
@@ -27,7 +26,5 @@ class Dish(Ingredient):
             for y in range(self.height):
                 for pixel in self.cook(self.pixels[x][y], x, y):
                     self.pixels[x][y] = pixel
-
-                    yield self
 
     # taste test - serve and cook each ingredient simulatneously

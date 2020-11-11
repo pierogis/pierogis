@@ -18,7 +18,7 @@ class TestDish(unittest.TestCase):
         mix = Mix(ingredients=[pierogi, threshold])
         # recipe = Recipe(mix)
 
-        dish = Dish(mix, size=pierogi.size)
+        dish = Dish(mix=mix, width=pierogi.width, height=pierogi.height)
 
         for pierogi in dish.serve():
             cooked_pierogi = pierogi

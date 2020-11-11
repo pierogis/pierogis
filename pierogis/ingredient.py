@@ -22,7 +22,7 @@ class Ingredient(ABC):
             self.width, self.height = self.pixels.shape[:2]
         else:
             self.pixels = np.full((self.height, self.width, 3), self.default_pixel)
-
+            pass
             # self.pixels = np.full((1, 1), self.default_pixel)
 
     @property
