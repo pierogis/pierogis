@@ -25,6 +25,8 @@ class Mix(Ingredient):
         for ingredient in self.ingredients:
             # cook the lower layer
             cooked_pixels = ingredient.cook(under_pixels)
+
+            a = cooked_pixels * ingredient.opacity
             mixed_pixels = (cooked_pixels * ingredient.opacity + under_pixels * (100 - ingredient.opacity)) / 100
 
             under_pixels = cooked_pixels

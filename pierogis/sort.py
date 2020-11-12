@@ -8,10 +8,9 @@ class Sort(Ingredient):
         ingredient = kwargs.get('ingredient')
 
     def cook(self, pixels: np.ndarray):
-
         intensities = np.average(pixels, axis=2)
-        indices = np.argsort(intensities, axis = 1)
+        indices = np.argsort(intensities)
 
-        sorted_pixels = pixels[indices]
+        sorted_pixels = pixels[np.arange(len(pixels))[:, np.newaxis], indices]
 
         return sorted_pixels

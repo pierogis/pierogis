@@ -23,5 +23,5 @@ class Pierogi(Ingredient):
         """Return a cropped array of the image
         """
 
-        pixels = self.pixels.reshape(pixels.shape)
+        pixels = self.pixels.reshape(pixels.shape).astype(pixels.dtype)
         return pixels
