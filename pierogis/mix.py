@@ -17,26 +17,6 @@ class Mix(Ingredient):
         else:
             raise TypeError("kwarg 'ingredients' must be of type list")
 
-    # def cook(self, pixel: Pixel, x: int, y: int):
-    #     under_pixel = pixel
-    #     for ingredient in self.ingredients:
-    #         cooked_pixel = ingredient.cook(under_pixel, x, y)
-    #
-    #         mixed_pixel = Pixel.mix(under_pixel, cooked_pixel, self.opacity)
-    #
-    #         under_pixel = mixed_pixel
-    #
-    #     return mixed_pixel
-
-    # def cook(self, r, g, b, x: int, y: int):
-    #     for ingredient in self.ingredients:
-    #         cooked_pixel = ingredient.cook(r, g, b, x, y)
-    #
-    #         mixed_pixel = self.mix((r, g, b), *cooked_pixel)
-    #
-    #         under_pixel = mixed_pixel
-    #
-    #     return mixed_pixel
     def cook(self, pixels: np.ndarray):
         """Applies pixels as a selection mask/base to ingredients
         """
@@ -61,18 +41,3 @@ class Mix(Ingredient):
     #     self.pixel_array
 
     #     return Ingredient()
-
-    # def start(self):
-    #     base = self.ingredients[0]
-    #
-    #     pixels = base.pixels
-    #
-    #     width, height = base.size
-    #
-    #     for x in range(width):
-    #         for y in range(height):
-    #             for pixel in self.cook(uncooked_pixel, x, y):
-    #                 yield pixel
-    #
-    #             # for i in range(len(pixels)):
-    #             #     pixels
