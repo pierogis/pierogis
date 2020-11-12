@@ -10,26 +10,18 @@ from pierogis import Dish
 class TestDish(unittest.TestCase):
     def test_serve(self):
         image_path = '/Users/kyle/Desktop/input1.png'
-        pierogi = Pierogi(image=image_path)
+        pierogi = Pierogi(file=image_path)
 
-        threshold = Threshold(lower_threshold=100, upper_threshold=120)
+        threshold = Threshold()
 
         # pass in lists to be mixed
         mix = Mix(ingredients=[pierogi, threshold])
         # recipe = Recipe(mix)
 
-        dish = Dish(mix=mix, width=pierogi.width, height=pierogi.height)
+        dish = Dish(mix=mix, height=pierogi.height, width=pierogi.width)
 
-        for pierogi in dish.serve():
-            cooked_pierogi = pierogi
-            pass
-
-        bites = cooked_pierogi.to_bytes()
-
-        cooked_image = Image.frombytes("RGBA", image.size, bites)
-
-        cooked_image.show()
-        pierogi.show()
+        dish.serve()
+        dish.show()
 
 
 if __name__ == '__main__':

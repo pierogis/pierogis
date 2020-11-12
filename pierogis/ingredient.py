@@ -8,21 +8,20 @@ from .pixel import Pixel
 
 
 class Ingredient(ABC):
-    default_pixel = Pixel()
+    default_pixel = [0, 0, 0]
 
-    def __init__(self, pixels: np.ndarray = None, width=0, height=0, opacity: int = 100, **kwargs):
+    def __init__(self, pixels: np.ndarray = None, height=0, width=0, opacity: int = 100, **kwargs):
         self.pixels = pixels
-        self.width = width
         self.height = height
+        self.width = width
         self.opacity = opacity
 
         self.prep(**kwargs)
 
         if self.pixels is not None:
-            self.width, self.height = self.pixels.shape[:2]
+            self.height, self.width = self.pixels.shape[:2]
         else:
             self.pixels = np.full((self.height, self.width, 3), self.default_pixel)
-            pass
             # self.pixels = np.full((1, 1), self.default_pixel)
 
     @property
@@ -36,25 +35,18 @@ class Ingredient(ABC):
         pass
 
     @abstractmethod
-    def cook(self, under_pixel: Pixel, x, y):
+    def cook(self, pixels: np.ndarray):
         pass
-
-    # def season(self):
-    #     pass
-    #
-    # def to_bytes(self):
-    #     for ingredient in self.ingredients:
-    #         self.layer(ingredient)
-    #     self.input.show()
-    #     ret = []
-    #     for column in self.pixels:
-    #         for pixel in column:
-    #             ret.extend(pixel.tuple)
-    #     return bytes(ret)
 
     @property
     def image(self):
-        return Image.fromarray(self.pixels, 'RGB')
+        image = Image.fromarray(self.pixels, 'RGB')
+        print(image.load()[0, 0])
+        return image
 
     def show(self):
         self.image.show()
+
+    @staticmethod
+    def mix_channel(under_val, over_val, opacity=100):
+        return round((under_val * (100 - opacity) / 100) + (over_val * opacity / 100))

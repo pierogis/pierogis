@@ -16,14 +16,19 @@ class Pierogi(Ingredient):
     """
 
     def prep(self, **kwargs):
-        image = kwargs.pop('image')
-        if isinstance(image, str):
-            image = Image.open(image)
+        image = kwargs.get('image')
+        if not image:
+            file = kwargs.get('file')
+            image = Image.open(file)
 
-        if isinstance(image, Image.Image):
-            self.pixels = np.array(image.convert('RGB'))
-        else:
-            raise Exception("image should be str or PIL.Image")
+        self.pixels = np.array(image.convert('RGB'))
 
-    def cook(self, pixel: Pixel, x: int, y: int):
-        return Pixel(*self.image.load()[x, y])
+    # def cook(self, pixel: Pixel, x: int, y: int):
+    #     return Pixel(*self.image.load()[x, y])
+
+    def cook(self, pixels: np.ndarray):
+        """Return a cropped array of the image
+        """
+
+        pixels = self.pixels.reshape(pixels.shape)
+        return pixels
