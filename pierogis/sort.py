@@ -5,7 +5,8 @@ from .ingredient import Ingredient
 class Sort(Ingredient):
 
     def prep(self, **kwargs):
-        ingredient = kwargs.get('ingredient')
+        self.target = kwargs.get('target')
+        self.delimiter = kwargs.get('delimiter', np.array([255, 255, 255]))
 
     def cook(self, pixels: np.ndarray):
         intensities = np.average(pixels, axis=2)
