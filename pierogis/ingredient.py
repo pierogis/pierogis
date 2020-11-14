@@ -1,5 +1,5 @@
-from abc import ABC
-from abc import abstractmethod
+# from abc import ABC
+# from abc import abstractmethod
 
 import numpy as np
 from PIL import Image
@@ -8,7 +8,7 @@ from .pixel import Pixel
 from .seasoning import Seasoning
 
 
-class Ingredient(ABC):
+class Ingredient:
     """Wrapper for a function to be applied to a grid of pixels.
     """
 
@@ -44,15 +44,15 @@ class Ingredient(ABC):
         print(image.load()[0, 0])
         return image
 
-    @abstractmethod
+    # @abstractmethod
     def prep(self, **kwargs):
         pass
 
-    @abstractmethod
+    # @abstractmethod
     def cook(self, pixels: np.ndarray):
         """Performs actions on a pixel array and returns a cooked array
         """
-        pass
+        return self.pixels
 
     def season(self, seasoning: Seasoning):
         """Execute a seasoning object's season function

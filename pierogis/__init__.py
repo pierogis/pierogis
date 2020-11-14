@@ -7,3 +7,4 @@ from .dish import Dish
 from .sort import Sort
 from .interval import Interval
 from .swap import Swap
+from .quantize import Quantize

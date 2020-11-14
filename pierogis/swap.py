@@ -19,7 +19,7 @@ class Swap(Ingredient):
     def cook(self, pixels: np.ndarray):
         delimiter_pixels = (pixels == self.select).all(axis=2)
 
-        sorted_pixels = np.zeros(shape=(100, 100, 3))
+        sorted_pixels = np.zeros(pixels.shape)
         sorted_pixels[delimiter_pixels] = self.target.pixels[delimiter_pixels]
 
 
