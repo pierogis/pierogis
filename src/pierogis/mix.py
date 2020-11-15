@@ -7,9 +7,7 @@ from .pixel import Pixel
 
 class Mix(Ingredient):
 
-    def prep(self, **kwargs):
-        ingredients = kwargs.get('ingredients')
-
+    def prep(self, ingredients: list, **kwargs):
         if ingredients is None:
             ingredients = []
         if isinstance(ingredients, list):
@@ -26,10 +24,9 @@ class Mix(Ingredient):
             # cook the lower layer
             cooked_pixels = ingredient.cook(under_pixels)
 
-            a = cooked_pixels * ingredient.opacity
             mixed_pixels = (cooked_pixels * ingredient.opacity + under_pixels * (100 - ingredient.opacity)) / 100
 
-            under_pixels = cooked_pixels
+            under_pixels = ingredient.mask(under_pixels, cooked_pixels)
             # mixed_pixels += cooked_pixels.astype('uint32') * ingredient.opacity / (100 * len(self.ingredients))
 
         clipped_pixels = np.clip(mixed_pixels, 0, 255)

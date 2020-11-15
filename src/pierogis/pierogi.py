@@ -11,10 +11,8 @@ class Pierogi(Ingredient):
     """Image container for iterative pixel manipulation
     """
 
-    def prep(self, **kwargs):
-        image = kwargs.get('image')
+    def prep(self, image: Image=None, file: str=None):
         if not image:
-            file = kwargs.get('file')
             image = Image.open(file)
 
         self.pixels = np.array(image.convert('RGB'))

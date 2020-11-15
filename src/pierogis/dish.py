@@ -8,8 +8,8 @@ class Dish(Ingredient):
     """Crop and cook an entire recipe for all pixels
     """
 
-    def prep(self, **kwargs):
-        self.mix = kwargs.pop('mix')
+    def prep(self, mix: Mix):
+        self.mix = mix
 
     def cook(self, pixels: np.ndarray):
         return self.mix.cook(pixels)

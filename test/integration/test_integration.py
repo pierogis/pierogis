@@ -1,31 +1,34 @@
-import unittest
-
 import numpy as np
 
+from pierogis import Dish
 from pierogis import Ingredient
-from pierogis import Pierogi
-from pierogis import Threshold
+from pierogis import Interval
 # from pierogis import Recipe
 from pierogis import Mix
-from pierogis import Dish
-from pierogis import Sort
-from pierogis import Interval
-from pierogis import Swap
+from pierogis import Pierogi
 from pierogis import Quantize
+from pierogis import Seasoning
+from pierogis import Sort
+from pierogis import Swap
+from pierogis import Threshold
 
 
-class TestDish(unittest.TestCase):
+class TestDish():
     def test_threshold(self):
         image_path = '/Users/kyle/Desktop/input1.png'
-        pierogi = Pierogi(file=image_path)
+        pierogi = Pierogi()
+        pierogi.prep(file=image_path)
 
         threshold = Threshold()
+        threshold.prep()
 
         # pass in lists to be mixed
-        threshold_mix = Mix(ingredients=[pierogi, threshold])
+        threshold_mix = Mix()
+        threshold_mix.prep([pierogi, threshold])
         # recipe = Recipe(mix)
 
-        threshold_dish = Dish(mix=threshold_mix, height=pierogi.height, width=pierogi.width)
+        threshold_dish = Dish(height=pierogi.height, width=pierogi.width)
+        threshold_dish.prep(threshold_mix)
 
         threshold_dish.serve()
 
@@ -69,6 +72,8 @@ class TestDish(unittest.TestCase):
         ]
         quantize = Quantize(palette=palette)
 
+        # quantize.season(palette=palette)
+
         # pass in lists to be mixed
         quantize_mix = Mix(ingredients=[pierogi, quantize])
         # recipe = Recipe(mix)
@@ -79,18 +84,21 @@ class TestDish(unittest.TestCase):
         quantize_dish.show()
 
     def test_sort(self):
-        input = np.array([[[150, 50, 100], [50, 50, 50]],
-                          [[200, 150, 100], [100, 100, 100]]])
-        ingredient = Ingredient(pixels=input)
+        pixels = np.random.randint(0, 255, (4, 4, 3))
+        ingredient = Ingredient(pixels=pixels)
 
-        threshold = Threshold(upper_threshold=50)
+        threshold = Threshold(upper_threshold=100)
         threshold_mix = Mix(ingredients=[ingredient, threshold])
         threshold_dish = Dish(mix=threshold_mix, height=ingredient.height, width=ingredient.width)
 
-        interval = Interval(target=threshold_dish)
+        threshold_dish.serve()
+
+        # seasoning is for things that process but don't return a array
+        seasoning = Seasoning(target=threshold_dish)
 
         sort = Sort()
-        sort.season(interval)
+        # this will call a function on each kwarg and set the return to the sort's attribute with the name of the kwarg
+        sort.season(seasoning)
 
         sort_mix = Mix(ingredients=[ingredient, threshold, sort])
 
@@ -98,7 +106,3 @@ class TestDish(unittest.TestCase):
 
         sort_dish.serve()
         sort_dish.show()
-
-
-if __name__ == '__main__':
-    unittest.main()
