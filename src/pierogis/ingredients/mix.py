@@ -1,8 +1,6 @@
-from typing import List
 import numpy as np
 
-from .ingredient import Ingredient
-from .pixel import Pixel
+from pierogis.ingredients.ingredient import Ingredient
 
 
 class Mix(Ingredient):
@@ -22,12 +20,11 @@ class Mix(Ingredient):
         under_pixels = pixels
         for ingredient in self.ingredients:
             # cook the lower layer
-            cooked_pixels = ingredient.cook(under_pixels)
+            cooked_pixels = ingredient.cook_mask(under_pixels)
 
             mixed_pixels = (cooked_pixels * ingredient.opacity + under_pixels * (100 - ingredient.opacity)) / 100
 
-            under_pixels = ingredient.mask(under_pixels, cooked_pixels)
-            # mixed_pixels += cooked_pixels.astype('uint32') * ingredient.opacity / (100 * len(self.ingredients))
+            under_pixels = mixed_pixels
 
         clipped_pixels = np.clip(mixed_pixels, 0, 255)
 

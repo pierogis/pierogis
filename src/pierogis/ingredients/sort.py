@@ -1,6 +1,6 @@
 import numpy as np
 
-from .ingredient import Ingredient
+from pierogis.ingredients.ingredient import Ingredient
 
 class Sort(Ingredient):
 

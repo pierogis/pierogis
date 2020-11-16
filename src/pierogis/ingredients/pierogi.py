@@ -4,7 +4,7 @@
 from PIL import Image
 import numpy as np
 
-from .ingredient import Ingredient
+from pierogis.ingredients.ingredient import Ingredient
 
 
 class Pierogi(Ingredient):
@@ -15,7 +15,7 @@ class Pierogi(Ingredient):
         if not image:
             image = Image.open(file)
 
-        self.pixels = np.array(image.convert('RGB'))
+        self._pixels = np.array(image.convert('RGB'))
 
         # if self.height > 0 and self.width > 0:
         #     # truncate or fill pixels
@@ -26,5 +26,4 @@ class Pierogi(Ingredient):
         """Return a cropped array of the image
         """
 
-        pixels = self.pixels.reshape(pixels.shape).astype(pixels.dtype)
-        return pixels
+        return self.pixels.reshape(pixels.shape).astype(pixels.dtype)

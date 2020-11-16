@@ -1,8 +1,8 @@
 import numpy as np
 
-from .ingredient import Ingredient
-from .mix import Mix
-from .pixel import Pixel
+from pierogis.ingredients.ingredient import Ingredient
+from pierogis.ingredients.mix import Mix
+
 
 class Dish(Ingredient):
     """Crop and cook an entire recipe for all pixels
@@ -12,7 +12,7 @@ class Dish(Ingredient):
         self.mix = mix
 
     def cook(self, pixels: np.ndarray):
-        return self.mix.cook(pixels)
+        return self.mix.cook_mask(pixels)
 
     def serve(self):
         pixels = self.pixels
@@ -26,4 +26,4 @@ class Dish(Ingredient):
 
         clipped_pixels = np.clip(cooked_pixels, 0, 255)
 
-        self.pixels = clipped_pixels.astype('uint8')
+        self._pixels = clipped_pixels.astype('uint8')
