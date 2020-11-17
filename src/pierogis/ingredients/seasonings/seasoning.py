@@ -34,7 +34,7 @@ class Seasoning(Ingredient):
         self.exclude_pixel = exclude_pixel
 
     def season(self, ingredient: Ingredient):
-        ingredient.mask = self.cook(ingredient.pixels)
+        ingredient.mask = self.cook(self.target.pixels)
 
         return ingredient
 

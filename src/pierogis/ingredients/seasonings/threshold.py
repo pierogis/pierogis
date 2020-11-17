@@ -4,6 +4,9 @@ from pierogis.ingredients.seasonings.seasoning import Seasoning
 
 
 class Threshold(Seasoning):
+    """A seasoning that compares the average value (intesity) of each pixel in the :param target pixel array.
+    When used in a mix, the threshold will target the pixel array below it if it has not been initialized with target
+    """
 
     def prep(self, lower_threshold: int = 0, upper_threshold: int = 255, **kwargs):
         self.lower_threshold = lower_threshold

@@ -17,21 +17,21 @@ class Ingredient:
 
     def __init__(self, pixels: np.ndarray = None, origin: tuple = (0, 0), height: int = 0, width: int = 0,
                  opacity: int = 100, mask: np.ndarray = None):
-        self.__pixels = pixels
+        self._pixels = pixels
         self.origin = origin
         self.opacity = opacity
         self.__height = height
         self.__width = width
         self.mask = mask
 
-        if self.__pixels is not None:
+        if self._pixels is not None:
             self.__height = self.pixels.shape[0]
             self.__width = self.pixels.shape[1]
 
     @property
     def pixels(self):
-        pixels = self.__pixels
-        if self.__pixels is None:
+        pixels = self._pixels
+        if self._pixels is None:
             pixels = np.full(self.shape, self.default_pixel)
 
         return pixels
@@ -82,7 +82,7 @@ class Ingredient:
         if mask is None:
             binary_array = np.full(cooked_pixels.shape[:2], True)
         else:
-            binary_array = np.all(mask == self._white_pixel)
+            binary_array = np.all(mask == self._white_pixel, axis=2)
         masked_pixels[binary_array] = cooked_pixels[binary_array]
 
         return masked_pixels
