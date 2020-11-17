@@ -8,20 +8,34 @@ class Sort(Ingredient):
         self.target = kwargs.get('target')
         self.delimiter = kwargs.get('delimiter', np.array([255, 255, 255]))
 
+    # def cook(self, pixels: np.ndarray):
+    #     mask = self.mask
+    #     boolean_array = np.all(mask == self._white_pixel, axis=2)
+    #
+    #     # false indicates that the pixel should not be sorted
+    #
+    #     intensities = np.average(pixels, axis=2)
+    #     indices = np.argsort(intensities)
+    #
+    #     sorted_pixels = pixels[np.arange(len(pixels))[:, np.newaxis], indices]
+    #
+    #     return sorted_pixels
+
     def cook(self, pixels: np.ndarray):
         mask = self.mask
         boolean_array = np.all(mask == self._white_pixel, axis=2)
-
         # false indicates that the pixel should not be sorted
 
-        a = pixels[boolean_array]
-
-        b = np.split(boolean_array)
-
         intensities = np.average(pixels, axis=2)
-        a  =intensities[boolean_array]
-        indices[boolean_array] = np.argsort(intensities[boolean_array])
+        start = 0
+        end = 3
+        j = 0
+        ind = np.array([[0]])
+        a = intensities[ind]
+        intensities[ind] = np.sort(intensities[ind])
 
-        sorted_pixels = pixels[np.arange(len(pixels))[:, np.newaxis], indices[boolean_array]]
+        indices = np.argsort(intensities)
+
+        sorted_pixels = pixels[np.arange(len(pixels))[:, np.newaxis], indices]
 
         return sorted_pixels
