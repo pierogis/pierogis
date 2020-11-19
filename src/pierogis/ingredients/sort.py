@@ -26,6 +26,20 @@ class Sort(Ingredient):
         boolean_array = np.all(mask == self._white_pixel, axis=2)
         # false indicates that the pixel should not be sorted
 
+        # recursive sort
+        # find the index of the first false along the sort axis for each off axis
+        # color all after this index black
+        # set first from i= 0 j= first i
+        # for each consecutive i j in the splits
+        #   row[0:i] = white
+        #   row[i:j] = pixels
+        #   row{j:] = black
+        #   crop the left to the lowest non white index
+        #   crop the right to the highest black index
+        #   cook these pixels with a new sort
+        # "terminating condition" is that there is no mask
+        # create a sort of each set of pixels
+
         intensities = np.average(pixels, axis=2)
         start = 0
         end = 3

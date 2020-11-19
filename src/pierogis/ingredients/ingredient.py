@@ -66,10 +66,6 @@ class Ingredient:
         return image
 
     # @abstractmethod
-    def prep(self):
-        pass
-
-    # @abstractmethod
     def cook(self, pixels: np.ndarray):
         """Performs actions on a pixel array and returns a cooked array
         """
