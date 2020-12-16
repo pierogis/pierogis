@@ -15,47 +15,52 @@ class Ingredient:
 
     default_pixel = _black_pixel
 
-    def __init__(self, pixels: np.ndarray = None, origin: tuple = (0, 0), height: int = 0, width: int = 0,
-                 opacity: int = 100, mask: np.ndarray = None):
+    def __init__(self, pixels: np.ndarray = None, origin: tuple = (0, 0), width: int = 0, height: int = 0,
+                 opacity: int = 100, mask: np.ndarray = None, **kwargs):
         self.origin = origin
         self.opacity = opacity
         self.mask = mask
 
         if pixels is None:
-            pixels = np.full((height, width, 3), self.default_pixel)
+            pixels = np.full((width, height, 3), self.default_pixel)
 
         self.pixels = pixels
 
+        self.prep(**kwargs)
+
     @property
     def width(self):
-        """(width, height)
+        """From self.pixels
         """
         return self.pixels.shape[0]
 
     @property
     def height(self):
-        """self.pixels.shape
+        """From self.pixels
         """
         return self.pixels.shape[1]
 
-    @property
-    def size(self):
-        """(width, height)
-        """
-        return self.height, self.width
+    # @property
+    # def size(self):
+    #     """(width, height)
+    #     """
+    #     return self.width, self.height
 
     @property
     def shape(self):
-        """(width, height)
+        """(width, height, 3)
         """
-        return *self.size, 3
+        return self.width, self.height, 3
+
+    def prep(self, *args, **kwargs):
+        """Parameterize the cook function
+        """
+        pass
 
     def get_image(self):
-        image = Image.fromarray(self.pixels, 'RGB')
-        print(image.load()[0, 0])
+        image = Image.fromarray(np.rot90(self.pixels), 'RGB')
         return image
 
-    # @abstractmethod
     def cook(self, pixels: np.ndarray):
         """Performs actions on a pixel array and returns a cooked array
         """

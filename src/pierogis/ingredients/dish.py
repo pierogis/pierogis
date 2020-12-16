@@ -1,29 +1,38 @@
 import numpy as np
 
 from pierogis.ingredients.ingredient import Ingredient
-from pierogis.ingredients.mix import Mix
+from pierogis.ingredients.recipe import Recipe
 
 
 class Dish(Ingredient):
     """Crop and cook an entire recipe for all pixels
     """
 
-    def prep(self, mix: Mix):
-        self.mix = mix
+    def prep(self, recipe: Recipe):
+        """Set the recipe to cook for this dish
+        """
+        self.recipe = recipe
 
     def cook(self, pixels: np.ndarray):
-        return self.mix.cook_mask(pixels)
+        """Use the recipe's cook_mask() method
+        """
+        return self.recipe.cook_mask(pixels)
 
     def serve(self):
+        """Cook the recipe and set the output to this object's pixel array
+        """
+
         pixels = self.pixels
-        if self.size == (0, 0):
-            base = self.mix.ingredients[0]
-            width, height = base.size
 
-            pixels = np.full((height, width, 3), self.default_pixel)
+        # if pixels weren't provided, create a blank canvas sized to the first element of the mix
+        if pixels.shape == (0, 0, 3):
+            base = self.recipe.ingredients[0]
+            pixels = np.full(base.shape, self.default_pixel)
 
+        # cook with these pixels as first input
         cooked_pixels = self.cook(pixels.astype('uint32'))
-
+        # ensure that the cooked pixels do not overflow 0-255
         clipped_pixels = np.clip(cooked_pixels, 0, 255)
 
+        # set the objects own pixels to the result of cooking
         self.pixels = clipped_pixels.astype('uint8')

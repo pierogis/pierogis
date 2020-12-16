@@ -5,8 +5,7 @@ if __name__ == '__main__':
     # pixels = np.random.randint(0, 255, (1, 2, 3))
     # ingredient = Ingredient(pixels=pixels)
     # ingredient.show()
-    pierogi = Pierogi()
-    pierogi.prep(file='/Users/kyle/Desktop/c50ef630aded13b32d4acc342ea04857.jpg')
+    pierogi = Pierogi(path='/Users/kyle/Desktop/c50ef630aded13b32d4acc342ea04857.jpg')
 
     palette = [
         [100, 210, 69],
@@ -18,17 +17,14 @@ if __name__ == '__main__':
         [255, 255, 255],
         [99, 94, 124]
     ]
-    quantize = Quantize()
-    quantize.prep(palette=palette)
+    quantize = Quantize(palette=palette)
 
     # quantize.season(palette=palette)
 
     # pass in lists to be mixed
-    quantize_mix = Mix()
-    quantize_mix.prep(ingredients=[pierogi, quantize])
+    quantize_recipe = Recipe(ingredients=[pierogi, quantize])
 
-    quantize_dish = Dish()
-    quantize_dish.prep(mix=quantize_mix)
+    quantize_dish = Dish(recipe=quantize_recipe)
 
     quantize_dish.serve()
     quantize_dish.show()

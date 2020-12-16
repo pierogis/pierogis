@@ -11,11 +11,14 @@ class Pierogi(Ingredient):
     """Image container for iterative pixel manipulation
     """
 
-    def prep(self, image: Image=None, file: str=None):
+    def prep(self, image: Image = None, path: str = None):
+        """Provide either a PIL Image or a path to an image file
+        """
         if not image:
-            image = Image.open(file)
+            image = Image.open(path)
 
-        self.pixels = np.array(image.convert('RGB'))
+        # rotate the image array on receipt so that the array dimensions are (width, height, 3)
+        self.pixels = np.rot90(np.array(image.convert('RGB')), axes=(1, 0))
 
         # if self.height > 0 and self.width > 0:
         #     # truncate or fill pixels

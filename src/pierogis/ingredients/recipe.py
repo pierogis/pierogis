@@ -3,7 +3,7 @@ import numpy as np
 from pierogis.ingredients.ingredient import Ingredient
 
 
-class Mix(Ingredient):
+class Recipe(Ingredient):
 
     def prep(self, ingredients: list, **kwargs):
         if ingredients is None:
