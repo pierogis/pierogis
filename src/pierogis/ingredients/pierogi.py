@@ -15,7 +15,7 @@ class Pierogi(Ingredient):
         if not image:
             image = Image.open(file)
 
-        self._pixels = np.array(image.convert('RGB'))
+        self.pixels = np.array(image.convert('RGB'))
 
         # if self.height > 0 and self.width > 0:
         #     # truncate or fill pixels
@@ -27,3 +27,5 @@ class Pierogi(Ingredient):
         """
 
         return self.pixels.reshape(pixels.shape).astype(pixels.dtype)
+
+        # return self.pixels

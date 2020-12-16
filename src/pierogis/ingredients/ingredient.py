@@ -17,36 +17,26 @@ class Ingredient:
 
     def __init__(self, pixels: np.ndarray = None, origin: tuple = (0, 0), height: int = 0, width: int = 0,
                  opacity: int = 100, mask: np.ndarray = None):
-        self._pixels = pixels
         self.origin = origin
         self.opacity = opacity
-        self.__height = height
-        self.__width = width
         self.mask = mask
 
-        if self._pixels is not None:
-            self.__height = self.pixels.shape[0]
-            self.__width = self.pixels.shape[1]
+        if pixels is None:
+            pixels = np.full((height, width, 3), self.default_pixel)
 
-    @property
-    def pixels(self):
-        pixels = self._pixels
-        if self._pixels is None:
-            pixels = np.full(self.shape, self.default_pixel)
-
-        return pixels
+        self.pixels = pixels
 
     @property
     def width(self):
         """(width, height)
         """
-        return self.__width
+        return self.pixels.shape[0]
 
     @property
     def height(self):
-        """(width, height)
+        """self.pixels.shape
         """
-        return self.__height
+        return self.pixels.shape[1]
 
     @property
     def size(self):
@@ -58,7 +48,7 @@ class Ingredient:
     def shape(self):
         """(width, height)
         """
-        return (*self.size, 3)
+        return *self.size, 3
 
     def get_image(self):
         image = Image.fromarray(self.pixels, 'RGB')

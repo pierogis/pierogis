@@ -18,6 +18,8 @@ class Quantize(Ingredient):
         self.palette = palette
 
     def cook(self, pixels: np.ndarray):
+        a = np.expand_dims(pixels, axis=2)
+        b = np.expand_dims(self.palette, axis=(0, 1))
         differences = np.expand_dims(pixels, axis=2) - np.expand_dims(self.palette, axis=(0, 1))
 
         distances = np.sqrt(np.sum(differences ** 2, axis=3))

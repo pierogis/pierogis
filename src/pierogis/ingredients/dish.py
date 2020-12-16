@@ -20,10 +20,10 @@ class Dish(Ingredient):
             base = self.mix.ingredients[0]
             width, height = base.size
 
-            pixels = np.full((width, height), self.default_pixel)
+            pixels = np.full((height, width, 3), self.default_pixel)
 
         cooked_pixels = self.cook(pixels.astype('uint32'))
 
         clipped_pixels = np.clip(cooked_pixels, 0, 255)
 
-        self._pixels = clipped_pixels.astype('uint8')
+        self.pixels = clipped_pixels.astype('uint8')
