@@ -8,11 +8,13 @@ from pierogis.ingredients.ingredient import Ingredient
 
 
 class Pierogi(Ingredient):
-    """Image container for iterative pixel manipulation
+    """
+    Image container for iterative pixel manipulation
     """
 
     def prep(self, image: Image = None, path: str = None):
-        """Provide either a PIL Image or a path to an image file
+        """
+        Provide either a PIL Image or a path to an image file
         """
         if not image:
             image = Image.open(path)
@@ -30,5 +32,3 @@ class Pierogi(Ingredient):
         """
 
         return self.pixels.reshape(pixels.shape).astype(pixels.dtype)
-
-        # return self.pixels

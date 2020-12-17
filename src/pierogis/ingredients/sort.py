@@ -22,6 +22,11 @@ class Sort(Ingredient):
     #     return sorted_pixels
 
     def cook(self, pixels: np.ndarray):
+        """
+        Sort within each sequence group of contiguous white pixels in the mask (may be all white)
+
+        NOT WORKING
+        """
         mask = self.mask
         boolean_array = np.all(mask == self._white_pixel, axis=2)
         # false indicates that the pixel should not be sorted

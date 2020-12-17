@@ -5,21 +5,25 @@ from pierogis.ingredients.recipe import Recipe
 
 
 class Dish(Ingredient):
-    """Crop and cook an entire recipe for all pixels
+    """
+    Crop and cook an entire recipe for all pixels
     """
 
     def prep(self, recipe: Recipe):
-        """Set the recipe to cook for this dish
+        """
+        Set the recipe to cook for this dish
         """
         self.recipe = recipe
 
     def cook(self, pixels: np.ndarray):
-        """Use the recipe's cook_mask() method
+        """
+        Use the recipe's cook_mask() method
         """
         return self.recipe.cook_mask(pixels)
 
     def serve(self):
-        """Cook the recipe and set the output to this object's pixel array
+        """
+        Cook the recipe and set the output to this object's pixel array
         """
 
         pixels = self.pixels
