@@ -14,18 +14,16 @@ class TestDish():
     def test_threshold(self):
         pixels = np.random.randint(0, 255, (10, 15, 3))
         ingredient = Ingredient(pixels=pixels)
-        ingredient.show()
 
         threshold = Threshold(upper_threshold=100)
 
-        # pass in lists to be recipeed
+        # pass in lists to be mixed
         threshold_recipe = Recipe(ingredients=[ingredient, threshold])
         # recipe = Recipe(recipe)
 
         threshold_dish = Dish(height=ingredient.height, width=ingredient.width, recipe=threshold_recipe)
 
         threshold_dish.serve()
-        threshold_dish.show()
 
     def test_season(self):
         pixels = np.random.randint(150, 255, (10, 10, 3))
@@ -67,18 +65,21 @@ class TestDish():
         quantize_dish.serve()
 
     def test_sort(self):
-        pixels = np.random.randint(0, 255, (10, 10, 3))
-        ingredient = Ingredient(pixels=pixels)
+        # pixels = np.random.randint(0, 255, (10, 10, 3))
+        # ingredient = Ingredient(pixels=pixels)
+
+        pierogi = Pierogi(path='/Users/kyle/Desktop/c50ef630aded13b32d4acc342ea04857.jpg')
 
         # seasoning is for things that process but don't return a array
-        threshold = Threshold(target=ingredient, upper_threshold=100)
+        threshold = Threshold(target=pierogi, upper_threshold=80)
 
         sort = Sort()
         # apply a threshold mask to the sort
         threshold.season(sort)
 
-        sort_recipe = Recipe(ingredients=[ingredient, sort])
+        sort_recipe = Recipe(ingredients=[pierogi, sort])
 
-        sort_dish = Dish(height=ingredient.height, width=ingredient.width, recipe=sort_recipe)
+        sort_dish = Dish(height=pierogi.height, width=pierogi.width, recipe=sort_recipe)
 
         sort_dish.serve()
+        sort_dish.show()

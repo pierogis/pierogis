@@ -2,24 +2,12 @@ import numpy as np
 
 from pierogis.ingredients.ingredient import Ingredient
 
+
 class Sort(Ingredient):
 
     def prep(self, **kwargs):
         self.target = kwargs.get('target')
         self.delimiter = kwargs.get('delimiter', np.array([255, 255, 255]))
-
-    # def cook(self, pixels: np.ndarray):
-    #     mask = self.mask
-    #     boolean_array = np.all(mask == self._white_pixel, axis=2)
-    #
-    #     # false indicates that the pixel should not be sorted
-    #
-    #     intensities = np.average(pixels, axis=2)
-    #     indices = np.argsort(intensities)
-    #
-    #     sorted_pixels = pixels[np.arange(len(pixels))[:, np.newaxis], indices]
-    #
-    #     return sorted_pixels
 
     def cook(self, pixels: np.ndarray):
         """
@@ -28,33 +16,36 @@ class Sort(Ingredient):
         NOT WORKING
         """
         mask = self.mask
-        boolean_array = np.all(mask == self._white_pixel, axis=2)
         # false indicates that the pixel should not be sorted
+        boolean_array = np.all(mask == self._white_pixel, axis=2)
 
-        # recursive sort
-        # find the index of the first false along the sort axis for each off axis
-        # color all after this index black
-        # set first from i= 0 j= first i
-        # for each consecutive i j in the splits
-        #   row[0:i] = white
-        #   row[i:j] = pixels
-        #   row{j:] = black
-        #   crop the left to the lowest non white index
-        #   crop the right to the highest black index
-        #   cook these pixels with a new sort
-        # "terminating condition" is that there is no mask
-        # create a sort of each set of pixels
+        sorted_pixels = pixels
+        # loop through one axis
+        for i in range(pixels.shape[0]):
+            # get that axis
+            axis = pixels[i]
+            # and the axis for the mask-truth
+            boolean_axis = boolean_array[i]
+            # get the indices for this row on the mask that are True
+            masked_indices_axis = np.nonzero(np.invert(boolean_axis))[0]
+            # split up the axis into sub groups at the indices where the mask is inactive
+            sort_groups = np.split(axis, masked_indices_axis)
 
-        intensities = np.average(pixels, axis=2)
-        start = 0
-        end = 3
-        j = 0
-        ind = np.array([[0]])
-        a = intensities[ind]
-        intensities[ind] = np.sort(intensities[ind])
+            sorted_groups = []
+            # loop through the groups
+            for group in sort_groups:
+                # np.sort(group)
+                # if the subgroup to be sorted contains no pixels or just one pixel, ignore
+                if group.size > 3:
+                    # intensity as the sorting criterion
+                    intensities = np.average(group, axis=1)
+                    # get "sort order" indices of the intensities of this group
+                    indices = np.argsort(intensities)
+                    # sort the group by these indices
+                    group = group[indices]
+                sorted_groups.append(group)
 
-        indices = np.argsort(intensities)
-
-        sorted_pixels = pixels[np.arange(len(pixels))[:, np.newaxis], indices]
+            # concatenate the row back together, sorted in the mask
+            sorted_pixels[i] = np.concatenate(sorted_groups)
 
         return sorted_pixels
