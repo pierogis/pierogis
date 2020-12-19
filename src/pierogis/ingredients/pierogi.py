@@ -1,10 +1,11 @@
 """pierogi.py
 """
+import io
 
 from PIL import Image
 import numpy as np
 
-from pierogis.ingredients.ingredient import Ingredient
+from .ingredient import Ingredient
 
 
 class Pierogi(Ingredient):
@@ -28,7 +29,8 @@ class Pierogi(Ingredient):
         #     pass
 
     def cook(self, pixels: np.ndarray):
-        """Return a cropped array of the image
+        """
+        Return a cropped array of the image
         """
 
         return self.pixels.reshape(pixels.shape).astype(pixels.dtype)

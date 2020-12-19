@@ -56,18 +56,19 @@ class Ingredient:
         """
         return self.width, self.height, 3
 
-    def prep(self, *args, **kwargs):
-        """
-        Parameterize the cook function
-        """
-        pass
-
-    def get_image(self):
+    @property
+    def image(self):
         """
         Turn the numpy array into a PIL Image
         """
         image = Image.fromarray(np.rot90(self.pixels), 'RGB')
         return image
+
+    def prep(self, *args, **kwargs):
+        """
+        Parameterize the cook function
+        """
+        pass
 
     def cook(self, pixels: np.ndarray):
         """
@@ -107,4 +108,11 @@ class Ingredient:
         """
         Open the image view to display the array
         """
-        self.get_image().show()
+        self.image.show()
+
+    def save(self, path):
+        """
+        Save the image to the given path
+        """
+
+        self.image.save(path)

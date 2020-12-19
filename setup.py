@@ -7,7 +7,12 @@ setup(
     package_dir={'': 'src'},
     include_package_data=True,
     install_requires=[
-        'Pillow',
-        'numpy'
+        'Pillow>=8.0.1',
+        'numpy>=1.19.4',
+        'click'
     ],
+    entry_points='''
+            [console_scripts]
+            pierogis=pierogis.scripts:cli
+        ''',
 )
