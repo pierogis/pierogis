@@ -32,19 +32,19 @@ class Seasoning(Ingredient):
             exclude_pixel = self._black_pixel
         self.exclude_pixel = exclude_pixel
 
-    def season(self, ingredient: Ingredient):
+    def season(self, recipient: Ingredient):
         """
         Set the input ingredients mask to the output of cook
         Will cook :param ingredient or self.target, if present
         """
 
-        target_pixels = ingredient.pixels
+        recipient_pixels = recipient.pixels
         if self.target is not None:
-            target_pixels = self.target.pixels
+            recipient_pixels = self.target.pixels
 
-        ingredient.mask = self.cook(target_pixels)
+        recipient.mask = self.cook(recipient_pixels)
 
-        return ingredient
+        return recipient
 
     def cook(self, pixels: np.ndarray):
         # tries to use self.target and defaults to the passed in pixels

@@ -6,3 +6,7 @@ from .ingredients import Quantize
 from .ingredients import Sort
 from .ingredients.seasonings import Seasoning
 from .ingredients.seasonings import Threshold
+
+from .chef import Chef
+
+__version__ = '0.0.1'

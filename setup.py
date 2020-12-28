@@ -8,11 +8,11 @@ setup(
     include_package_data=True,
     install_requires=[
         'Pillow>=8.0.1',
-        'numpy>=1.19.4',
-        'click'
+        'numpy>=1.19.4'
     ],
-    entry_points='''
-            [console_scripts]
-            pierogis=pierogis.scripts:cli
-        ''',
+    entry_points={
+        'console_scripts': [
+            "pierogis=pierogis.__main__:main"
+        ]
+    }
 )

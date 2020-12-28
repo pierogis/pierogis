@@ -7,3 +7,5 @@ venv
 
 # vscode
 .vscode
+/dist/
+/build/

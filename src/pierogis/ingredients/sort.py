@@ -2,13 +2,16 @@ import numpy as np
 
 from .ingredient import Ingredient
 from .rotate import Rotate
+from .seasonings import Seasoning, Threshold
 
 
 class Sort(Ingredient):
 
-    def prep(self, rotate: Rotate = None, delimiter: np.ndarray = np.array([255, 255, 255]), **kwargs):
+    def prep(self, rotate: Rotate = None, seasoning: Seasoning = None,
+             delimiter: np.ndarray = np.array([255, 255, 255]), **kwargs):
         """
         :param rotate define the direction to rotate on. cook sorts from bottom to top after rotation, then unrotates
+        :param seasoning provide the seasoning as a mask
         :param delimiter the pixel that should be used as the sort subgroup delimiter
 
         Extra kwargs get passed to the Rotate if one is not provided
@@ -19,6 +22,10 @@ class Sort(Ingredient):
             rotate = Rotate(**kwargs)
 
         self.rotate = rotate
+
+        # apply seasoning as mask if provided
+        if seasoning is not None:
+            seasoning.season(self)
 
     def cook(self, pixels: np.ndarray):
         """

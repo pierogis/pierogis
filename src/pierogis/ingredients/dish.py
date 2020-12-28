@@ -39,4 +39,6 @@ class Dish(Ingredient):
         clipped_pixels = np.clip(cooked_pixels, 0, 255)
 
         # set the objects own pixels to the result of cooking
-        self.pixels = clipped_pixels.astype('uint8')
+        ingredient = Ingredient(pixels=clipped_pixels.astype('uint8'))
+
+        return ingredient

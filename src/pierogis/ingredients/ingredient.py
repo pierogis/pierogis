@@ -110,9 +110,9 @@ class Ingredient:
         """
         self.image.show()
 
-    def save(self, path):
+    def save(self, path, format='PNG'):
         """
         Save the image to the given path
         """
 
-        self.image.save(path)
+        self.image.save(path, format=format)
