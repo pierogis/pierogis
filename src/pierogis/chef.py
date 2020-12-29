@@ -38,6 +38,27 @@ class Chef:
             'recipe': recipe_parser
         }
 
+    def read_recipe(self, ingredients, season_links, recipes, file_links, recipe_text):
+        lines = recipe_text.split('\n')
+
+        parser = argparse.ArgumentParser()
+        subparsers = parser.add_subparsers()
+        for command, command_parser in self.menu.items():
+            subparsers.add_parser(command, parents=[command_parser], add_help=False)
+
+        for i in range(len(lines)):
+            line = lines[i]
+            phrases = line.split()
+
+            parsed = parser.parse_args(phrases)
+            parsed_vars = vars(parsed)
+            create_dish_desc = parsed_vars.pop('create_dish_desc')
+
+            ingredients, season_links, recipes, file_links = create_dish_desc(ingredients, season_links, recipes,
+                                                                              file_links, **parsed_vars)
+
+        return ingredients, season_links, recipes, file_links
+
     def create_recipe_dicts(self, ingredients, season_links, recipes, file_links, recipe_path, **kwargs):
         try:
             with open(recipe_path) as recipe_file:
@@ -50,8 +71,8 @@ class Chef:
             print(err)
 
     def create_pierogi_desc(self, ingredients, season_links, recipes, file_links, path):
-        pierogi_uuid = uuid.uuid4()
-        file_uuid = uuid.uuid4()
+        pierogi_uuid = str(uuid.uuid4())
+        file_uuid = str(uuid.uuid4())
 
         ingredients[pierogi_uuid] = {
             'type': 'pierogi',
@@ -80,7 +101,7 @@ class Chef:
                     **kwargs
                 }
             }
-            sort_uuid = uuid.uuid4()
+            sort_uuid = str(uuid.uuid4())
             ingredients[sort_uuid] = sort_dict
 
             # check for implied threshold
@@ -95,7 +116,7 @@ class Chef:
                         'upper_threshold': upper_threshold
                     }
                 }
-                season_uuid = uuid.uuid4()
+                season_uuid = str(uuid.uuid4())
                 ingredients[season_uuid] = threshold_dict
 
                 season_links[sort_uuid] = season_uuid
@@ -110,13 +131,12 @@ class Chef:
     def create_quantize_dicts(self, **kwargs):
         return
 
-    def create_dish(self, ingredient_descs, seasoning_links, recipe_orders, file_links):
+    def cook_dish_desc(self, ingredient_descs, seasoning_links, recipe_orders, file_links):
         """
-        Create a dish from a series of descriptive dicts
+        Cook a dish from a series of descriptive dicts
         """
 
         ingredients = {}
-
         target = None
 
         for ingredient_name, ingredient_desc in ingredient_descs.items():
@@ -131,13 +151,6 @@ class Chef:
             ingredient = ingredient_class(*ingredient_desc['args'], **ingredient_desc['kwargs'])
 
             ingredients[ingredient_name] = ingredient
-
-        # for ingredient_name, ingredient in ingredients.items():
-        #     # if an ingredient has a target we should look it up in the ingredient dictionary
-        #     target_name = getattr(ingredient, 'target', None)
-        #     if target_name is not None:
-        #         target = ingredients[target_name]
-        #         ingredient.target = target
 
         for recipe_order in recipe_orders:
             recipe = Recipe(ingredients=[])
@@ -163,66 +176,3 @@ class Chef:
             target = dish.serve()
 
         return target
-
-    def read_recipe(self, ingredients, season_links, recipes, file_links, recipe_text):
-        lines = recipe_text.split('\n')
-
-        parser = argparse.ArgumentParser()
-        subparsers = parser.add_subparsers()
-        for command, command_parser in self.menu.items():
-            subparsers.add_parser(command, parents=[command_parser], add_help=False)
-
-        for i in range(len(lines)):
-            line = lines[i]
-            phrases = line.split()
-
-            parsed = parser.parse_args(phrases)
-            parsed_vars = vars(parsed)
-            create_dish_desc = parsed_vars.pop('create_dish_desc')
-
-            ingredients, season_links, recipes, file_links = create_dish_desc(ingredients, season_links, recipes,
-                                                                              file_links, **parsed_vars)
-
-        return ingredients, season_links, recipes, file_links
-
-    def cook_json_dish(self, output_file, ingredients_dict, recipe, files, seasons=None):
-        """
-        Use json dicts to construct ingredients and put them into a recipe in a given order
-        :param output_file:
-        :param ingredients_dict:
-        :param recipe:
-        :param files:
-        :param seasons:
-        :return:
-        """
-        ingredients = {}
-        seasonings = {}
-
-        for name, dict_ingredient in ingredients_dict.items():
-            ingredient_args = dict_ingredient.get('args')
-            ingredient_kwargs = dict_ingredient.get('kwargs', {})
-
-            path = ingredient_kwargs.pop('path', None)
-            if path is not None:
-                ingredient_kwargs['file'] = files[path]
-
-            # handle seasonings
-            target = ingredient_kwargs.get('target')
-            if target is not None:
-                seasonings['name'] = target
-
-            ingredient_class = self.ingredient_classes[dict_ingredient['type']]
-
-            ingredient = ingredient_class(*ingredient_args, **ingredient_kwargs)
-            ingredients[name] = ingredient
-
-        for season_dict in seasons:
-            seasoning = ingredients[season_dict['seasoning']]
-            recipient = ingredients[season_dict['recipient']]
-            seasoning.season(recipient)
-
-        recipe = Recipe(ingredients=[ingredients[ingredient_name] for ingredient_name in recipe])
-        dish = Dish(recipe=recipe)
-        dish.serve()
-
-        dish.save(output_file)

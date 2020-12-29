@@ -46,10 +46,12 @@ def main(args=None):
         season_links = {}
         recipes = []
         file_links = {}
-        ingredients, season_links, recipes, file_links = chef.create_pierogi_desc(ingredients, season_links, recipes, file_links, path)
-        ingredients, season_links, recipes, file_links = create_dish_desc(ingredients, season_links, recipes, file_links, **parsed_vars)
+        ingredients, season_links, recipes, file_links = chef.create_pierogi_desc(ingredients, season_links, recipes,
+                                                                                  file_links, path)
+        ingredients, season_links, recipes, file_links = create_dish_desc(ingredients, season_links, recipes,
+                                                                          file_links, **parsed_vars)
 
-        dish = chef.create_dish(ingredients, season_links, recipes, file_links)
+        cooked_dish = chef.cook_dish_desc(ingredients, season_links, recipes, file_links)
 
         output_filename = output
         if output_filename is None:
@@ -57,7 +59,8 @@ def main(args=None):
 
             output_filename = file_name + ".png"
             print("No output path provided, using " + output_filename)
-        dish.save(output_filename)
+
+        cooked_dish.save(output_filename)
 
 
 if __name__ == "__main__":
