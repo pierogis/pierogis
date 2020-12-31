@@ -40,7 +40,7 @@ class Chef:
         }
 
     def read_recipe(self, ingredients, seasoning_links, recipes, file_links, recipe_text):
-        lines = recipe_text.split('\n')
+        lines = recipe_text.split(';')
 
         parser = argparse.ArgumentParser()
         subparsers = parser.add_subparsers()
@@ -51,7 +51,7 @@ class Chef:
             line = lines[i]
             phrases = line.split()
 
-            parsed = parser.parse_args(phrases)
+            parsed, unknown = parser.parse_known_args(phrases)
             parsed_vars = vars(parsed)
             create_dish_desc = parsed_vars.pop('create_dish_desc')
 
