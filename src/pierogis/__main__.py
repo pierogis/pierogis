@@ -15,13 +15,13 @@ def main(args=None):
     chef = Chef()
 
     # create top level parser
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='** image processing pipelines **')
     subparsers = parser.add_subparsers()
 
     # create parent parser to pass down arguments only
     parent_parser = argparse.ArgumentParser()
-    parent_parser.add_argument('path', default='./')
-    parent_parser.add_argument('-o', '--output', help='Path and filename to save resulting image')
+    parent_parser.add_argument('path', default='./', help='path to file or directory to use as input')
+    parent_parser.add_argument('-o', '--output', help='path and filename to save resulting image')
 
     for command, command_parser in chef.menu.items():
         # inherit the parent class arguments and the arguments specific to a subcommand
