@@ -1,5 +1,6 @@
 from setuptools import setup
 from setuptools import find_packages
+from setuptools_rust import RustExtension, Binding
 
 setup(
     name='pierogis',
@@ -10,9 +11,11 @@ setup(
         'Pillow>=8.0.1',
         'numpy>=1.19.4'
     ],
+    rust_extensions=[RustExtension("rpierogis", binding=Binding.PyO3)],
     entry_points={
         'console_scripts': [
             "pierogis=pierogis.__main__:main"
         ]
-    }
+    },
+    zip_safe=False
 )

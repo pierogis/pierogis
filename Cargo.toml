@@ -1,0 +1,21 @@
+[package]
+name = "rpierogis"
+version = "0.1.0"
+authors = ["Kyle Moore <moore.kyle39@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "quantize"
+crate-type = ["cdylib"]
+
+[dependencies]
+numpy = "0.13"
+ndarray = "0.14"
+
+[dependencies.pyo3]
+version = "0.13"
+features = ["extension-module"]
+
+[dependencies.rscolorq]
+version = "0.1"
+default-features = false

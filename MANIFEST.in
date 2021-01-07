@@ -1,0 +1,4 @@
+include Cargo.toml
+recursive-include src *
+
+global-exclude *.py[cod]
