@@ -1,6 +1,7 @@
 import numpy as np
 
-from pierogis.ingredients.seasonings.seasoning import Seasoning
+from rpierogis import ingredients
+from .seasoning import Seasoning
 
 
 class Threshold(Seasoning):
@@ -24,8 +25,23 @@ class Threshold(Seasoning):
 
     def cook(self, pixels: np.ndarray):
         """
-        Average values of rgb in :param pixels outside of intensity thresholds are true (include_pixel)
+        Pixels with brightness >= upper_threshold or <= lower_threshold are replaced by include pixel
+        brightness = r * 0.299 + g * 0.587 + b * 0.114
+
+        Parallel computation in rust is 10x speedup
         """
+
+        cooked_pixels = ingredients.threshold(pixels.astype(dtype=np.dtype(float)), self.upper_threshold,
+                                              self.include_pixel,
+                                              self.exclude_pixel)
+
+        return cooked_pixels
+
+    def cook_np(self, pixels: np.ndarray):
+        """
+        Perform the same operation as cook, but only in numpy
+        """
+
         include_pixels = np.resize(self.include_pixel, pixels.shape)
         exclude_pixels = np.resize(self.exclude_pixel, pixels.shape)
 
@@ -37,7 +53,7 @@ class Threshold(Seasoning):
         # use exclude_pixels as the base
         cooked_pixels = exclude_pixels
         # get intensities from average of rgb
-        intensities_array = np.average(target_pixels, 2)
+        intensities_array = np.sum(target_pixels * np.asarray([0.299, 0.587, 0.114]), axis=2)
         # if intensity <= lower or >= upper, True
         boolean_array = np.logical_or(intensities_array >= self.upper_threshold,
                                       intensities_array <= self.lower_threshold)

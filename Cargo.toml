@@ -10,7 +10,8 @@ crate-type = ["cdylib"]
 
 [dependencies]
 numpy = "0.13"
-ndarray = "0.14"
+ndarray = { version = "0.14.0", features = ["rayon"]}
+rayon = "1.5"
 
 [dependencies.pyo3]
 version = "0.13"

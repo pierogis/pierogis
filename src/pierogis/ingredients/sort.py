@@ -33,17 +33,17 @@ class Sort(Ingredient):
         """
         # rotate self.mask and pixels to correspond to self.angle
         rotate = self.rotate
-        oriented_mask = rotate.cook(self.mask)
-        oriented_pixels = rotate.cook(pixels)
+        rotated_mask = rotate.cook(self.mask)
+        rotated_pixels = rotate.cook(pixels)
 
         # false indicates that the pixel should not be sorted
-        boolean_array = np.all(oriented_mask == self._white_pixel, axis=2)
+        boolean_array = np.all(rotated_mask == self._white_pixel, axis=2)
 
-        sorted_pixels = oriented_pixels
+        sorted_pixels = rotated_pixels
         # loop through one axis
-        for i in range(oriented_pixels.shape[0]):
+        for i in range(rotated_pixels.shape[0]):
             # get that axis
-            axis = oriented_pixels[i]
+            axis = rotated_pixels[i]
             # and the axis for the mask-truth
             boolean_axis = boolean_array[i]
             # get the indices for this row on the mask that are True

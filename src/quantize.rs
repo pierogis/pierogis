@@ -1,53 +1,31 @@
-use ndarray::Array;
+use ndarray::ArrayView3;
+use itertools::Itertools;
 
-fn quantize(array: ArrayView<'_, u8>) -> Vec<u8> {
-    let width = array.width;
-    let height = array.height;
+pub fn cook(pixels: &[f64], palette_size: u8) -> Vec<u8> {
 
-    use rscolorq::{color::Rgb, Matrix2d, Params};
-
-    // Create the output buffer and quantized palette index buffer
-    let mut imgbuf = Vec::with_capacity(width * height * 3);
-    let mut matrix = Matrix2d::new(width, height);
-
-    // Build the quantization parameters, verify if accepting user input
-    let mut conditions = Params::new();
-    conditions.palette_size(palette_size);
-    conditions.verify_parameters()?;
-
-    // Convert the input image buffer from Rgb<u8> to Rgb<f64>
-    let image = Matrix2d::from_vec(
-        array.iter()
-            .map(|&c| Rgb {
-                red: c[0] as f64 / 255.0,
-                green: c[1] as f64 / 255.0,
-                blue: c[2] as f64 / 255.0,
-            })
-            .collect(),
-        width,
-        height,
-    );
-
-    let mut palette = Vec::with_capacity(palette_size as usize);
-
-    rscolorq::spatial_color_quant(&image, &mut matrix, &mut palette, &conditions);
-
-    // Convert the Rgb<f64> palette to Rgb<u8>
-    let palette = palette
-        .iter()
-        .map(|&c| {
-            let color = 255.0 * c;
-            [
-                color.red.round() as u8,
-                color.green.round() as u8,
-                color.blue.round() as u8,
-            ]
-        })
-        .collect::<Vec<[u8; 3]>>();
-
-    // Create the final image by color lookup from the palette
-    matrix.iter().for_each(|&c| {
-        imgbuf.extend_from_slice(&*palette.get(c as usize).unwrap());
-    });
-    imgbuf
 }
+
+// NOTES on spatial quantization
+
+// COLOR PERCEPTION
+// There is a notion of the neighborhood N_ik that points to other pixels j
+// i,j represents the pixel indices in the flattened pixel grid - i is x and y
+// In the paper the pixels are indexed scanning rows left to right, then moving down the row (raster scan order)
+// k represents the 1,2,3 index in rgb or any color system (3tuple)
+
+// There is also a kernel function W that uses the relative location (distance?) of i and j
+// to create a 3tuple of "perception filter" weights for those pixel indicies -> w_ijk
+
+// With the pixel defined as x_j, the sum of the elementwise product of weights 3tuple w_ij and pixel 3tuple (rgb) x_j
+// for those j in the neighborhood of i is a general definition of the perceived color of pixel at i
+// subject to the kernel function that is being used to specify perceieved value of color
+
+// The weights w_ij for pixel-i's neighborhood should sum to 1
+// In the paper they used w_ij = exp(-euclidean distance between two pixels at i and j / a variance)
+
+// COST FUNCTION
+// There is a set of 3tuple colors Y that constitute a palette. y_v is vth color in the palette
+// M is a 2d boolean array, M_iv being 1 means that pixel at i is quantized to color at v
+// The sum of each pixel's ((before vs after-quantization filtered 3tuple euclidean distance)) is the cost
+// The optimization problem is finding the combination of colors (Y) and assignements (M) that minimizes cost
+
