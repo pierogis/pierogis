@@ -4,6 +4,42 @@ import uuid
 from pierogis import Dish, Pierogi, Sort, Quantize, Threshold, Recipe
 
 
+class DishDescription:
+    def __init__(self, ingredients=None, seasoning_links=None, recipes=None, file_links=None):
+        if ingredients is None:
+            ingredients = {}
+        if seasoning_links is None:
+            seasoning_links = {}
+        if recipes is None:
+            recipes = []
+        if file_links is None:
+            file_links = {}
+
+        self.ingredients = ingredients
+        self.seasoning_links = seasoning_links
+        self.recipes = recipes
+        self.file_links = file_links
+
+    def add_ingredient(self, ingredient_desc):
+        pierogi_uuid = str(uuid.uuid4())
+
+        self.ingredients[pierogi_uuid] = ingredient_desc
+
+        return pierogi_uuid
+
+    def add_file_link(self, path):
+        file_uuid = str(uuid.uuid4())
+        self.file_links[file_uuid] = path
+
+        return file_uuid
+
+    def add_recipe(self, recipe):
+        self.recipes.append(recipe)
+
+    def add_seasoning(self, target_uuid, season_uuid):
+        self.seasoning_links[target_uuid] = season_uuid
+
+
 class Chef:
     ingredient_classes = {
         'pierogi': Pierogi,
@@ -18,7 +54,7 @@ class Chef:
 
     def __init__(self):
         sort_parser = argparse.ArgumentParser(add_help=False)
-        sort_parser.set_defaults(create_dish_desc=self.create_sort_desc)
+        sort_parser.set_defaults(add_dish_desc=self.add_sort_desc)
         sort_parser.add_argument('-t', '--turns', default=0, type=int)
         sort_parser.add_argument('-l', '--lower-threshold', default=64, type=int,
                                  help='Pixels with lightness below this threshold will not get sorted')
@@ -26,11 +62,11 @@ class Chef:
                                  help='Pixels with lightness above this threshold will not get sorted')
 
         quantize_parser = argparse.ArgumentParser(add_help=False)
-        quantize_parser.set_defaults(create_dish_desc=self.create_quantize_desc)
+        quantize_parser.set_defaults(add_dish_desc=self.add_quantize_desc)
         quantize_parser.add_argument('-k', '--colors', default=8)
 
         recipe_parser = argparse.ArgumentParser(add_help=False)
-        recipe_parser.set_defaults(create_dish_desc=self.create_recipe_desc)
+        recipe_parser.set_defaults(add_dish_desc=self.add_recipe_desc)
         recipe_parser.add_argument('recipe_path', type=str, default='./recipe.txt')
 
         self.menu = {
@@ -39,7 +75,7 @@ class Chef:
             'recipe': recipe_parser
         }
 
-    def read_recipe(self, ingredients, seasoning_links, recipes, file_links, recipe_text):
+    def read_recipe(self, dish_description, recipe_text):
         lines = recipe_text.split(';')
 
         parser = argparse.ArgumentParser()
@@ -53,29 +89,26 @@ class Chef:
 
             parsed, unknown = parser.parse_known_args(phrases)
             parsed_vars = vars(parsed)
-            create_dish_desc = parsed_vars.pop('create_dish_desc')
+            add_dish_desc = parsed_vars.pop('add_dish_desc')
 
-            ingredients, seasoning_links, recipes, file_links = create_dish_desc(ingredients, seasoning_links, recipes,
-                                                                              file_links, **parsed_vars)
+            dish_description = add_dish_desc(dish_description, **parsed_vars)
 
-        return ingredients, seasoning_links, recipes, file_links
+        return dish_description
 
-    def create_recipe_desc(self, ingredients, seasoning_links, recipes, file_links, recipe_path, **kwargs):
+    def add_recipe_desc(self, dish_description, recipe_path, **kwargs):
         try:
             with open(recipe_path) as recipe_file:
-                ingredients, seasoning_links, recipes, file_links = self.read_recipe(ingredients, seasoning_links, recipes,
-                                                                             file_links, recipe_file.read())
+                dish_description = self.read_recipe(dish_description, recipe_file.read())
 
-            return ingredients, seasoning_links, recipes, file_links
+            return dish_description
 
         except Exception as err:
             print(err)
 
-    def create_pierogi_desc(self, ingredients, seasoning_links, recipes, file_links, path):
-        pierogi_uuid = str(uuid.uuid4())
-        file_uuid = str(uuid.uuid4())
+    def add_pierogi_desc(self, dish_description, image_path):
+        file_uuid = dish_description.add_file_link(image_path)
 
-        ingredients[pierogi_uuid] = {
+        ingredient_desc = {
             'type': 'pierogi',
             'args': [],
             'kwargs': {
@@ -83,13 +116,13 @@ class Chef:
             }
         }
 
-        file_links[file_uuid] = path
+        pierogi_uuid = dish_description.add_ingredient(ingredient_desc)
 
-        recipes.append([pierogi_uuid])
+        dish_description.add_recipe([pierogi_uuid])
 
-        return ingredients, seasoning_links, recipes, file_links
+        return dish_description
 
-    def create_sort_desc(self, ingredients, seasoning_links, recipes, file_links, **kwargs):
+    def add_sort_desc(self, dish_desc, **kwargs):
         """
         Sort pixels in an image by intensity
         """
@@ -102,8 +135,7 @@ class Chef:
                     **kwargs
                 }
             }
-            sort_uuid = str(uuid.uuid4())
-            ingredients[sort_uuid] = sort_dict
+            sort_uuid = dish_desc.add_ingredient(sort_dict)
 
             # check for implied threshold
             lower_threshold = kwargs.pop('lower_threshold')
@@ -117,19 +149,20 @@ class Chef:
                         'upper_threshold': upper_threshold
                     }
                 }
-                season_uuid = str(uuid.uuid4())
-                ingredients[season_uuid] = threshold_dict
+                season_uuid = dish_desc.add_ingredient(threshold_dict)
+                dish_desc.add_seasoning(sort_uuid, season_uuid)
 
-                seasoning_links[sort_uuid] = season_uuid
+            dish_desc.add_recipe([sort_uuid])
 
-            recipes.append([sort_uuid])
-
-            return ingredients, seasoning_links, recipes, file_links
+            return dish_desc
 
         except Exception as err:
             print(err)
 
-    def create_quantize_desc(self, ingredients, seasoning_links, recipes, file_links, **kwargs):
+    def add_quantize_desc(self, dish_desc, **kwargs):
+        """
+        Create a description of a quantize recipe
+        """
         quantize_dict = {
             'type': 'quantize',
             'args': [],
@@ -137,17 +170,20 @@ class Chef:
                 **kwargs
             }
         }
-        quantize_uuid = str(uuid.uuid4())
-        ingredients[quantize_uuid] = quantize_dict
+        quantize_uuid = dish_desc.add_ingredient(quantize_dict)
 
-        recipes.append([quantize_uuid])
+        dish_desc.add_recipe([quantize_uuid])
 
-        return ingredients, seasoning_links, recipes, file_links
+        return dish_desc
 
-    def cook_dish_desc(self, ingredient_descs, seasoning_links, recipe_orders, file_links):
+    def cook_dish_desc(self, dish_description):
         """
         Cook a dish from a series of descriptive dicts
         """
+        ingredient_descs = dish_description.ingredients
+        file_links = dish_description.file_links
+        recipe_orders = dish_description.recipes
+        seasoning_links = dish_description.seasoning_links
 
         ingredients = {}
         target = None

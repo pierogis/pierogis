@@ -1,10 +1,10 @@
 import time
 
-from rpierogis import ingredients
+from rpierogis import recipes
 from pierogis import Threshold
 import numpy as np
 
-array = np.random.randint(0, 255, (1280, 720, 3))
+array = np.random.randint(0, 255, (400, 500, 3))
 
 def test_threshold():
     upper_threshold = 100
@@ -23,7 +23,7 @@ def test_threshold():
 
     # slice
     start = time.time()
-    slice = ingredients.threshold(array.astype(dtype=np.dtype(float)), upper_threshold, include_pixel, exclude_pixel)
+    slice = recipes.threshold(array.astype('uint8'), upper_threshold, include_pixel, exclude_pixel)
     print(time.time() - start)
     # slice is super performant at all size images
 
@@ -34,11 +34,12 @@ def test_threshold():
     # # ndarray is really good with small images, and like 33% better than numpy with large ones
 
 def test_sort():
-    ingredients.sort(array.astype(dtype=np.dtype(float)), 100)
+    recipes.sort(array.astype('uint8'), 100)
 
 def test_quantize():
-    ingredients.quantize(array.astype(dtype=np.dtype(float)), 8)
+    a = recipes.quantize(array.astype('uint8'), 8)
+    pass
 
 
 if __name__ == '__main__':
-    test_threshold()
+    test_quantize()

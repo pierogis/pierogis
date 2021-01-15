@@ -1,6 +1,6 @@
 import numpy as np
 
-from rpierogis import ingredients
+from rpierogis import recipes
 from .seasoning import Seasoning
 
 
@@ -31,9 +31,13 @@ class Threshold(Seasoning):
         Parallel computation in rust is 10x speedup
         """
 
-        cooked_pixels = ingredients.threshold(pixels.astype(dtype=np.dtype(float)), self.upper_threshold,
-                                              self.include_pixel,
-                                              self.exclude_pixel)
+        cooked_pixels = pixels.copy()
+
+        recipes.threshold(
+            cooked_pixels,
+            self.lower_threshold, self.upper_threshold,
+            self.include_pixel, self.exclude_pixel
+        )
 
         return cooked_pixels
 

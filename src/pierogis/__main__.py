@@ -4,7 +4,7 @@ import sys
 import time
 
 from .ingredients import Dish
-from .chef import Chef
+from .chef import Chef, DishDescription
 
 
 def main(args=None):
@@ -39,19 +39,16 @@ def main(args=None):
     else:
         raise Exception('Bad path')
 
-    create_dish_desc = parsed_vars.pop('create_dish_desc')
+    add_dish_desc = parsed_vars.pop('add_dish_desc')
 
     for path in paths:
-        ingredients = {}
-        season_links = {}
-        recipes = []
-        file_links = {}
-        ingredients, season_links, recipes, file_links = chef.create_pierogi_desc(ingredients, season_links, recipes,
-                                                                                  file_links, path)
-        ingredients, season_links, recipes, file_links = create_dish_desc(ingredients, season_links, recipes,
-                                                                          file_links, **parsed_vars)
 
-        cooked_dish = chef.cook_dish_desc(ingredients, season_links, recipes, file_links)
+        dish_desc = DishDescription()
+
+        dish_desc = chef.add_pierogi_desc(dish_desc, path)
+        dish_desc = add_dish_desc(dish_desc, **parsed_vars)
+
+        cooked_dish = chef.cook_dish_desc(dish_desc)
 
         output_filename = output
         if output_filename is None:

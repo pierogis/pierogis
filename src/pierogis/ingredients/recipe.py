@@ -29,7 +29,7 @@ class Recipe(Ingredient):
             under_pixels = mixed_pixels
 
         # keep in range
-        clipped_pixels = np.clip(mixed_pixels, 0, 255)
+        clipped_pixels = np.clip(under_pixels, 0, 255)
 
         return clipped_pixels
 
