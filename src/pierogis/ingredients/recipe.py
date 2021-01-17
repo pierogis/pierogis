@@ -6,6 +6,11 @@ from pierogis.ingredients.ingredient import Ingredient
 class Recipe(Ingredient):
 
     def prep(self, ingredients: list, **kwargs):
+        """
+        Provide a list of ingredients to cook in sequence
+
+        :param ingredients: list of Ingredient objects
+        """
         if ingredients is None:
             ingredients = []
         if isinstance(ingredients, list):

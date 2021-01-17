@@ -1,7 +1,7 @@
 import argparse
 import uuid
 
-from pierogis import Dish, Pierogi, Sort, Quantize, Threshold, Recipe
+from pierogis import Dish, Pierogi, Sort, SpatialQuantize, Threshold, Recipe
 
 
 class DishDescription:
@@ -44,7 +44,7 @@ class Chef:
     ingredient_classes = {
         'pierogi': Pierogi,
         'sort': Sort,
-        'quantize': Quantize,
+        'quantize': SpatialQuantize,
         'threshold': Threshold
     }
 
@@ -63,7 +63,7 @@ class Chef:
 
         quantize_parser = argparse.ArgumentParser(add_help=False)
         quantize_parser.set_defaults(add_dish_desc=self.add_quantize_desc)
-        Quantize.add_parser_arguments(quantize_parser)
+        SpatialQuantize.add_parser_arguments(quantize_parser)
 
         recipe_parser = argparse.ArgumentParser(add_help=False)
         recipe_parser.set_defaults(add_dish_desc=self.add_recipe_desc)
@@ -72,7 +72,7 @@ class Chef:
         self.menu = {
             'sort': sort_parser,
             'quantize': quantize_parser,
-            'recipe': recipe_parser,
+            'chef': recipe_parser,
             'threshold': threshold_parser
         }
 

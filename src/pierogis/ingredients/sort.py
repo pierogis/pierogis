@@ -6,6 +6,12 @@ from .seasonings import Seasoning, Threshold
 
 
 class Sort(Ingredient):
+    """
+    Sort a pixel array
+    Uses its mask to determine which groups of pixels to sort (white pixels get sorted)
+
+    Can use a seasoning to create that mask when cooking, or have it preloaded using a season method
+    """
 
     def prep(self, rotate: Rotate = None, seasoning: Seasoning = None,
              delimiter: np.ndarray = np.array([255, 255, 255]), **kwargs):

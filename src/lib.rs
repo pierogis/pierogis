@@ -1,11 +1,10 @@
-use pyo3::{Python, PyResult, IntoPy, Py};
+use pyo3::{Python, PyResult};
 use pyo3::prelude::{PyModule, pymodule};
-use numpy::{PyArray, PyReadonlyArray, Ix1, Ix2, Ix3, ToPyArray};
+use numpy::{PyArray, PyReadonlyArray, Ix1, Ix3, ToPyArray};
 use ndarray::parallel::prelude::*;
 use rayon::prelude::*;
-use rscolorq::{color::Rgb, Matrix2d, Params, FilterSize};
-use numpy::npyffi::NPY_ORDER;
-use ndarray::Array;
+
+mod quantize;
 
 
 #[pymodule]
@@ -36,75 +35,22 @@ fn rpierogis(py: Python<'_>, m: &PyModule) -> PyResult<()> {
         let width = shape[0];
         let height = shape[1];
 
-        // Build the quantization parameters, verify if accepting user input
-        let mut conditions = Params::new();
-
-        // set parameters for quantization
-        conditions.palette_size(palette_size);
-        conditions.dithering_level(dithering_level);
-
-        conditions.filter_size(match filter_size {
-            1 => FilterSize::One,
-            3 => FilterSize::Three,
-            5 => FilterSize::Five,
-            _ => panic!("Must be 1, 3, or 5")
-        });
-
-        conditions.seed(seed);
-
-        conditions.initial_temp(initial_temp);
-        conditions.final_temp(final_temp);
-        conditions.iters_per_level(iters_per_level);
-        conditions.repeats_per_temp(repeats_per_temp);
-
-        // verify
-        conditions.verify_parameters();
-
-        // Create the output buffer and quantized palette index buffer
-        let mut imgbuf = Vec::with_capacity(width * height * 3);
-        // height, width to account for different input orientation (w x h)
-        let mut quantized_image = Matrix2d::new(height, width);
-
-        // Convert the input array buffer from chunks of <u8> to Rgb<f64>
-        // println!("numpy array: {}", array[3]);
-        let image = Matrix2d::from_vec(
-            array.chunks(3)
-                .map(|c| Rgb {
-                    red: c[0] as f64 / 255.0,
-                    green: c[1] as f64 / 255.0,
-                    blue: c[2] as f64 / 255.0,
-                })
-                .collect(),
-            height, // note these are switched, numpy is using (width, height, 3)
-            width, // where this lib expects (height, width, 3)
+        let cooked_array = quantize::cook(
+            &array,
+            width,
+            height,
+            palette_size,
+            iters_per_level,
+            repeats_per_temp,
+            initial_temp,
+            final_temp,
+            filter_size,
+            dithering_level,
+            seed,
         );
 
-        // create and empty vector of Rgb to hold the palette
-        let mut palette = Vec::with_capacity(palette_size as usize);
-
-        // perform the quantization, filling these refs
-        rscolorq::spatial_color_quant(&image, &mut quantized_image, &mut palette, &conditions);
-
-        // Convert the Rgb<f64> palette to Rgb<u8>
-        let palette = palette
-            .iter()
-            .map(|&c| {
-                let color = 255.0 * c;
-                [
-                    color.red.round() as u8,
-                    color.green.round() as u8,
-                    color.blue.round() as u8,
-                ]
-            })
-            .collect::<Vec<[u8; 3]>>();
-
-        // Create the final image by color lookup from the palette
-        quantized_image.iter().for_each(|&c| {
-            imgbuf.extend_from_slice(&*palette.get(c as usize).unwrap());
-        });
-
         // return a py array resized to the input shape
-        PyArray::from_vec(py, imgbuf).reshape((width, height, 3))
+        PyArray::from_vec(py, cooked_array).reshape((width, height, 3))
     }
 
     #[pyfn(recipes_module, "threshold")]
@@ -177,11 +123,6 @@ fn rpierogis(py: Python<'_>, m: &PyModule) -> PyResult<()> {
     //
     //     Ok(array.to_pyarray(py))
     // }
-
-    /// rsort(py_array, palette_size, /)
-    /// --
-    ///
-    /// This function adds two unsigned 64-bit integers.
     // #[pyfn(ingredients_module, "sort")]
     // fn sort_py_array<'py>(
     //     py: Python<'py>,

@@ -12,6 +12,8 @@ class Dish(Ingredient):
     def prep(self, recipe: Recipe):
         """
         Set the recipe to cook for this dish
+
+        :param recipe: Recipe to cook and serve
         """
         self.recipe = recipe
 

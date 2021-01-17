@@ -34,8 +34,12 @@ class Threshold(Seasoning):
         Parallel computation in rust is 10x speedup
         """
 
+        if self.target is not None:
+            pixels = self.target.pixels
+
         cooked_pixels = pixels.copy()
 
+        # cook using the rust function
         cooked_pixels = recipes.threshold(
             cooked_pixels.astype(np.dtype('uint8')),
             self.lower_threshold, self.upper_threshold,

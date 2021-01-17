@@ -11,11 +11,16 @@ from .ingredient import Ingredient
 class Pierogi(Ingredient):
     """
     Image container for iterative pixel manipulation
+
+    Uses PIL.Image to load to self.pixels
     """
 
     def prep(self, image: Image = None, file: str = None):
         """
         Provide either a PIL Image or a path to an image file
+
+        :param image: Provide a PIL Image that has already been loaded (takes precedence)
+        :param file: Provide a file path to load from
         """
         if not image:
             image = Image.open(file)
@@ -30,7 +35,7 @@ class Pierogi(Ingredient):
 
     def cook(self, pixels: np.ndarray):
         """
-        Return a cropped array of the image
+        Return a reshaped array of the image
         """
 
         return self.pixels.reshape(pixels.shape).astype(pixels.dtype)
