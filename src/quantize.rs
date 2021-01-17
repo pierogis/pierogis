@@ -36,7 +36,7 @@ pub fn cook(
     conditions.repeats_per_temp(repeats_per_temp);
 
     // verify
-    conditions.verify_parameters();
+    conditions.verify_parameters().unwrap();
 
     // Create the output buffer and quantized palette index buffer
     let mut imgbuf = Vec::with_capacity(width * height * 3);
