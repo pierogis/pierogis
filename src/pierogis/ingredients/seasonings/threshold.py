@@ -12,7 +12,10 @@ class Threshold(Seasoning):
     As it is a subclass of seasoning, a Threshold instance can use season method and work with or without a target
     """
 
-    def prep(self, lower_threshold: int = 0, upper_threshold: int = 255, **kwargs):
+    LOWER_THRESHOLD = 64
+    UPPER_THRESHOLD = 180
+
+    def prep(self, lower_threshold: int = LOWER_THRESHOLD, upper_threshold: int = UPPER_THRESHOLD, **kwargs):
         """
         Set the threshold intensity levels
         Pixels lower than :param lower_threshold or higher that :param upper_threshold are true (include_pixel)
@@ -33,7 +36,7 @@ class Threshold(Seasoning):
 
         cooked_pixels = pixels.copy()
 
-        recipes.threshold(
+        recipes.threshold_mut(
             cooked_pixels,
             self.lower_threshold, self.upper_threshold,
             self.include_pixel, self.exclude_pixel

@@ -56,14 +56,14 @@ class Chef:
         sort_parser = argparse.ArgumentParser(add_help=False)
         sort_parser.set_defaults(add_dish_desc=self.add_sort_desc)
         sort_parser.add_argument('-t', '--turns', default=0, type=int)
-        sort_parser.add_argument('-l', '--lower-threshold', default=64, type=int,
+        sort_parser.add_argument('-l', '--lower-threshold', default=Threshold.LOWER_THRESHOLD, type=int,
                                  help='Pixels with lightness below this threshold will not get sorted')
-        sort_parser.add_argument('-u', '--upper-threshold', default=180, type=int,
+        sort_parser.add_argument('-u', '--upper-threshold', default=Threshold.UPPER_THRESHOLD, type=int,
                                  help='Pixels with lightness above this threshold will not get sorted')
 
         quantize_parser = argparse.ArgumentParser(add_help=False)
         quantize_parser.set_defaults(add_dish_desc=self.add_quantize_desc)
-        quantize_parser.add_argument('-k', '--colors', default=8)
+        Quantize.add_parser_arguments(quantize_parser)
 
         recipe_parser = argparse.ArgumentParser(add_help=False)
         recipe_parser.set_defaults(add_dish_desc=self.add_recipe_desc)

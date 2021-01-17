@@ -21,12 +21,13 @@ class Recipe(Ingredient):
         for ingredient in self.ingredients:
             # cook the lower layer
             cooked_pixels = ingredient.cook_mask(under_pixels)
-
             # mix them based on the overlaying opacity
-            mixed_pixels = (cooked_pixels * ingredient.opacity + under_pixels * (100 - ingredient.opacity)) / 100
-
+            mixed_pixels = (
+                                   cooked_pixels.astype(np.dtype(float)) * ingredient.opacity
+                                   + under_pixels.astype(np.dtype(float)) * (100 - ingredient.opacity)
+                           ) / 100
             # reset for loop
-            under_pixels = mixed_pixels
+            under_pixels = mixed_pixels.astype('uint8')
 
         # keep in range
         clipped_pixels = np.clip(under_pixels, 0, 255)

@@ -1,10 +1,11 @@
 import time
 
+from PIL import Image
 from rpierogis import recipes
-from pierogis import Threshold
+from pierogis import Threshold, Ingredient
 import numpy as np
 
-array = np.random.randint(0, 255, (400, 500, 3))
+array = np.random.randint(0, 255, (100, 100, 3))
 
 def test_threshold():
     upper_threshold = 100
@@ -37,7 +38,21 @@ def test_sort():
     recipes.sort(array.astype('uint8'), 100)
 
 def test_quantize():
-    a = recipes.quantize(array.astype('uint8'), 8)
+
+    array = np.array(Image.open("./demo/gnome_small.jpg").convert('RGB'))
+    Ingredient(array).show()
+    a = recipes.quantize(
+        array.astype(dtype=np.dtype('uint8')),
+        palette_size=4,
+        iters_per_level=3,
+        repeats_per_temp=1,
+        initial_temp=1,
+        final_temp=.001,
+        filter_size=3,
+        dithering_level=.8,
+        seed=0
+    )
+    Ingredient(a).show()
     pass
 
 
