@@ -61,7 +61,7 @@ pub fn cook(
     let mut palette = Vec::with_capacity(palette_size as usize);
 
     // perform the quantization, filling these refs
-    rscolorq::spatial_color_quant(&image, &mut quantized_image, &mut palette, &conditions);
+    rscolorq::spatial_color_quant(&image, &mut quantized_image, &mut palette, &conditions).unwrap();
 
     // Convert the Rgb<f64> palette to Rgb<u8>
     let palette = palette
