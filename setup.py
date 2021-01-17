@@ -16,7 +16,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            "pierogis=pyrogis.__main__:main"
+            "pyrogis=pyrogis.__main__:main"
         ]
     },
     zip_safe=False
