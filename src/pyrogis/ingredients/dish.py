@@ -1,7 +1,7 @@
 import numpy as np
 
-from pierogis.ingredients.ingredient import Ingredient
-from pierogis.ingredients.recipe import Recipe
+from pyrogis.ingredients.ingredient import Ingredient
+from pyrogis.ingredients.recipe import Recipe
 
 
 class Dish(Ingredient):

@@ -1,7 +1,7 @@
 import argparse
 import uuid
 
-from pierogis import Dish, Pierogi, Sort, SpatialQuantize, Threshold, Recipe
+from pyrogis import Dish, Pierogi, Sort, SpatialQuantize, Threshold, Recipe
 
 
 class DishDescription:
@@ -246,7 +246,5 @@ class Chef:
 
             dish = Dish(recipe=recipe)
             target = dish.serve()
-
-            target.show()
 
         return target

@@ -2,7 +2,7 @@ import time
 
 from PIL import Image
 from rpierogis import recipes
-from pierogis import Threshold, Ingredient
+from pyrogis import Threshold, Ingredient
 import numpy as np
 
 array = np.random.randint(0, 255, (100, 100, 3))

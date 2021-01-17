@@ -3,7 +3,6 @@ import os
 import sys
 import time
 
-from .ingredients import Dish
 from .chef import Chef, DishDescription
 
 chef = Chef()

@@ -1,7 +1,7 @@
 import numpy as np
 from rpierogis import recipes
 
-from pierogis.ingredients.ingredient import Ingredient
+from pyrogis.ingredients.ingredient import Ingredient
 
 
 class Quantize(Ingredient):

@@ -1,13 +1,13 @@
 import numpy as np
 
-from pierogis import Dish
-from pierogis import Ingredient
-from pierogis import Recipe
-from pierogis import Pierogi
-from pierogis import Quantize
-from pierogis import Seasoning
-from pierogis import Sort
-from pierogis import Threshold
+from pyrogis import Dish
+from pyrogis import Ingredient
+from pyrogis import Recipe
+from pyrogis import Pierogi
+from pyrogis import Quantize
+from pyrogis import Seasoning
+from pyrogis import Sort
+from pyrogis import Threshold
 
 
 class TestDish():

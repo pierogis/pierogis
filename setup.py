@@ -3,7 +3,7 @@ from setuptools import find_packages
 from setuptools_rust import RustExtension, Binding
 
 setup(
-    name='pierogis',
+    name='pyrogis',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,
@@ -16,7 +16,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            "pierogis=pierogis.__main__:main"
+            "pierogis=pyrogis.__main__:main"
         ]
     },
     zip_safe=False
