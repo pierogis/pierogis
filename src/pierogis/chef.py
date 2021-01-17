@@ -55,11 +55,11 @@ class Chef:
     def __init__(self):
         sort_parser = argparse.ArgumentParser(add_help=False)
         sort_parser.set_defaults(add_dish_desc=self.add_sort_desc)
-        sort_parser.add_argument('-t', '--turns', default=0, type=int)
-        sort_parser.add_argument('-l', '--lower-threshold', default=Threshold.LOWER_THRESHOLD, type=int,
-                                 help='Pixels with lightness below this threshold will not get sorted')
-        sort_parser.add_argument('-u', '--upper-threshold', default=Threshold.UPPER_THRESHOLD, type=int,
-                                 help='Pixels with lightness above this threshold will not get sorted')
+        Sort.add_parser_arguments(sort_parser)
+
+        threshold_parser = argparse.ArgumentParser(add_help=False)
+        threshold_parser.set_defaults(add_dish_desc=self.add_threshold_desc)
+        Threshold.add_parser_arguments(threshold_parser)
 
         quantize_parser = argparse.ArgumentParser(add_help=False)
         quantize_parser.set_defaults(add_dish_desc=self.add_quantize_desc)
@@ -72,11 +72,12 @@ class Chef:
         self.menu = {
             'sort': sort_parser,
             'quantize': quantize_parser,
-            'recipe': recipe_parser
+            'recipe': recipe_parser,
+            'threshold': threshold_parser
         }
 
     def read_recipe(self, dish_description, recipe_text):
-        lines = recipe_text.split(';')
+        lines = recipe_text.split(';')[0:-1]
 
         parser = argparse.ArgumentParser()
         subparsers = parser.add_subparsers()
@@ -85,7 +86,7 @@ class Chef:
 
         for i in range(len(lines)):
             line = lines[i]
-            phrases = line.split()
+            phrases = line.strip().split()
 
             parsed, unknown = parser.parse_known_args(phrases)
             parsed_vars = vars(parsed)
@@ -95,18 +96,17 @@ class Chef:
 
         return dish_description
 
-    def add_recipe_desc(self, dish_description, recipe_path, **kwargs):
-        try:
-            with open(recipe_path) as recipe_file:
-                dish_description = self.read_recipe(dish_description, recipe_file.read())
+    def add_recipe_desc(self, dish_desc, recipe_path, path=None, **kwargs):
+        if path is not None:
+            dish_desc = self.add_pierogi_desc(dish_desc, path)
 
-            return dish_description
+        with open(recipe_path) as recipe_file:
+            dish_desc = self.read_recipe(dish_desc, recipe_file.read())
 
-        except Exception as err:
-            print(err)
+        return dish_desc
 
-    def add_pierogi_desc(self, dish_description, image_path):
-        file_uuid = dish_description.add_file_link(image_path)
+    def add_pierogi_desc(self, dish_description, path):
+        file_uuid = dish_description.add_file_link(path)
 
         ingredient_desc = {
             'type': 'pierogi',
@@ -122,47 +122,70 @@ class Chef:
 
         return dish_description
 
-    def add_sort_desc(self, dish_desc, **kwargs):
+    def add_threshold_desc(self, dish_desc, path=None, **kwargs):
+        """
+        Add a threshold recipe to the dish description
+        """
+        if path is not None:
+            dish_desc = self.add_pierogi_desc(dish_desc, path)
+
+        ingredient_desc = {
+            'type': 'threshold',
+            'args': [],
+            'kwargs': {
+                **kwargs
+            }
+        }
+
+        threshold_uuid = dish_desc.add_ingredient(ingredient_desc)
+
+        dish_desc.add_recipe([threshold_uuid])
+
+        return dish_desc
+
+    def add_sort_desc(self, dish_desc, path=None, **kwargs):
         """
         Sort pixels in an image by intensity
         """
-        try:
-            # seasoning is for things that process but don't return a array
-            sort_dict = {
-                'type': 'sort',
+        if path is not None:
+            dish_desc = self.add_pierogi_desc(dish_desc, path)
+
+        # seasoning is for things that process but don't return a array
+        sort_dict = {
+            'type': 'sort',
+            'args': [],
+            'kwargs': {
+                **kwargs
+            }
+        }
+        sort_uuid = dish_desc.add_ingredient(sort_dict)
+
+        # check for implied threshold
+        lower_threshold = kwargs.pop('lower_threshold')
+        upper_threshold = kwargs.pop('upper_threshold')
+        if (lower_threshold is not None) or (upper_threshold is not None):
+            threshold_dict = {
+                'type': 'threshold',
                 'args': [],
                 'kwargs': {
-                    **kwargs
+                    'lower_threshold': lower_threshold,
+                    'upper_threshold': upper_threshold
                 }
             }
-            sort_uuid = dish_desc.add_ingredient(sort_dict)
+            season_uuid = dish_desc.add_ingredient(threshold_dict)
+            dish_desc.add_seasoning(sort_uuid, season_uuid)
 
-            # check for implied threshold
-            lower_threshold = kwargs.pop('lower_threshold')
-            upper_threshold = kwargs.pop('upper_threshold')
-            if (lower_threshold is not None) or (upper_threshold is not None):
-                threshold_dict = {
-                    'type': 'threshold',
-                    'args': [],
-                    'kwargs': {
-                        'lower_threshold': lower_threshold,
-                        'upper_threshold': upper_threshold
-                    }
-                }
-                season_uuid = dish_desc.add_ingredient(threshold_dict)
-                dish_desc.add_seasoning(sort_uuid, season_uuid)
+        dish_desc.add_recipe([sort_uuid])
 
-            dish_desc.add_recipe([sort_uuid])
+        return dish_desc
 
-            return dish_desc
-
-        except Exception as err:
-            print(err)
-
-    def add_quantize_desc(self, dish_desc, **kwargs):
+    def add_quantize_desc(self, dish_desc, path=None, **kwargs):
         """
         Create a description of a quantize recipe
         """
+        if path is not None:
+            dish_desc = self.add_pierogi_desc(dish_desc, path)
+
         quantize_dict = {
             'type': 'quantize',
             'args': [],
@@ -223,5 +246,7 @@ class Chef:
 
             dish = Dish(recipe=recipe)
             target = dish.serve()
+
+            target.show()
 
         return target

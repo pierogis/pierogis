@@ -29,7 +29,7 @@ def main(args=None):
 
     parsed = parser.parse_args(args)
     parsed_vars = vars(parsed)
-    path = parsed_vars.pop('path')
+    path = parsed_vars.get('path')
     output = parsed_vars.pop('output')
 
     if os.path.isdir(path):
@@ -45,7 +45,6 @@ def main(args=None):
 
         dish_desc = DishDescription()
 
-        dish_desc = chef.add_pierogi_desc(dish_desc, path)
         dish_desc = add_dish_desc(dish_desc, **parsed_vars)
 
         cooked_dish = chef.cook_dish_desc(dish_desc)

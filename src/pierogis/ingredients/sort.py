@@ -73,3 +73,8 @@ class Sort(Ingredient):
         sorted_pixels = unrotate.cook(sorted_pixels)
 
         return sorted_pixels
+
+    @classmethod
+    def add_parser_arguments(cls, parser):
+        parser.add_argument('-t', '--turns', default=0, type=int)
+        Threshold.add_parser_arguments(parser)

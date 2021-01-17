@@ -36,8 +36,8 @@ class Threshold(Seasoning):
 
         cooked_pixels = pixels.copy()
 
-        recipes.threshold_mut(
-            cooked_pixels,
+        cooked_pixels = recipes.threshold(
+            cooked_pixels.astype(np.dtype('uint8')),
             self.lower_threshold, self.upper_threshold,
             self.include_pixel, self.exclude_pixel
         )
@@ -69,3 +69,10 @@ class Threshold(Seasoning):
         cooked_pixels[boolean_array] = include_pixels[boolean_array]
 
         return cooked_pixels
+
+    @classmethod
+    def add_parser_arguments(cls, parser):
+        parser.add_argument('-l', '--lower-threshold', default=Threshold.LOWER_THRESHOLD, type=int,
+                            help='Pixels with lightness below this threshold will not get sorted')
+        parser.add_argument('-u', '--upper-threshold', default=Threshold.UPPER_THRESHOLD, type=int,
+                            help='Pixels with lightness above this threshold will not get sorted')

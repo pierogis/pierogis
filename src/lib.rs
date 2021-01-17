@@ -107,7 +107,7 @@ fn rpierogis(py: Python<'_>, m: &PyModule) -> PyResult<()> {
         PyArray::from_vec(py, imgbuf).reshape((width, height, 3))
     }
 
-    #[pyfn(recipes_module, "threshold_mut")]
+    #[pyfn(recipes_module, "threshold")]
     fn py_threshold<'py>(
         py: Python<'py>,
         pixels_py_array: &PyArray<u8, Ix3>,
