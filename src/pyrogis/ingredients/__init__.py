@@ -3,4 +3,7 @@ from .dish import Dish
 from .recipe import Recipe
 from .pierogi import Pierogi
 from .quantize import Quantize
+from .quantize import SpatialQuantize
 from .sort import Sort
+from .flip import Flip
+from .rotate import Rotate

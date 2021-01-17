@@ -1,7 +1,7 @@
 import numpy as np
 
-from pierogis.ingredients.ingredient import Ingredient
-from pierogis.ingredients.recipe import Recipe
+from pyrogis.ingredients.ingredient import Ingredient
+from pyrogis.ingredients.recipe import Recipe
 
 
 class Dish(Ingredient):
@@ -12,6 +12,8 @@ class Dish(Ingredient):
     def prep(self, recipe: Recipe):
         """
         Set the recipe to cook for this dish
+
+        :param recipe: Recipe to cook and serve
         """
         self.recipe = recipe
 
@@ -31,14 +33,14 @@ class Dish(Ingredient):
         # if pixels weren't provided, create a blank canvas sized to the first element of the mix
         if pixels.shape == (0, 0, 3):
             base = self.recipe.ingredients[0]
-            pixels = np.full(base.shape, self.default_pixel)
+            pixels = base.pixels
 
         # cook with these pixels as first input
-        cooked_pixels = self.cook(pixels.astype('uint32'))
+        cooked_pixels = self.cook(pixels)
         # ensure that the cooked pixels do not overflow 0-255
         clipped_pixels = np.clip(cooked_pixels, 0, 255)
 
         # set the objects own pixels to the result of cooking
-        ingredient = Ingredient(pixels=clipped_pixels.astype('uint8'))
+        ingredient = Ingredient(pixels=clipped_pixels)
 
         return ingredient

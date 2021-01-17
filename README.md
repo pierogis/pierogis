@@ -52,12 +52,19 @@ pierogis sort ./input.jpg -o output.png -l 50 -u 180 -t 1
 Quantize an image to a set of colors.
 
 ```bash
-pierogis quantize ./input.jpg -o output.png -k 10
+pierogis quantize ./input.jpg -o output.png -n 16 -r 3 -i 3
 ```
 
 |arg|description|default|valid|
 |:----:|-----------|:-----:|:---:|
-|-k|number of colors in the palette to cluster for|`10`|`int`|
+|`-n`, `--palette_size`|number of colors in the palette to cluster for|`8`|`int`|
+|`-r`, `--repeats`|number of times to repeat a temperature for DA|`8`|`int`|
+|`-i`, `--iterations`|number of times to repeat an iteration of a coarseness level|`1`|`int`|
+|`--initial_temp`|initial temp to use in DA for optimization|`1`|`float`|
+|`--final_temp`|final temp to use in DA for optimization|`.001`|`float`|
+|`-d`, `--dithering_level`|relative dithering level (use .5-1.5)|`.8`|`float`|
+
+(See more documentation on [`rscolorq`](https://github.com/okaneco/rscolorq))
 
 ### chef
 
@@ -192,3 +199,8 @@ and rows of an array.
 The original python [pixelsort](https://github.com/satyarth/pixelsort) package inspired this package. While the
 underlying [algorithm](https://github.com/kimasendorf/ASDFPixelSort) of that package and of `sort` in this one is
 supposed to be functionally the same, details of the implementation differ, and it makes up just part of this package.
+
+The quantizing algorithm used in this package is implemented by [`rscolorq`](https://github.com/okaneco/rscolorq), which
+is a port of [`scolorq`](http://people.eecs.berkeley.edu/~dcoetzee/downloads/scolorq/), itself an implementation
+of [Spatial Color Quantization](https://d1wqtxts1xzle7.cloudfront.net/43904012/On_spatial_quantization_of_color_images20160319-27913-c9b6q.pdf?1458434120=&response-content-disposition=inline%3B+filename%3DOn_spatial_quantization_of_color_images.pdf&Expires=1610863916&Signature=JkipRED50Fx67dOuvn~n8-VmRIQ9BfVuFKXyX9iKmR8PV7RLDQfEabsjDZtbuL52f1QI1jSz-wIkVKB1LydnCMQHYBudZS0-Opch-A~2~wxn6rD0Ugwn8EoaU502Nc0yRVjrohpStmEzMNLU79K2591Ek5w8joJVthbg1FTN5AD-jY1NIpe~sah9MPjd84~pMTjXHlKZzL~vhO2~hj3ywTg28Gkx7Fs7MxmDcAbgeuvwKSzitRV7AZBACfBsfH4ih0gqgtQWh~FbPmvCc8cryeN1pjFTBUBFHF4GPNchrx14BYGNMYBdpvfBGJrT5TwzR-OMTBROfTM2wlncRi4z-g__&Key-Pair-Id=APKAJLOHF5GGSLRBV4ZA)
+.

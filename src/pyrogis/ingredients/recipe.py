@@ -1,11 +1,16 @@
 import numpy as np
 
-from pierogis.ingredients.ingredient import Ingredient
+from pyrogis.ingredients.ingredient import Ingredient
 
 
 class Recipe(Ingredient):
 
     def prep(self, ingredients: list, **kwargs):
+        """
+        Provide a list of ingredients to cook in sequence
+
+        :param ingredients: list of Ingredient objects
+        """
         if ingredients is None:
             ingredients = []
         if isinstance(ingredients, list):
@@ -21,15 +26,16 @@ class Recipe(Ingredient):
         for ingredient in self.ingredients:
             # cook the lower layer
             cooked_pixels = ingredient.cook_mask(under_pixels)
-
             # mix them based on the overlaying opacity
-            mixed_pixels = (cooked_pixels * ingredient.opacity + under_pixels * (100 - ingredient.opacity)) / 100
-
+            mixed_pixels = (
+                                   cooked_pixels.astype(np.dtype(float)) * ingredient.opacity
+                                   + under_pixels.astype(np.dtype(float)) * (100 - ingredient.opacity)
+                           ) / 100
             # reset for loop
-            under_pixels = mixed_pixels
+            under_pixels = mixed_pixels.astype('uint8')
 
         # keep in range
-        clipped_pixels = np.clip(mixed_pixels, 0, 255)
+        clipped_pixels = np.clip(under_pixels, 0, 255)
 
         return clipped_pixels
 

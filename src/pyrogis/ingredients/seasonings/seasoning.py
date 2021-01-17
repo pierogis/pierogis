@@ -1,9 +1,9 @@
-"""Add a seasoning to an ingredient before you cook it
+"""Add seasoning to an ingredient before you cook it
 """
 
 import numpy as np
 
-from pierogis.ingredients.ingredient import Ingredient
+from pyrogis.ingredients.ingredient import Ingredient
 
 
 class Seasoning(Ingredient):
@@ -22,6 +22,12 @@ class Seasoning(Ingredient):
 
     def prep(self, target: Ingredient = None, include_pixel: np.ndarray = None, exclude_pixel: np.ndarray = None, *args,
              **kwargs):
+        """
+        :param target: If set, target will be the pixels that are cooked
+        :param include_pixel: The color to be used if a cooking pixel is to be included.
+        Think of them like little flakes of seasoning
+        :param exclude_pixel: The color to be used if a cooking pixel is not to be included
+        """
         self.target = target
 
         if include_pixel is None:
@@ -34,19 +40,23 @@ class Seasoning(Ingredient):
 
     def season(self, recipient: Ingredient):
         """
-        Set the input ingredients mask to the output of cook
-        Will cook :param ingredient or self.target, if present
+        Set the input ingredient's mask to the output of a cook.
+        If self.target is none, recipient will be the pixels that are cooked as well.
+
+        :param recipient: ingredient which will have its mask set
         """
 
         recipient_pixels = recipient.pixels
-        if self.target is not None:
-            recipient_pixels = self.target.pixels
 
         recipient.mask = self.cook(recipient_pixels)
 
         return recipient
 
     def cook(self, pixels: np.ndarray):
+        """
+        Pixels that match the include pixel should be set as the include pixel, otherwise set as the exclude pixel
+        This isn't very useful, this is mostly an abstract class.
+        """
         # tries to use self.target and defaults to the passed in pixels
         target_pixels = pixels
 

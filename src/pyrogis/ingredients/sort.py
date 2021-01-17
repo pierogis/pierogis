@@ -6,6 +6,12 @@ from .seasonings import Seasoning, Threshold
 
 
 class Sort(Ingredient):
+    """
+    Sort a pixel array
+    Uses its mask to determine which groups of pixels to sort (white pixels get sorted)
+
+    Can use a seasoning to create that mask when cooking, or have it preloaded using a season method
+    """
 
     def prep(self, rotate: Rotate = None, seasoning: Seasoning = None,
              delimiter: np.ndarray = np.array([255, 255, 255]), **kwargs):
@@ -33,17 +39,17 @@ class Sort(Ingredient):
         """
         # rotate self.mask and pixels to correspond to self.angle
         rotate = self.rotate
-        oriented_mask = rotate.cook(self.mask)
-        oriented_pixels = rotate.cook(pixels)
+        rotated_mask = rotate.cook(self.mask)
+        rotated_pixels = rotate.cook(pixels)
 
         # false indicates that the pixel should not be sorted
-        boolean_array = np.all(oriented_mask == self._white_pixel, axis=2)
+        boolean_array = np.all(rotated_mask == self._white_pixel, axis=2)
 
-        sorted_pixels = oriented_pixels
+        sorted_pixels = rotated_pixels
         # loop through one axis
-        for i in range(oriented_pixels.shape[0]):
+        for i in range(rotated_pixels.shape[0]):
             # get that axis
-            axis = oriented_pixels[i]
+            axis = rotated_pixels[i]
             # and the axis for the mask-truth
             boolean_axis = boolean_array[i]
             # get the indices for this row on the mask that are True
@@ -73,3 +79,8 @@ class Sort(Ingredient):
         sorted_pixels = unrotate.cook(sorted_pixels)
 
         return sorted_pixels
+
+    @classmethod
+    def add_parser_arguments(cls, parser):
+        parser.add_argument('-t', '--turns', default=0, type=int)
+        Threshold.add_parser_arguments(parser)

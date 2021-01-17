@@ -9,3 +9,10 @@ venv
 .vscode
 /dist/
 /build/
+/.eggs/
+
+
+# rust
+/target
+/build
+/src/rpierogis*

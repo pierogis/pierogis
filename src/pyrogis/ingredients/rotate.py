@@ -4,6 +4,10 @@ from .ingredient import Ingredient
 
 
 class Rotate(Ingredient):
+    """
+    Rotate a pixel array using a given number of turns in a specified direction
+    """
+
     def prep(self, clockwise: bool = True, turns: int = 1, **kwargs):
         """
         :param clockwise if True, top left pixel becomes top right
@@ -13,6 +17,9 @@ class Rotate(Ingredient):
         self.turns = turns
 
     def cook(self, pixels: np.ndarray):
+        """
+        Rotate the pixels according to parameters
+        """
         rotated_pixels = pixels
         # determine axes of rotation from clockwise or not
         rotation_axes = (0, 1) if self.clockwise else (1, 0)
