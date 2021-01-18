@@ -26,9 +26,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install setuptools wheel twine setuptools-rust
       - name: Build and publish
+        run: |
+          echo username - $TWINE_USERNAME
+          python setup.py sdist bdist_wheel
+          twine upload dist/*
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: |
-          python setup.py sdist bdist_wheel
-          twine upload dist/*
