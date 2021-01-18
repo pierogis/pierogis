@@ -1,0 +1,75 @@
+name: test pyrogis
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ${{ matrix.platform.os }}
+    strategy:
+      fail-fast: false  # If one platform fails, allow the rest to keep testing.
+      matrix:
+        python-version: [ 3.6, 3.7, 3.8, 3.9 ]
+        platform: [
+          { os: "macOS-latest",   python-architecture: "x64", rust-target: "x86_64-apple-darwin" },
+          { os: "windows-latest", python-architecture: "x64", rust-target: "x86_64-pc-windows-msvc" },
+          { os: "windows-latest", python-architecture: "x86", rust-target: "i686-pc-windows-msvc" },
+          { os: "ubuntu-latest", python-architecture: "x86", rust-target: "i686-pc-windows-msvc" },
+        ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.platform.python-architecture }}
+
+      - name: install rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.platform.rust-target }}
+          profile: minimal
+          default: true
+          components: rustfmt, clippy
+
+      - name: Lint with RustFmt
+        uses: actions-rs/cargo@v1
+        with:
+          toolchain: stable
+          command: fmt
+          args: --manifest-path ./bindings/python/Cargo.toml -- --check
+
+      - name: Lint with Clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --manifest-path ./bindings/python/Cargo.toml --all-targets --all-features -- -D warnings
+
+      - name: Install Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.platform.python-architecture }}
+
+      - name: Install
+        run: |
+          python -m venv .env
+          source .env/bin/activate
+          pip install -r requirements.txt
+          python setup.py develop
+      - name: Check style
+        run: |
+          source .env/bin/activate
+          pip install black==20.8b1
+          make check-style
+      - name: Run tests
+        run: |
+          source .env/bin/activate
+          python -m pytest -s -v tests
