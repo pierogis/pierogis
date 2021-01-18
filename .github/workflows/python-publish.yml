@@ -1,13 +1,12 @@
 # This workflow will upload a Python Package using Twine when a release is created
 # For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
 
-name: Upload Python Package
+name: upload pyrogis
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
+    tags:
+      - v*
 
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -22,7 +21,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - name: Build
+      - name: build wheels
         run: 'sh build_wheels.sh'
 
   macos-windows-build:
@@ -40,13 +39,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: install python
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.platform.python-architecture }}
 
-      - name: Install Rust
+      - name: install rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -54,12 +53,12 @@ jobs:
           profile: minimal
           default: true
 
-      - name: Build wheel
+      - name: build wheel
         run: |
           pip install -U setuptools wheel setuptools-rust
           python setup.py bdist_wheel
 
-      - name: Upload to AWS
+      - name: upload to aws
         shell: bash
         run: |
           pip install -U awscli
@@ -71,10 +70,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install Python
+      - name: install python
         uses: actions/setup-python@v2
 
-      - name: Retrieve all wheels
+      - name: retrieve all wheels
         shell: bash
         run: |
           pip install awscli
@@ -82,11 +81,11 @@ jobs:
       - name: Install dependencies
         run: |
           pip install setuptools wheel setuptools-rust
-      - name: Create source distribution
+      - name: create source distribution
         run: |
           python setup.py sdist
 
-      - name: Upload to PyPi
+      - name: upload to PyPi
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
