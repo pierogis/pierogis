@@ -9,28 +9,22 @@ on:
       - main
   pull_request:
 
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: us-east-1
+
+  DIST_DIR: ${{ github.sha }}
+
 jobs:
   manylinux-build:
     runs-on: ubuntu-latest
+    container: quay.io/pypa/manylinux2014_x86_64
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.8'
-      - name: Build manylinux wheels
-        uses: RalfG/python-wheels-manylinux-build@v0.3.3-manylinux2010_x86_64
-        with:
-          pre-build-command: curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y
-            export PATH="$HOME/.cargo/bin:$PATH"
-          build-requirements: 'pillow numpy'
-      - name: Build and publish
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: |
-          twine upload dist/*-manylinux*.whl
+      - uses: actions/checkout@v1
+      - name: Build
+        run: 'sh build_wheels.sh'
 
   macos-windows-build:
     runs-on: ${{ matrix.platform.os }}
@@ -53,24 +47,48 @@ jobs:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.platform.python-architecture }}
 
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1.0.6
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           target: ${{ matrix.platform.rust-target }}
           profile: minimal
           default: true
 
+      - name: Build wheel
+        run: |
+          pip install -U setuptools wheel setuptools-rust
+          python setup.py bdist_wheel
+
+      - name: Upload to AWS
+        run: |
+          pip install -U awscli
+          python -m awscli s3 sync --exact-timestamps ./dist "s3://pierogis/dist/$DIST_DIR"
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: [ manylinux-build, macos-windows-build ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Python
+        uses: actions/setup-python@v2
+
+      - name: Retrieve all wheels
+        shell: bash
+        run: |
+          pip install awscli
+          aws s3 sync "s3://pierogis/dist/$DIST_DIR" ./dist
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install setuptools wheel twine setuptools-rust
-
-      - name: Build and publish
+          pip install setuptools wheel setuptools-rust
+      - name: Create source distribution
         run: |
-          echo username - $TWINE_USERNAME
-          python setup.py sdist bdist_wheel
-          twine upload dist/*
+          python setup.py sdist
+
+      - name: Upload to PyPi
         env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          pip install twine
+          twine upload dist/* -u __token__ -p "$PYPI_TOKEN"
