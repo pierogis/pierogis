@@ -68,6 +68,7 @@ jobs:
 
       - name: Build and publish
         run: |
+          echo username - $TWINE_USERNAME
           python setup.py sdist bdist_wheel
           twine upload dist/*
         env:
