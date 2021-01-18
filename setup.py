@@ -11,10 +11,6 @@ setup(
         'Pillow>=8.0.1',
         'numpy>=1.19.4'
     ],
-    setup_requires=[
-        'Pillow>=8.0.1',
-        'numpy>=1.19.4'
-    ],
     rust_extensions=[
         RustExtension("rpierogis", binding=Binding.PyO3)
     ],
