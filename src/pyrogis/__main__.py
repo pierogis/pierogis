@@ -11,7 +11,7 @@ chef = Chef()
 def parse_args(args):
     # create top level parser
     parser = argparse.ArgumentParser(description='** image processing pipelines **')
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers(dest='recipe', required=True)
 
     # create parent parser to pass down arguments only
     parent_parser = argparse.ArgumentParser()
