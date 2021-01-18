@@ -4,11 +4,13 @@
 name: Upload Python Package
 
 on:
-  release:
-    types: [ created ]
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
-  deploy:
+  manylinux-build:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,19 +18,58 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
-      - name: rust-toolchain
-        uses: actions-rs/toolchain@v1.0.6
+          python-version: '3.8'
+      - name: Build manylinux wheels
+        uses: RalfG/python-wheels-manylinux-build@v0.3.3-manylinux2010_x86_64
         with:
-          toolchain: stable
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install setuptools wheel twine setuptools-rust
+          pre-build-command: curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y
+            export PATH="$HOME/.cargo/bin:$PATH"
+          build-requirements: 'pillow numpy'
       - name: Build and publish
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
+          twine upload dist/*-manylinux*.whl
+
+  macos-windows-build:
+    runs-on: ${{ matrix.platform.os }}
+    strategy:
+      fail-fast: false  # If one platform fails, allow the rest to keep testing.
+      matrix:
+        python-version: [ 3.6, 3.7, 3.8, 3.9 ]
+        platform: [
+          { os: "macOS-latest",   python-architecture: "x64", rust-target: "x86_64-apple-darwin" },
+          { os: "windows-latest", python-architecture: "x64", rust-target: "x86_64-pc-windows-msvc" },
+          { os: "windows-latest", python-architecture: "x86", rust-target: "i686-pc-windows-msvc" },
+        ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.platform.python-architecture }}
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1.0.6
+        with:
+          toolchain: stable
+          target: ${{ matrix.platform.rust-target }}
+          profile: minimal
+          default: true
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine setuptools-rust
+
+      - name: Build and publish
+        run: |
           python setup.py sdist bdist_wheel
           twine upload dist/*
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
