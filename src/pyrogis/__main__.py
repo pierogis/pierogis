@@ -8,7 +8,10 @@ from .chef import Chef, DishDescription
 chef = Chef()
 
 
-def parse_args(args):
+def parse_args(args: list):
+    """
+    use a chef to parse args into specified command
+    """
     # create top level parser
     parser = argparse.ArgumentParser(description='** image processing pipelines **')
     subparsers = parser.add_subparsers(dest='recipe', required=True)
@@ -20,7 +23,7 @@ def parse_args(args):
 
     for command, command_parser in chef.menu.items():
         # inherit the parent class arguments and the arguments specific to a subcommand
-        subparser = subparsers.add_parser(command, parents=[parent_parser, command_parser], add_help=False)
+        subparsers.add_parser(command, parents=[parent_parser, command_parser], add_help=False)
 
     # parse the input args with the applicable arguments attached
     parsed = parser.parse_args(args)
@@ -36,7 +39,14 @@ def parse_args(args):
     return path, output, parsed_vars, add_dish_desc
 
 
-def create_dish(path, add_dish_desc, parsed_vars):
+def create_dish(path: str, add_dish_desc, parsed_vars):
+    """
+    create and cook the specified dish with the vars
+
+    :param path: path to use for the media in the dish
+    :param add_dish_desc: chef method used to handle the parsed_vars
+    :param parsed_vars: arguments to the recipe to create
+    """
     dish_desc = DishDescription()
     # use the parser attached function to create a dish description for the specified cli recipe
     dish_desc = add_dish_desc(dish_desc, path=path, **parsed_vars)
@@ -46,7 +56,7 @@ def create_dish(path, add_dish_desc, parsed_vars):
 
 
 def main(args=None):
-    """The cli program."""
+    """cli program"""
     if args is None:
         args = sys.argv[1:]
 

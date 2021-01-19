@@ -4,6 +4,5 @@
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../pierogis-bot" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../pierogis-live" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../rscolorq" vcs="Git" />
   </component>
 </project>
