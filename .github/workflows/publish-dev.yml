@@ -90,4 +90,4 @@ jobs:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
           pip install twine
-          twine upload dist/* -u __token__ -p "$PYPI_TOKEN" --index-url https://test.pypi.org/simple/
+          twine upload --repository testpypi dist/* -u __token__ -p "$PYPI_TOKEN"
