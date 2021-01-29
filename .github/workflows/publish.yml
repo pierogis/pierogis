@@ -88,6 +88,7 @@ jobs:
           python setup.py sdist
 
       - name: publish to test pypi
+        if: startsWith(github.ref, 'refs/heads')
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TEST_TOKEN }}
         run: |
