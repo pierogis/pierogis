@@ -1,11 +1,10 @@
-use pyo3::{Python, PyResult};
-use pyo3::prelude::{PyModule, pymodule};
-use numpy::{PyArray, PyReadonlyArray, Ix1, Ix3, ToPyArray};
 use ndarray::parallel::prelude::*;
+use numpy::{Ix1, Ix3, PyArray, PyReadonlyArray, ToPyArray};
+use pyo3::prelude::{pymodule, PyModule};
+use pyo3::{PyResult, Python};
 use rayon::prelude::*;
 
 mod quantize;
-
 
 #[pymodule]
 fn rpierogis(py: Python<'_>, m: &PyModule) -> PyResult<()> {
@@ -67,25 +66,27 @@ fn rpierogis(py: Python<'_>, m: &PyModule) -> PyResult<()> {
         let exclude_pixel = exclude_pixel.as_slice()?;
 
         // iterate through the flat array in chunks of 3
-        pixels.par_chunks_mut(3)
-            .for_each(|pixel_array| -> () {
-                // get the brightness of the pixel
-                let pixel_value = (pixel_array[0] as f64) * 0.299 + (pixel_array[1] as f64) * 0.587 + (pixel_array[2] as f64) * 0.114;
-                // get with the correct pixel based on if it is outside a threshold
-                let replacement =
-                    match (pixel_value >= upper_threshold as f64) | (pixel_value <= lower_threshold as f64) {
-                        true => &include_pixel,
-                        false => &exclude_pixel,
-                    };
+        pixels.par_chunks_mut(3).for_each(|pixel_array| {
+            // get the brightness of the pixel
+            let pixel_value = (pixel_array[0] as f64) * 0.299
+                + (pixel_array[1] as f64) * 0.587
+                + (pixel_array[2] as f64) * 0.114;
+            // get with the correct pixel based on if it is outside a threshold
+            let replacement = match (pixel_value >= upper_threshold as f64)
+                | (pixel_value <= lower_threshold as f64)
+            {
+                true => &include_pixel,
+                false => &exclude_pixel,
+            };
 
-                // pixel.brightness() >= upper_threshold
-                // pixel.replace(replacement)
+            // pixel.brightness() >= upper_threshold
+            // pixel.replace(replacement)
 
-                // replace rgb on the current chunk
-                pixel_array[0] = replacement[0] as u8;
-                pixel_array[1] = replacement[1] as u8;
-                pixel_array[2] = replacement[2] as u8;
-            });
+            // replace rgb on the current chunk
+            pixel_array[0] = replacement[0] as u8;
+            pixel_array[1] = replacement[1] as u8;
+            pixel_array[2] = replacement[2] as u8;
+        });
 
         pixels.to_pyarray(py).reshape(pixels_py_array.dims())
     }

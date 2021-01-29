@@ -12,7 +12,7 @@ class Quantize(Ingredient):
     PALETTE_SIZE = 8
 
     def prep(self,
-             palette=None, palette_size=PALETTE_SIZE):
+             palette=None, palette_size=PALETTE_SIZE, **kwargs):
         """
         Parameters for spatial color quantization
 

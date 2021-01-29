@@ -3,8 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/pierogis.iml" filepath="$PROJECT_DIR$/.idea/pierogis.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../pierogis-bot/.idea/pierogis-bot.iml" filepath="$PROJECT_DIR$/../pierogis-bot/.idea/pierogis-bot.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../pierogis-live/.idea/pierogis-live.iml" filepath="$PROJECT_DIR$/../pierogis-live/.idea/pierogis-live.iml" />
     </modules>
   </component>
 </project>

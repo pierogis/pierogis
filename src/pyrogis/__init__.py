@@ -10,4 +10,4 @@ from .ingredients.seasonings import Threshold
 
 from .chef import Chef
 
-__version__ = '0.1.1dev1'
+__version__ = '0.1.1dev2'

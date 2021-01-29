@@ -1,5 +1,5 @@
-use rscolorq::{Params, FilterSize, Matrix2d};
 use rscolorq::color::Rgb;
+use rscolorq::{FilterSize, Matrix2d, Params};
 
 pub fn cook(
     pixels_array: &&[u8],
@@ -25,7 +25,7 @@ pub fn cook(
         1 => FilterSize::One,
         3 => FilterSize::Three,
         5 => FilterSize::Five,
-        _ => panic!("Must be 1, 3, or 5")
+        _ => panic!("Filter size must be 1, 3, or 5"),
     });
 
     conditions.seed(seed);
@@ -46,7 +46,8 @@ pub fn cook(
     // Convert the input array buffer from chunks of <u8> to Rgb<f64>
     // println!("numpy array: {}", array[3]);
     let image = Matrix2d::from_vec(
-        pixels_array.chunks(3)
+        pixels_array
+            .chunks(3)
             .map(|c| Rgb {
                 red: c[0] as f64 / 255.0,
                 green: c[1] as f64 / 255.0,
@@ -54,7 +55,7 @@ pub fn cook(
             })
             .collect(),
         height, // note these are switched, numpy is using (width, height, 3)
-        width, // where this lib expects (height, width, 3)
+        width,  // where this lib expects (height, width, 3)
     );
 
     // create and empty vector of Rgb to hold the palette
@@ -107,4 +108,3 @@ pub fn cook(
 // M is a 2d boolean array, M_iv being 1 means that pixel at i is quantized to color at v
 // The sum of each pixel's ((before vs after-quantization filtered 3tuple euclidean distance)) is the cost
 // The optimization problem is finding the combination of colors (Y) and assignements (M) that minimizes cost
-
