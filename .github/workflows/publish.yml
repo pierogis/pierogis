@@ -89,14 +89,14 @@ jobs:
         run: |
           python setup.py sdist
 
-      - name: publish to PyPI
+      - name: publish to test pypi
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TEST_TOKEN }}
         run: |
           pip install twine
           twine upload --repository testpypi dist/* -u __token__ -p "$PYPI_TOKEN"
 
-      - name: publish to Test PyPI
+      - name: publish to pypi
         if: startsWith(github.ref, 'refs/tags')
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}

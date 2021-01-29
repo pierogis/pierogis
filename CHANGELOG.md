@@ -1,25 +1,37 @@
 # changelog
 
 ## TODO
+
 - ingredients
     - [ ] add `Sort.cook` in rust
-    
+
 - features
     - [ ] add cook recipe from json
-    
+
 - testing
     - [ ] add cook and prep tests using simple numpy arrays
     - [ ] add parsing tests
     - [ ] add dish description creation tests
-    
+
 - docs
     - [ ] add docs creation
     - [ ] add docs publish
-    
+
 - deploy
     - [ ] add develop publish to TestPyPi
-    - [ ] ensure testing 
-    - [ ] add docs build to 
+    - [ ] ensure testing
+    - [ ] add docs build to
+
+## v0.1.1
+
+- ingredients
+    - fix `Quantize.prep` not catching extra kwargs
+  
+- documentation
+    - update readme to reflect changes in package name and quantize
+
+- deploy
+    - combine test pypi and normal pypi publish
 
 ## v0.1.0
 
