@@ -4,6 +4,7 @@
 
 - chef
     - redo handling of input dir and unknown output name
+    - add quiet flag
 
 - documentation
     - fix some typos in readme

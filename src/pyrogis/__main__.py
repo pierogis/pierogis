@@ -20,8 +20,10 @@ def parse_args(args: list):
 
     # create parent parser to pass down arguments only
     parent_parser = argparse.ArgumentParser()
-    parent_parser.add_argument('path', default='./', help='path to file or directory to use as input')
-    parent_parser.add_argument('-o', '--output', help='path and filename to save resulting image')
+    parent_parser.add_argument('path', default='./', help="path to file or directory to use as input")
+    parent_parser.add_argument('-o', '--output', help="path and filename to save resulting image")
+    parent_parser.add_argument('-q', '--quiet', default=False, action='store_true',
+                               help="don't output the save location")
 
     for command, command_parser in chef.menu.items():
         # inherit the parent class arguments and the arguments specific to a subcommand
@@ -81,7 +83,8 @@ def main(args=None):
             # use the output popped from arguments to make a filename
             if output is None:
                 # make cooked dir
-                os.mkdir('cooked')
+                if not os.path.isdir('cooked'):
+                    os.mkdir('cooked')
                 output_filename = os.path.join("cooked", path.split('/')[-1])
             else:
                 if len(paths) > 1:
@@ -92,7 +95,9 @@ def main(args=None):
                 else:
                     output_filename = output
 
-            print("Saving " + output_filename, end='\r')
+            if not parsed_vars['quiet']:
+                print("Saving " + output_filename)
+
             # save to the outcome filename
             cooked_dish.save(output_filename)
 
