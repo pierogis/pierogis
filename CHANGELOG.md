@@ -1,5 +1,13 @@
 # changelog
 
+## v0.1.2
+
+- chef
+    - redo handling of input dir and unknown output name
+
+- documentation
+    - fix some typos in readme
+
 ## v0.1.1
 
 - ingredients
