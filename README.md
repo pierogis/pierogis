@@ -13,11 +13,9 @@ pip install pyrogis
 pyrogis chef input.png "sort; quantize"
 ```
 
-![sorted and quantized gnome](demo/gnome_sort_quantize.png)
+![sorted and quantized gnome](demo/out/gnome_sort_quantize.png)
 
 ## features
-
-**
 
 - **Lazy Rendering** - Render a manipulation after constructing your pipeline
 - **Extendable** - Easy to create custom manipulations
@@ -27,7 +25,7 @@ Some ingredients use compiled `Rust` for more speed.
 
 ## install
 
-**Install from wheel with pip**
+**install from a wheel with pip**
 
 ```sh
 pip install pyrogis
@@ -36,7 +34,7 @@ pip install pyrogis
 Depends on `numpy` and `PIL`. PIL requires some external C libraries for handling image files.
 You probably don't have to worry about this. If you do, try a `conda` installation.
 
-To build from source, you will need to install the rust stable toolchain and `setuptools-rust`
+To build from source (either the repository or the sdist), you will need to install the rust stable toolchain and `setuptools-rust`
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 pip install setuptools-rust
@@ -51,34 +49,40 @@ pip install .
 ## cli
 
 ```bash
-pyrogis {recipe} -o output.png path
+pyrogis {recipe} {path} [-o output.png] [...recipe options]
 ```
 
-These options are part of each recipe subcommand (`sort`, `quantize`, etc.).
+The options for output file name and path are used for each recipe subcommand (`sort`, `quantize`, etc.).
+A directory can be used for the path, in which case the program will try to cook each file in the directory.
+If an output filename is provided with a dir path, it will be appended to like `output-0.png`.
 
 |arg|description|default|valid|
 |:----:|-----------|:-----:|:---:|
-|`recipe`|provide the recipe to cook|`sort`|`sort`, `quantize`, `chef`|
+|`recipe`|recipe to cook|`required`|`sort`, `quantize`, `chef`, `threshold`|
+|`-o`,`--output`|name of the output file|`%Y%m%d-%H%M%S.png`|`str`|
+|`path`|path to input media|`required`|`dir`, `file`|
 
 ### sort
+
+*sort pixels along an axis*
 
 ```bash
 pyrogis sort ./input.jpg -o output.png -l 50 -u 180 -t 1
 ```
 
-![quantized gnome](demo/gnome_sort.png)
+![sorted gnome](demo/out/gnome_sort.png)
 
 |arg|description|default|valid|
 |------|-----------|:-----:|:---:|
 |`-l`, `--lower-threshold`|pixels with intensity *below* this value serve as sort boundaries|`64`|`0-255`|
 |`-u`, `--upper-threshold`|pixels with intensity *above* this value serve as sort boundaries|`180`|`0-255`|
-|`-t`, `--turns`|number of turns|`0`|`0-3`|
+|`-t`, `--turns`|number of clockwise turns from sorting bottom to top|`0`|`0-3`|
 
 ### quantize
 
-*quantize an image to a smaller of colors*
+*quantize an image to a smaller set of colors*
 
-![sorted gnome](demo/gnome_magic.png)
+![quantized gnome](demo/out/gnome_magic.png)
 
 ```bash
 pyrogis quantize ./input.jpg -o output.png -n 16 -r 3 -i 3
@@ -97,13 +101,15 @@ pyrogis quantize ./input.jpg -o output.png -n 16 -r 3 -i 3
 
 ### chef
 
-*parse a file for a recipe*
+*parse text for a recipe*
 
-![sorted and quantized gnome](demo/gnome_sort_quantize.png)
+![sorted and quantized gnome](demo/out/gnome_sort_quantize.png)
 
-txt files can describe a series of CLI recipes, piped from one to the next.
+txt files and quoted strings can describe a series of CLI recipes, piped from one to the next.
 
 ```bash
+pyrogis chef ./input.jpg "sort; quantize" -o output.png
+# or
 pyrogis chef ./input.jpg recipe.txt -o output.png
 ```
 
@@ -126,8 +132,8 @@ sort; quantize
 from pyrogis import Pierogi, SpatialQuantize, Sort, Threshold, Dish, Recipe
 ```
 
-A factory, called an `Ingredient`, has a `prep` method for receiving parameters, and a `cook` method for operating on a
-numpy array to produce a programmatic output.
+A factory, called an `Ingredient`, has a `prep` method for receiving parameters,
+and a `cook` method for operating on a numpy array to produce a programmatic output.
 
 These two methods are usually called implicitly, `prep` on init and `cook` when rendering.
 `prep` can be seen as parameterizing the manipulation while `cook` applies it (to an array).
@@ -147,7 +153,9 @@ pixel has been quantized to the closest color in the `palette`.
 
 Note how it is less static than a `Pierogi`, almost *precooked*. When a pierogi is cooked, the "manipulation" that it
 applies is just loading the picture on top. Quantize, like many other `Ingredient` types, depends on a meaningful input
-to `cook` to produce a meaningful output
+to `cook` to produce a meaningful output.
+
+There is also the SpatialQuantize variant which is used for the cli tool.
 
 ```python
 palette = [
@@ -166,9 +174,9 @@ As you can see above, an `Ingredient` has a `pixels` member. This is the interna
 with shape `(width, height, 3)`.
 
 Also consider how `quantize.pixels` doesn't really make sense compared to `pierogi.pixels`. This is related to the
-relative staticness of the `Pierogi`. More on that later.
+relative "staticness" of `Pierogi`. More on that later.
 
-Some other `Ingredient` types include: `SpatialQuantize`, `Threshold`, `Flip`, and `Rotate`.
+Some other `Ingredient` types include: `Threshold`, `Flip`, and `Rotate`.
 
 ### recipe
 
@@ -185,7 +193,7 @@ recipe = Recipe(ingredients=[quantize])
 recipe.cook(pierogi.pixels)
 ```
 
-The will produce the same result.
+The two will produce the same result. But there's a better way.
 
 ### dish
 
@@ -198,10 +206,13 @@ dish = Dish(recipe=recipe)
 ingredient = dish.serve()
 ```
 
-The recipe gets cooked sequentially. The output ingredient can be used like a pierogi now, *precooked*.
-The `save` and `show` methods of `ingredient` can be used.
+The recipe gets cooked sequentially.
+The output ingredient can be used like a pierogi now, *precooked* (with `pixels` member set).
+The `save` and `show` methods of `ingredient` can be used as well.
 
 ### seasoning
+
+There is also a concept of seasonings 
 
 ## extending
 

@@ -3,6 +3,8 @@ import os
 import sys
 import time
 
+from PIL import UnidentifiedImageError
+
 from .chef import Chef, DishDescription
 
 chef = Chef()
@@ -72,18 +74,33 @@ def main(args=None):
 
     # loop through the potential media paths
     for path in paths:
-        cooked_dish = create_dish(path, add_dish_desc, parsed_vars)
+        try:
+            # cook the described dish
+            cooked_dish = create_dish(path, add_dish_desc, parsed_vars)
 
-        # use the output popped from arguments to make a filename
-        output_filename = output
-        if output_filename is None:
-            file_name = time.strftime("%Y%m%d-%H%M%S")
+            # use the output popped from arguments to make a filename
+            if output is None:
+                # make cooked dir
+                os.mkdir('cooked')
+                output_filename = os.path.join("cooked", path.split('/')[-1])
+            else:
+                if len(paths) > 1:
+                    if os.path.isdir(output):
+                        output_filename = os.path.join(output, path.split('/')[-1])
+                    else:
+                        raise Exception("{} should be a directory".format(output))
+                else:
+                    output_filename = output
 
-            output_filename = file_name + ".png"
-            print("No output path provided, using " + output_filename)
+            print("Saving " + output_filename, end='\r')
+            # save to the outcome filename
+            cooked_dish.save(output_filename)
 
-        # save to the outcome filename
-        cooked_dish.save(output_filename)
+        except UnidentifiedImageError:
+            print("{} is not an image".format(path))
+
+        except IsADirectoryError:
+            print("{} is a directory".format(path))
 
 
 if __name__ == "__main__":

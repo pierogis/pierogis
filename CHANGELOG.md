@@ -1,27 +1,5 @@
 # changelog
 
-## TODO
-
-- ingredients
-    - [ ] add `Sort.cook` in rust
-
-- features
-    - [ ] add cook recipe from json
-
-- testing
-    - [ ] add cook and prep tests using simple numpy arrays
-    - [ ] add parsing tests
-    - [ ] add dish description creation tests
-
-- docs
-    - [ ] add docs creation
-    - [ ] add docs publish
-
-- deploy
-    - [ ] add develop publish to TestPyPi
-    - [ ] ensure testing
-    - [ ] add docs build to
-
 ## v0.1.1
 
 - ingredients

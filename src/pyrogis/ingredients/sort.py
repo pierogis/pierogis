@@ -13,25 +13,24 @@ class Sort(Ingredient):
     Can use a seasoning to create that mask when cooking, or have it preloaded using a season method
     """
 
-    def prep(self, rotate: Rotate = None, seasoning: Seasoning = None,
+    def prep(self, rotate: Rotate = None, seasoning: Seasoning = Threshold(),
              delimiter: np.ndarray = np.array([255, 255, 255]), **kwargs):
         """
-        :param rotate define the direction to rotate on. cook sorts from bottom to top after rotation, then unrotates
-        :param seasoning provide the seasoning as a mask
-        :param delimiter the pixel that should be used as the sort subgroup delimiter
+        :param rotate: define the direction to rotate on. cook sorts from bottom to top after rotation, then unrotates
+        :param seasoning: create a mask from a seasoning
+        :param delimiter: the pixel that should be used as the sort subgroup delimiter
 
         Extra kwargs get passed to the Rotate if one is not provided
         """
         self.delimiter = delimiter
 
-        if not rotate:
+        if rotate is None:
             rotate = Rotate(**kwargs)
 
         self.rotate = rotate
 
         # apply seasoning as mask if provided
-        if seasoning is not None:
-            seasoning.season(self)
+        self.seasoning = seasoning
 
     def cook(self, pixels: np.ndarray):
         """
@@ -39,6 +38,11 @@ class Sort(Ingredient):
         """
         # rotate self.mask and pixels to correspond to self.angle
         rotate = self.rotate
+
+        if self.mask is None:
+            self.seasoning.target = Ingredient(pixels)
+            self.seasoning.season(self)
+
         rotated_mask = rotate.cook(self.mask)
         rotated_pixels = rotate.cook(pixels)
 
