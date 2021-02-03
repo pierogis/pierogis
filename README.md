@@ -54,13 +54,13 @@ pyrogis {recipe} {path} [-o output.png] [...recipe options]
 
 The options for output file name and path are used for each menu item subcommand (`sort`, `quantize`, etc.).
 A directory can be used for the path, in which case the program will try to cook each file in the directory.
-If an output is provided with a dir path, it should also be a directory.
+An output can be provided as a directory and filenames will be the same as their input.
 
 |arg|description|default|valid|
 |:----:|-----------|:-----:|:---:|
 |`recipe`|menu item to cook|`required`|`sort`, `quantize`, `chef`, `threshold`|
 |`path`|path to input media|`required`|`dir`, `file`|
-|`-o`,`--output`|name of the output file|`cooked/{input filename}.png`|`str`|
+|`-o`,`--output`|name of the output file|`./cooked`|`str`|
 
 ### sort
 

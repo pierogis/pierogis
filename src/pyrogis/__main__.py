@@ -102,25 +102,17 @@ def main(args=None):
     else:
         raise Exception('Bad path')
 
-    if len(paths) > 1:
-        if os.path.isfile(output):
-            raise Exception(
-                "Output should be a directory when using a directory input"
-            )
+    if not os.path.exists(output):
+        os.makedirs(output)
 
     # loop through the potential media paths
     for path in paths:
         try:
             cooked_dish = cook_dish(path, add_dish_desc, parsed_vars)
 
-            if os.path.isfile(output):
-                output_filename = output
-            else:
-                if not os.path.isdir(output):
-                    os.mkdir(output)
-                output_filename = os.path.join(
-                    output, path.split('/')[-1]
-                )
+            output_filename = os.path.join(
+                output, os.path.split(path)[1]
+            )
 
             if not quiet:
                 print("Saving " + output_filename)
