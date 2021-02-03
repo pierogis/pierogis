@@ -5,11 +5,13 @@ from .ingredient import Ingredient
 
 class Rotate(Ingredient):
     """
-    Rotate a pixel array using a given number of turns in a specified direction
+    rotate a pixel array
     """
 
     def prep(self, clockwise: bool = True, turns: int = 1, **kwargs):
         """
+        provide a given number of turns in a specified direction
+
         :param clockwise if True, top left pixel becomes top right
         :param turns number of 90 degree turns to make
         """
@@ -18,7 +20,7 @@ class Rotate(Ingredient):
 
     def cook(self, pixels: np.ndarray):
         """
-        Rotate the pixels according to parameters
+        rotate the pixels according to parameters
         """
         rotated_pixels = pixels
         # determine axes of rotation from clockwise or not
@@ -33,7 +35,8 @@ class Rotate(Ingredient):
     @classmethod
     def unrotate(cls, rotate: 'Rotate'):
         """
+        return a Rotate that will reverse the given Rotate
+
         :param rotate the rotate to reverse
-        Return a Rotate that will reverse the given Rotate
         """
         return cls(clockwise=not rotate.clockwise, turns=rotate.turns)

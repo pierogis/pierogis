@@ -52,15 +52,15 @@ pip install .
 pyrogis {recipe} {path} [-o output.png] [...recipe options]
 ```
 
-The options for output file name and path are used for each recipe subcommand (`sort`, `quantize`, etc.).
+The options for output file name and path are used for each menu item subcommand (`sort`, `quantize`, etc.).
 A directory can be used for the path, in which case the program will try to cook each file in the directory.
-If an output filename is provided with a dir path, it will be appended to like `output-0.png`.
+If an output is provided with a dir path, it should also be a directory.
 
 |arg|description|default|valid|
 |:----:|-----------|:-----:|:---:|
-|`recipe`|recipe to cook|`required`|`sort`, `quantize`, `chef`, `threshold`|
-|`-o`,`--output`|name of the output file|`%Y%m%d-%H%M%S.png`|`str`|
+|`recipe`|menu item to cook|`required`|`sort`, `quantize`, `chef`, `threshold`|
 |`path`|path to input media|`required`|`dir`, `file`|
+|`-o`,`--output`|name of the output file|`cooked/{input filename}.png`|`str`|
 
 ### sort
 
@@ -91,7 +91,7 @@ pyrogis quantize ./input.jpg -o output.png -n 16 -r 3 -i 3
 |arg|description|default|valid|
 |:----:|-----------|:-----:|:---:|
 |`-n`, `--palette_size`|number of colors in the palette to cluster for|`8`|`int`|
-|`-r`, `--repeats`|number of times to repeat a temperature for DA|`8`|`int`|
+|`-r`, `--repeats`|number of times to repeat a temperature for DA|`1`|`int`|
 |`-i`, `--iterations`|number of times to repeat an iteration of a coarseness level|`1`|`int`|
 |`--initial_temp`|initial temp to use in DA for optimization|`1`|`float`|
 |`--final_temp`|final temp to use in DA for optimization|`.001`|`float`|
@@ -108,14 +108,14 @@ pyrogis quantize ./input.jpg -o output.png -n 16 -r 3 -i 3
 txt files and quoted strings can describe a series of CLI recipes, piped from one to the next.
 
 ```bash
-pyrogis chef ./input.jpg "sort; quantize" -o output.png
+pyrogis chef ./input.jpg "sort -u 100; quantize" -o output.png
 # or
 pyrogis chef ./input.jpg recipe.txt -o output.png
 ```
 
 *recipe.txt*
 ```text
-sort; quantize
+sort -u 100; quantize
 ```
 
 |arg|description|default|valid|
@@ -148,11 +148,14 @@ pierogi = Pierogi(file="/Users/kyle/Desktop/image.jpg")
 
 ### quantize
 
-`Quantize` is another `Ingredient`. When cooked, it will process an incoming numpy array and return an array where every
-pixel has been quantized to the closest color in the `palette`.
+`Quantize` is another `Ingredient`.
+When cooked, it will process an incoming numpy array and return an array
+where every pixel has been quantized to the closest color in the `palette`.
 
-Note how it is less static than a `Pierogi`, almost *precooked*. When a pierogi is cooked, the "manipulation" that it
-applies is just loading the picture on top. Quantize, like many other `Ingredient` types, depends on a meaningful input
+Note how it is less static than a `Pierogi`, almost *precooked*.
+When a pierogi is cooked, the "manipulation" that it applies
+is just loading the picture on top.
+Quantize, like many other `Ingredient` types, depends on a meaningful input
 to `cook` to produce a meaningful output.
 
 There is also the SpatialQuantize variant which is used for the cli tool.
@@ -170,7 +173,8 @@ quantized_pixels = quantize.cook(pierogi.pixels)
 
 This should produce a pixel for pixel quantized version of the input array.
 
-As you can see above, an `Ingredient` has a `pixels` member. This is the internal numpy pixel array of that `Ingredient`
+As you can see above, an `Ingredient` has a `pixels` member.
+This is the internal numpy pixel array of that `Ingredient`
 with shape `(width, height, 3)`.
 
 Also consider how `quantize.pixels` doesn't really make sense compared to `pierogi.pixels`. This is related to the
@@ -180,8 +184,9 @@ Some other `Ingredient` types include: `Threshold`, `Flip`, and `Rotate`.
 
 ### recipe
 
-A typical flow allows you to create a pipeline of `Ingredients` that sequentially apply their `cook` method on to the
-previous array of pixels.
+A typical flow allows you to create a pipeline of `Ingredients`
+that sequentially apply their `cook` method on to
+the previous array of pixels.
 
 A pipeline in `pierogis` is called a `Recipe`. It is an `Ingredient` itself.
 
@@ -259,5 +264,4 @@ supposed to be functionally the same, details of the implementation differ, and 
 
 The quantizing algorithm used in this package is implemented by [`rscolorq`](https://github.com/okaneco/rscolorq), which
 is a port of [`scolorq`](http://people.eecs.berkeley.edu/~dcoetzee/downloads/scolorq/), itself an implementation
-of [Spatial Color Quantization](https://d1wqtxts1xzle7.cloudfront.net/43904012/On_spatial_quantization_of_color_images20160319-27913-c9b6q.pdf?1458434120=&response-content-disposition=inline%3B+filename%3DOn_spatial_quantization_of_color_images.pdf&Expires=1610863916&Signature=JkipRED50Fx67dOuvn~n8-VmRIQ9BfVuFKXyX9iKmR8PV7RLDQfEabsjDZtbuL52f1QI1jSz-wIkVKB1LydnCMQHYBudZS0-Opch-A~2~wxn6rD0Ugwn8EoaU502Nc0yRVjrohpStmEzMNLU79K2591Ek5w8joJVthbg1FTN5AD-jY1NIpe~sah9MPjd84~pMTjXHlKZzL~vhO2~hj3ywTg28Gkx7Fs7MxmDcAbgeuvwKSzitRV7AZBACfBsfH4ih0gqgtQWh~FbPmvCc8cryeN1pjFTBUBFHF4GPNchrx14BYGNMYBdpvfBGJrT5TwzR-OMTBROfTM2wlncRi4z-g__&Key-Pair-Id=APKAJLOHF5GGSLRBV4ZA)
-.
+of Spatial Color Quantization.

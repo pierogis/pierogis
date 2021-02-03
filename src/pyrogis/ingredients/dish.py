@@ -6,12 +6,12 @@ from pyrogis.ingredients.recipe import Recipe
 
 class Dish(Ingredient):
     """
-    Crop and cook an entire recipe for all pixels
+    crop and cook an entire recipe for all pixels
     """
 
     def prep(self, recipe: Recipe):
         """
-        Set the recipe to cook for this dish
+        set the recipe to cook for this dish
 
         :param recipe: Recipe to cook and serve
         """
@@ -19,18 +19,19 @@ class Dish(Ingredient):
 
     def cook(self, pixels: np.ndarray):
         """
-        Use the recipe's cook_mask() method
+        use the recipe's cook_mask() method
         """
         return self.recipe.cook_mask(pixels)
 
     def serve(self):
         """
-        Cook the recipe and set the output to this object's pixel array
+        cook the recipe and set the output to this object's pixel array
         """
 
         pixels = self.pixels
 
-        # if pixels weren't provided, create a blank canvas sized to the first element of the mix
+        # if pixels weren't provided,
+        # create a blank canvas sized to the first element of the mix
         if pixels.shape == (0, 0, 3):
             base = self.recipe.ingredients[0]
             pixels = base.pixels

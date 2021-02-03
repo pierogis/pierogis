@@ -7,20 +7,24 @@ from .seasonings import Seasoning, Threshold
 
 class Sort(Ingredient):
     """
-    Sort a pixel array
-    Uses its mask to determine which groups of pixels to sort (white pixels get sorted)
+    sort a pixel array
 
-    Can use a seasoning to create that mask when cooking, or have it preloaded using a season method
+    uses its mask to determine which groups of pixels to sort
+    (white pixels get sorted)
+
+    can use a seasoning to create that mask when cooking,
+    or have it preloaded using a season method
     """
 
     def prep(self, rotate: Rotate = None, seasoning: Seasoning = Threshold(),
              delimiter: np.ndarray = np.array([255, 255, 255]), **kwargs):
         """
-        :param rotate: define the direction to rotate on. cook sorts from bottom to top after rotation, then unrotates
-        :param seasoning: create a mask from a seasoning
-        :param delimiter: the pixel that should be used as the sort subgroup delimiter
+        cook sorts from bottom to top after rotation, then unrotates
+        extra kwargs get passed to the Rotate if one is not provided
 
-        Extra kwargs get passed to the Rotate if one is not provided
+        :param rotate: define the direction to rotate on
+        :param seasoning: create a mask from a seasoning
+        :param delimiter: pixel used as the sort subgroup delimiter
         """
         self.delimiter = delimiter
 
@@ -34,7 +38,8 @@ class Sort(Ingredient):
 
     def cook(self, pixels: np.ndarray):
         """
-        Sort within each sequence group of contiguous white pixels in the mask (may be all white)
+        sort within each sequence group of contiguous white pixels
+        in the mask (may be all white)
         """
         # rotate self.mask and pixels to correspond to self.angle
         rotate = self.rotate
@@ -58,14 +63,14 @@ class Sort(Ingredient):
             boolean_axis = boolean_array[i]
             # get the indices for this row on the mask that are True
             masked_indices_axis = np.nonzero(boolean_axis)[0]
-            # split up the axis into sub groups at the indices where the mask is inactive
+            # split up the axis into sub groups at indices where mask is black
             sort_groups = np.split(axis, masked_indices_axis)
 
             sorted_groups = []
             # loop through the groups
             for group in sort_groups:
                 # np.sort(group)
-                # if the subgroup to be sorted contains no pixels or just one pixel, ignore
+                # if the subgroup to be sorted contains 0 or 1 pixels, ignore
                 if group.size > 3:
                     # intensity as the sorting criterion
                     intensities = np.average(group, axis=1)
@@ -83,8 +88,3 @@ class Sort(Ingredient):
         sorted_pixels = unrotate.cook(sorted_pixels)
 
         return sorted_pixels
-
-    @classmethod
-    def add_parser_arguments(cls, parser):
-        parser.add_argument('-t', '--turns', default=0, type=int)
-        Threshold.add_parser_arguments(parser)

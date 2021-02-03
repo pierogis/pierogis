@@ -1,6 +1,7 @@
 use rscolorq::color::Rgb;
 use rscolorq::{FilterSize, Matrix2d, Params};
 
+#[allow(clippy::too_many_arguments)]
 pub fn cook(
     pixels_array: &&[u8],
     width: usize,

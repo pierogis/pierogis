@@ -1,13 +1,18 @@
 import numpy as np
 
-from pyrogis.ingredients.ingredient import Ingredient
+from .ingredient import Ingredient
 
 
 class Recipe(Ingredient):
+    """
+    ingredient used to coordinate cooking of several ingredients
+
+    when a recipe is cooked, its ingredients are cooked in order
+    """
 
     def prep(self, ingredients: list, **kwargs):
         """
-        Provide a list of ingredients to cook in sequence
+        provide a list of ingredients to cook in sequence
 
         :param ingredients: list of Ingredient objects
         """
@@ -19,7 +24,9 @@ class Recipe(Ingredient):
             raise TypeError("kwarg 'ingredients' must be of type list")
 
     def cook(self, pixels: np.ndarray):
-        """Applies pixels as a selection mask/base to ingredients
+        """
+        sequentially cooks each ingredient
+        uses the pixels resulting from the previous cook
         """
         # input array used to select the
         under_pixels = pixels
@@ -27,10 +34,11 @@ class Recipe(Ingredient):
             # cook the lower layer
             cooked_pixels = ingredient.cook_mask(under_pixels)
             # mix them based on the overlaying opacity
-            mixed_pixels = (
-                                   cooked_pixels.astype(np.dtype(float)) * ingredient.opacity
-                                   + under_pixels.astype(np.dtype(float)) * (100 - ingredient.opacity)
-                           ) / 100
+            mixed_pixels = (cooked_pixels.astype(np.dtype(float))
+                            * ingredient.opacity
+                            +
+                            under_pixels.astype(np.dtype(float))
+                            * (100 - ingredient.opacity)) / 100
             # reset for loop
             under_pixels = mixed_pixels.astype('uint8')
 
@@ -44,8 +52,3 @@ class Recipe(Ingredient):
         Add an ingredient
         """
         self.ingredients.append(ingredient)
-
-    # def select(self):
-    #     self.pixel_array
-
-    #     return Ingredient()

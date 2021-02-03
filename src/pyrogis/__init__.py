@@ -5,9 +5,20 @@ from .ingredients import Pierogi
 from .ingredients import Quantize
 from .ingredients import SpatialQuantize
 from .ingredients import Sort
-from .ingredients.seasonings import Seasoning
-from .ingredients.seasonings import Threshold
+from .ingredients import Threshold
 
 from .chef import Chef
 
-__version__ = '0.1.2'
+__version__ = '0.1.3-dev0'
+
+__all__ = [
+    'Dish',
+    'Ingredient',
+    'Recipe',
+    'Pierogi',
+    'Quantize',
+    'SpatialQuantize',
+    'Sort',
+    'Threshold',
+    'Chef'
+]

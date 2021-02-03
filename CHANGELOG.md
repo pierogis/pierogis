@@ -1,5 +1,20 @@
 # changelog
 
+## v0.1.3
+
+- ingredients
+    - threshold default behavior change
+  
+- chef
+    - menu items as separate classes from chef
+  
+- package
+    - lots of formatting/lint fixes, notably subpackage imports
+    - documentation improvements
+
+- tests
+    - threshold tests added
+
 ## v0.1.2
 
 - chef

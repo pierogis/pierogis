@@ -2,8 +2,17 @@ from setuptools import setup
 from setuptools import find_packages
 from setuptools_rust import RustExtension, Binding
 
+readme = open("README.md").read()
+changelog = open("CHANGELOG.md").read()
+
 setup(
     name='pyrogis',
+    author="Kyle Moore",
+    author_email="admin@pierogis.live",
+    description="image manipulation with numpy",
+    url="https://github.com/pierogis/pierogis",
+    long_description=readme + "\n\n" + changelog,
+    long_description_content_type="text/markdown",
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,

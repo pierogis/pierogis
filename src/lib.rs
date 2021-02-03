@@ -16,6 +16,7 @@ fn rpierogis(py: Python<'_>, m: &PyModule) -> PyResult<()> {
     ///
     /// This function adds two unsigned 64-bit integers.
     #[pyfn(recipes_module, "quantize")]
+    #[allow(clippy::too_many_arguments)]
     fn py_quantize<'py>(
         py: Python<'py>,
         pixels_py_array: PyReadonlyArray<u8, Ix3>,
@@ -53,6 +54,7 @@ fn rpierogis(py: Python<'_>, m: &PyModule) -> PyResult<()> {
     }
 
     #[pyfn(recipes_module, "threshold")]
+    #[allow(clippy::too_many_arguments)]
     fn py_threshold<'py>(
         py: Python<'py>,
         pixels_py_array: &PyArray<u8, Ix3>,
