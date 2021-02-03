@@ -60,8 +60,8 @@ fn rpierogis(py: Python<'_>, m: &PyModule) -> PyResult<()> {
         pixels_py_array: &PyArray<u8, Ix3>,
         lower_threshold: u8,
         upper_threshold: u8,
-        include_pixel: PyReadonlyArray<i64, Ix1>,
-        exclude_pixel: PyReadonlyArray<i64, Ix1>,
+        include_pixel: PyReadonlyArray<u8, Ix1>,
+        exclude_pixel: PyReadonlyArray<u8, Ix1>,
     ) -> PyResult<&'py PyArray<u8, Ix3>> {
         let pixels = unsafe { pixels_py_array.as_slice_mut() }?;
         let include_pixel = include_pixel.as_slice()?;

@@ -4,6 +4,7 @@
 
 - ingredients
     - threshold default behavior change
+    - threshold now accepting exclude/include pixels as usize for windows support
   
 - chef
     - menu items as separate classes from chef
