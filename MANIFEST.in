@@ -1,4 +1,6 @@
 include Cargo.toml
+include README.md
+include CHANGELOG.md
 recursive-include src *
 
 global-exclude *.py[cod]

@@ -3,9 +3,9 @@ import os
 import sys
 
 from PIL import UnidentifiedImageError
-from .chef.dish_description import DishDescription
 
-from .chef import Chef, dish_description
+from .chef import Chef
+from .chef.dish_description import DishDescription
 
 chef = Chef()
 
@@ -103,20 +103,24 @@ def main(args=None):
         raise Exception('Bad path')
 
     if len(paths) > 1:
-        if not os.path.isdir(output):
-            os.mkdir(output)
+        if os.path.isfile(output):
+            raise Exception(
+                "Output should be a directory when using a directory input"
+            )
 
     # loop through the potential media paths
     for path in paths:
         try:
             cooked_dish = cook_dish(path, add_dish_desc, parsed_vars)
 
-            if os.path.isdir(output):
+            if os.path.isfile(output):
+                output_filename = output
+            else:
+                if not os.path.isdir(output):
+                    os.mkdir(output)
                 output_filename = os.path.join(
                     output, path.split('/')[-1]
                 )
-            else:
-                output_filename = output
 
             if not quiet:
                 print("Saving " + output_filename)
