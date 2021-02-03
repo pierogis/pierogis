@@ -70,7 +70,8 @@ class Threshold(Seasoning):
         cooked_pixels = recipes.threshold(
             cooked_pixels.astype(np.dtype('uint8')),
             self.lower_threshold, self.upper_threshold,
-            self.include_pixel, self.exclude_pixel
+            self.include_pixel.astype(np.dtype('uint8')),
+            self.exclude_pixel.astype(np.dtype('uint8'))
         )
 
         return cooked_pixels
