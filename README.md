@@ -13,8 +13,17 @@ pip install pyrogis
 pyrogis chef input.png "sort; quantize"
 ```
 
-![sorted and quantized gnome](demo/out/gnome_sort_quantize.png)
+![sorted and quantized gnome](https://raw.githubusercontent.com/pierogis/pierogis/master/demo/out/gnome_sort_quantize.png)
 
+##### Table of Contents  
+- [features](#features)    
+- [install](#install)   
+- [issues and contributing](#issues-and-contributing)   
+- [cli](#cli)   
+- [package](#package)
+- [acknowledgements](#acknowledgements)
+
+<a name="features"></a>
 ## features
 
 - **Lazy Rendering** - Render a manipulation after constructing your pipeline
@@ -23,6 +32,7 @@ pyrogis chef input.png "sort; quantize"
 - **Numpy or Rust backend** - Image processing functions use Numpy for (python relative) fast operations.
 Some ingredients use compiled `Rust` for more speed.
 
+<a name="install"></a>
 ## install
 
 **install from a wheel with pip**
@@ -44,33 +54,60 @@ python setup.py develop
 pip install .
 ```
 
+<a name="issues-and-contributing"></a>
+## issues and contributing
+
+When you encounter an error, there are some guidelines that will make it easier to help you:
+- Ensure that you are using the latest version of the package.
+  It's early days so errors and updates will be frequent.
+  Use `pip uninstall pyrogis` then `pip install pyrogis --no-cache-dir` to reinstall
+- Provide me the version of `pyrogis` that you are using in issues.
+  We can determine if that may be causing your issue
+  `pip list`
+- Provide the traceback or error message if you can
+- If the problem is visual, that can be more difficult to debug
+- If you are getting different behavior than you expect, that could be an error or a feature too
+- If your problem is with installation, good luck
+
+Hopefully all levels of skills use this package.
+Any form of contributing is appreciated;
+passive-aggressive semi-anonymous downvoting in issues is not appreciated.
+
+Remember that everyone using and contributing to this package
+is doing it for the love of the game.
+
+Don't feel like your problem is too small to make an issue.
+Pull requests are always welcome and anyone interested in dev work should join the [discord](https://discord.gg/9XpEjMw3Rx).
+There is always a desire for more `Ingredient` type suggestions.
+
 # usage
 
+<a name="cli"></a>
 ## cli
 
 ```bash
-pyrogis {recipe} {path} [-o output.png] [...recipe options]
+pyrogis {recipe} {path} [-o output_dir] [...recipe options]
 ```
 
-The options for output file name and path are used for each menu item subcommand (`sort`, `quantize`, etc.).
-A directory can be used for the path, in which case the program will try to cook each file in the directory.
-An output can be provided as a directory and filenames will be the same as their input.
+The options for `output` file name and `path` are used for each menu item subcommand (`sort`, `quantize`, etc.).
+A directory can be used for `path`, in which case the program will try to cook each file in the directory.
+An `output` can be provided as a directory and filenames will be the same as their input.
 
 |arg|description|default|valid|
 |:----:|-----------|:-----:|:---:|
 |`recipe`|menu item to cook|`required`|`sort`, `quantize`, `chef`, `threshold`|
 |`path`|path to input media|`required`|`dir`, `file`|
-|`-o`,`--output`|name of the output file|`./cooked`|`str`|
+|`-o`,`--output`|name of the output directory|`./cooked`|`str`|
 
 ### sort
 
 *sort pixels along an axis*
 
 ```bash
-pyrogis sort ./input.jpg -o output.png -l 50 -u 180 -t 1
+pyrogis sort ./input.jpg -o ./output -l 50 -u 180 -t 1
 ```
 
-![sorted gnome](demo/out/gnome_sort.png)
+![sorted gnome](https://raw.githubusercontent.com/pierogis/pierogis/master/demo/out/gnome_sort.png)
 
 |arg|description|default|valid|
 |------|-----------|:-----:|:---:|
@@ -82,10 +119,10 @@ pyrogis sort ./input.jpg -o output.png -l 50 -u 180 -t 1
 
 *quantize an image to a smaller set of colors*
 
-![quantized gnome](demo/out/gnome_magic.png)
+![quantized gnome](https://raw.githubusercontent.com/pierogis/pierogis/master/demo/out/gnome_magic.png)
 
 ```bash
-pyrogis quantize ./input.jpg -o output.png -n 16 -r 3 -i 3
+pyrogis quantize input.jpg -n 16 -r 3 -i 3
 ```
 
 |arg|description|default|valid|
@@ -103,14 +140,14 @@ pyrogis quantize ./input.jpg -o output.png -n 16 -r 3 -i 3
 
 *parse text for a recipe*
 
-![sorted and quantized gnome](demo/out/gnome_sort_quantize.png)
+![sorted and quantized gnome](https://raw.githubusercontent.com/pierogis/pierogis/master/demo/out/gnome_sort_quantize.png)
 
 txt files and quoted strings can describe a series of CLI recipes, piped from one to the next.
 
 ```bash
-pyrogis chef ./input.jpg "sort -u 100; quantize" -o output.png
+pyrogis chef ./input.jpg "sort -u 100; quantize" -o ./output
 # or
-pyrogis chef ./input.jpg recipe.txt -o output.png
+pyrogis chef ./input.jpg recipe.txt -o ./output
 ```
 
 *recipe.txt*
@@ -122,6 +159,7 @@ sort -u 100; quantize
 |:----:|-----------|:-----:|:---:|
 |recipe|path to json or txt file to use as a recipe|`recipe.txt`|`str`|
 
+<a name="package"></a>
 ## package
 
 *"`pierogis` is the name of the framework;
@@ -256,6 +294,7 @@ then divides them each by `self.scale`.
 Numpy operations can be pretty fast if you can keep them vectorized. This means try to avoid looping over the columns
 and rows of an array.
 
+<a name="acknowledgements"></a>
 ## acknowledgements
 
 The original python [pixelsort](https://github.com/satyarth/pixelsort) package inspired this package. While the
