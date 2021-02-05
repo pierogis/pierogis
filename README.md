@@ -61,13 +61,14 @@ When you encounter an error, there are some guidelines that will make it easier 
 - Ensure that you are using the latest version of the package.
   It's early days so errors and updates will be frequent.
   Use `pip uninstall pyrogis` then `pip install pyrogis --no-cache-dir` to reinstall
-- Provide me the version of `pyrogis` that you are using in issues.
-  We can determine if that may be causing your issue
-  `pip list`
+- Provide the version of `pyrogis` that you are using in issues to rule that out
+  `pip list` -> pyrogis _._._
 - Provide the traceback or error message if you can
-- If the problem is visual, that can be more difficult to debug
-- If you are getting different behavior than you expect, that could be an error or a feature too
-- If your problem is with installation, good luck
+- If the problem is visual: that can be more difficult to debug.
+  Try to use an image hosting site if you want to share what you are seeing in an issue.
+- If you are getting different behavior than you expect: that could be an error or a feature too
+- If your problem is with installation: try conda, preinstall `numpy` and `pillow`,
+  install the rust toolchain, and start praying
 
 Hopefully all levels of skills use this package.
 Any form of contributing is appreciated;
@@ -77,8 +78,12 @@ Remember that everyone using and contributing to this package
 is doing it for the love of the game.
 
 Don't feel like your problem is too small to make an issue.
-Pull requests are always welcome and anyone interested in dev work should join the [discord](https://discord.gg/9XpEjMw3Rx).
+Pull requests are always welcome and anyone interested in dev work should join the
+[discord](https://discord.gg/9XpEjMw3Rx).
 There is always a desire for more `Ingredient` type suggestions.
+
+You can post your creations in the demo channel on the
+[discord](https://discord.gg/9XpEjMw3Rx)
 
 # usage
 
@@ -255,7 +260,8 @@ The `save` and `show` methods of `ingredient` can be used as well.
 
 ### seasoning
 
-There is also a concept of seasonings 
+There is also a concept of seasonings.
+They can be used to apply something like masks to other ingredients that affect the pixels they act on.
 
 ## extending
 
