@@ -15,22 +15,12 @@ pyrogis chef input.png "sort; quantize"
 
 ![sorted and quantized gnome](https://raw.githubusercontent.com/pierogis/pierogis/master/demo/out/gnome_sort_quantize.png)
 
-##### Table of Contents  
-- [features](#features)    
 - [install](#install)   
+- [features](#features)   
 - [issues and contributing](#issues-and-contributing)   
 - [cli](#cli)   
 - [package](#package)
 - [acknowledgements](#acknowledgements)
-
-<a name="features"></a>
-## features
-
-- **Lazy Rendering** - Render a manipulation after constructing your pipeline
-- **Extendable** - Easy to create custom manipulations
-- **CLI** - Use the CLI to cook à la carte recipes, or provide a recipe in a document
-- **Numpy or Rust backend** - Image processing functions use Numpy for (python relative) fast operations.
-Some ingredients use compiled `Rust` for more speed.
 
 <a name="install"></a>
 ## install
@@ -44,15 +34,22 @@ pip install pyrogis
 Depends on `numpy` and `PIL`. PIL requires some external C libraries for handling image files.
 You probably don't have to worry about this. If you do, try a `conda` installation.
 
-To build from source (either the repository or the sdist), you will need to install the rust stable toolchain and `setuptools-rust`
+To build from source (either the repository or the sdist), you will need to install the rust stable toolchain and `setuptools-rust`.
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 pip install setuptools-rust
 
-python setup.py develop
-# or 
 pip install .
 ```
+
+<a name="features"></a>
+## features
+
+- **Lazy Rendering** - Render a manipulation after constructing your pipeline
+- **Extendable** - Easy to create custom manipulations
+- **CLI** - Use the CLI to cook à la carte recipes, or provide a recipe in a document
+- **Numpy or Rust backend** - Image processing functions use Numpy for (python relative) fast operations.
+Some ingredients use compiled `Rust` for more speed.
 
 <a name="issues-and-contributing"></a>
 ## issues and contributing
@@ -60,19 +57,22 @@ pip install .
 When you encounter an error, there are some guidelines that will make it easier to help you:
 - Ensure that you are using the latest version of the package.
   It's early days so errors and updates will be frequent.
-  Use `pip uninstall pyrogis` then `pip install pyrogis --no-cache-dir` to reinstall
-- Provide the version of `pyrogis` that you are using in issues to rule that out
-  `pip list` -> pyrogis _._._
-- Provide the traceback or error message if you can
+  Use `pip uninstall pyrogis` then `pip install pyrogis --no-cache-dir` to reinstall.
+- Provide the version of `pyrogis` that you are using in issues to rule that out.
+  `pip list` -> pyrogis \_.\_.\_
+- Provide the traceback or error message if you can.
+- Provide your os and any other specific information relevant to how you are trying to use the package.
+- Provide the code or the cli command that triggered the error.
 - If the problem is visual: that can be more difficult to debug.
   Try to use an image hosting site if you want to share what you are seeing in an issue.
-- If you are getting different behavior than you expect: that could be an error or a feature too
+- If you are getting different behavior than you expect: that could be an error or a feature too.
 - If your problem is with installation: try conda, preinstall `numpy` and `pillow`,
-  install the rust toolchain, and start praying
+  install the rust toolchain, and start praying.
+  There will be a website with a visual editor for this software so stay tuned.
 
 Hopefully all levels of skills use this package.
 Any form of contributing is appreciated;
-passive-aggressive semi-anonymous downvoting in issues is not appreciated.
+passive-aggressive semi-anonymous thumbs down in issues is not appreciated.
 
 Remember that everyone using and contributing to this package
 is doing it for the love of the game.
@@ -80,10 +80,9 @@ is doing it for the love of the game.
 Don't feel like your problem is too small to make an issue.
 Pull requests are always welcome and anyone interested in dev work should join the
 [discord](https://discord.gg/9XpEjMw3Rx).
-There is always a desire for more `Ingredient` type suggestions.
 
-You can post your creations in the demo channel on the
-[discord](https://discord.gg/9XpEjMw3Rx)
+There is always a desire for more `Ingredient` type suggestions in the ingredients channel.
+You can post your creations in the demo channel as well.
 
 # usage
 

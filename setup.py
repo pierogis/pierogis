@@ -1,5 +1,5 @@
-from setuptools import setup
 from setuptools import find_packages
+from setuptools import setup
 from setuptools_rust import RustExtension, Binding
 
 readme = open("README.md").read()
@@ -21,7 +21,7 @@ setup(
         'numpy>=1.19.4'
     ],
     rust_extensions=[
-        RustExtension("rpierogis", binding=Binding.PyO3)
+        RustExtension("pierogis_rs", binding=Binding.PyO3)
     ],
     entry_points={
         'console_scripts': [

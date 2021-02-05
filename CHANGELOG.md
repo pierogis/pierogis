@@ -1,5 +1,9 @@
 # changelog
 
+## v0.1.4
+- ingredients
+    - change references to `rpierogis` to `pierogis_rs`
+
 ## v0.1.3
 
 - ingredients

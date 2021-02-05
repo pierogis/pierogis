@@ -15,4 +15,4 @@ venv
 # rust
 /target
 /build
-/src/rpierogis*
+/src/pierogis_rs*

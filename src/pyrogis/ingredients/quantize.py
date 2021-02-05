@@ -1,5 +1,5 @@
 import numpy as np
-from rpierogis import recipes
+from pierogis_rs import algorithms
 
 from .ingredient import Ingredient
 
@@ -106,7 +106,7 @@ class SpatialQuantize(Quantize):
         """
 
         # rotating and unrotating because different orientation is expected
-        cooked_pixels = np.rot90(recipes.quantize(
+        cooked_pixels = np.rot90(algorithms.quantize(
             np.ascontiguousarray(np.rot90(pixels), dtype=np.dtype('uint8')),
             palette_size=self.palette_size,
             iters_per_level=self.iterations,

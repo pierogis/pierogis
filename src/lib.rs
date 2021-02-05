@@ -7,15 +7,15 @@ use rayon::prelude::*;
 mod quantize;
 
 #[pymodule]
-fn rpierogis(py: Python<'_>, m: &PyModule) -> PyResult<()> {
-    let recipes_module = PyModule::new(py, "recipes")?;
-    m.add_submodule(recipes_module)?;
+fn pierogis_rs(py: Python<'_>, m: &PyModule) -> PyResult<()> {
+    let module = PyModule::new(py, "algorithms")?;
+    m.add_submodule(module)?;
 
     /// quantize(py_array, palette_size, /)
     /// --
     ///
     /// This function adds two unsigned 64-bit integers.
-    #[pyfn(recipes_module, "quantize")]
+    #[pyfn(module, "quantize")]
     #[allow(clippy::too_many_arguments)]
     fn py_quantize<'py>(
         py: Python<'py>,
@@ -53,7 +53,7 @@ fn rpierogis(py: Python<'_>, m: &PyModule) -> PyResult<()> {
         PyArray::from_vec(py, cooked_array).reshape((width, height, 3))
     }
 
-    #[pyfn(recipes_module, "threshold")]
+    #[pyfn(module, "threshold")]
     #[allow(clippy::too_many_arguments)]
     fn py_threshold<'py>(
         py: Python<'py>,

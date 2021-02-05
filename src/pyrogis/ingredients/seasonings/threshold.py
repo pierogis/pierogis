@@ -2,7 +2,7 @@
 threshold ingredient(s)
 """
 import numpy as np
-from rpierogis import recipes
+from pierogis_rs import algorithms
 
 from .seasoning import Seasoning
 
@@ -67,7 +67,7 @@ class Threshold(Seasoning):
         cooked_pixels = pixels.copy()
 
         # cook using the rust function
-        cooked_pixels = recipes.threshold(
+        cooked_pixels = algorithms.threshold(
             cooked_pixels.astype(np.dtype('uint8')),
             self.lower_threshold, self.upper_threshold,
             self.include_pixel.astype(np.dtype('uint8')),
