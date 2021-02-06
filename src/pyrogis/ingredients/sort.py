@@ -1,5 +1,6 @@
 import numpy as np
 
+from .bases import Base
 from .ingredient import Ingredient
 from .rotate import Rotate
 from .seasonings import Seasoning, Threshold
@@ -16,7 +17,7 @@ class Sort(Ingredient):
     or have it preloaded using a season method
     """
 
-    def prep(self, rotate: Rotate = None, seasoning: Seasoning = Threshold(),
+    def prep(self, rotate: Rotate = None, seasoning: Seasoning = None,
              delimiter: np.ndarray = np.array([255, 255, 255]), **kwargs):
         """
         cook sorts from bottom to top after rotation, then unrotates
@@ -34,6 +35,8 @@ class Sort(Ingredient):
         self.rotate = rotate
 
         # apply seasoning as mask if provided
+        if seasoning is None:
+            seasoning = Threshold(target=kwargs.pop('target'))
         self.seasoning = seasoning
 
     def cook(self, pixels: np.ndarray):
@@ -45,7 +48,7 @@ class Sort(Ingredient):
         rotate = self.rotate
 
         if self.mask is None:
-            self.seasoning.target = Ingredient(pixels)
+            self.seasoning.target = Base(pixels=pixels)
             self.seasoning.season(self)
 
         rotated_mask = rotate.cook(self.mask)

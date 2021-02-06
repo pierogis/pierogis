@@ -35,6 +35,9 @@ class Threshold(Seasoning):
         or higher that :param upper_threshold
         are true (include_pixel)
         """
+        # set include/exclude_pixel and target, if provided
+        super().prep(**kwargs)
+
         if lower_threshold is None and upper_threshold is None:
             lower_threshold = self.LOWER_THRESHOLD
             upper_threshold = self.UPPER_THRESHOLD
@@ -48,9 +51,6 @@ class Threshold(Seasoning):
         self.lower_threshold = lower_threshold
         self.upper_threshold = upper_threshold
 
-        # set include/exclude_pixel and target, if provided
-        super().prep(**kwargs)
-
     def cook(self, pixels: np.ndarray):
         """
         pixels with brightness >= upper_threshold
@@ -60,10 +60,6 @@ class Threshold(Seasoning):
 
         parallel computation in rust is 10x speedup
         """
-
-        if self.target is not None:
-            pixels = self.target.pixels
-
         cooked_pixels = pixels.copy()
 
         # cook using the rust function
@@ -84,16 +80,11 @@ class Threshold(Seasoning):
         include_pixels = np.resize(self.include_pixel, pixels.shape)
         exclude_pixels = np.resize(self.exclude_pixel, pixels.shape)
 
-        # use target, if available
-        target_pixels = pixels
-        if self.target is not None:
-            target_pixels = self.target.pixels
-
         # use exclude_pixels as the base
         cooked_pixels = exclude_pixels
         # get intensities from average of rgb
         intensities_array = np.sum(
-            target_pixels * np.asarray([0.299, 0.587, 0.114]), axis=2
+            pixels * np.asarray([0.299, 0.587, 0.114]), axis=2
         )
         # if intensity <= lower or >= upper, True
         boolean_array = np.logical_or(

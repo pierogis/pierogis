@@ -9,7 +9,7 @@ setup(
     name='pyrogis',
     author="Kyle Moore",
     author_email="admin@pierogis.live",
-    description="image manipulation with numpy",
+    description="image processing framework",
     url="https://github.com/pierogis/pierogis",
     long_description=readme + "\n\n" + changelog,
     long_description_content_type="text/markdown",

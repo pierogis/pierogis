@@ -1,10 +1,10 @@
 # pierogis
 
-**image processing pipelines**
+**image processing framework**
 
 `pierogis` is a framework for image processing.
 Ingredients that describe image processing functions can be assembled
-into recipes and executed.
+into recipes and cooked.
 
 `pyrogis` is a python library and cli tool implementing this framework.
 
@@ -70,18 +70,18 @@ When you encounter an error, there are some guidelines that will make it easier 
   install the rust toolchain, and start praying.
   There will be a website with a visual editor for this software so stay tuned.
 
-Hopefully all levels of skills use this package.
+Hopefully all levels of skills can use this package.
 Any form of contributing is appreciated;
-passive-aggressive semi-anonymous thumbs down in issues is not appreciated.
+passive-aggressive semi-anonymous thumbs down is not appreciated.
 
-Remember that everyone using and contributing to this package
+Everyone using and contributing to this package
 is doing it for the love of the game.
 
-Don't feel like your problem is too small to make an issue.
+Don't feel like your issue is too small to make an issue.
 Pull requests are always welcome and anyone interested in dev work should join the
 [discord](https://discord.gg/9XpEjMw3Rx).
 
-There is always a desire for more `Ingredient` type suggestions in the ingredients channel.
+`Ingredient` type algorithm/function suggestions can go in the ingredients channel.
 You can post your creations in the demo channel as well.
 
 # usage

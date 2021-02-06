@@ -5,6 +5,7 @@ seasoning base ingredient
 import numpy as np
 
 from pyrogis.ingredients.ingredient import Ingredient
+from ..bases.base import Base
 
 
 class Seasoning(Ingredient):
@@ -23,7 +24,7 @@ class Seasoning(Ingredient):
 
     def prep(
             self,
-            target: Ingredient = None,
+            target: Base,
             include_pixel: np.ndarray = None,
             exclude_pixel: np.ndarray = None,
             **kwargs
@@ -44,6 +45,26 @@ class Seasoning(Ingredient):
             exclude_pixel = self._black_pixel
         self.exclude_pixel = np.asarray(exclude_pixel)
 
+    def cook(self, pixels: np.ndarray):
+        """
+        Pixels that match the include pixel should be set as the include pixel,
+        otherwise set as the exclude pixel
+
+        This isn't very useful, this is mostly an abstract class.
+        """
+        # turn pixels into boolean array
+        # True replaces a pixel that matches self.include_pixel
+        boolean_array = np.all(
+            pixels == self.include_pixel, axis=2
+        )
+
+        # replace True with include_pixel and False with exclude_pixel
+        binary_pixels = np.where(
+            boolean_array, self.include_pixel, self.exclude_pixel
+        )
+
+        return binary_pixels
+
     def season(self, recipient: Ingredient):
         """
         Set the input ingredient's mask to the output of a cook.
@@ -53,35 +74,6 @@ class Seasoning(Ingredient):
 
         :param recipient: ingredient which will have its mask set
         """
-
-        recipient_pixels = recipient.pixels
-
-        recipient.mask = self.cook(recipient_pixels)
+        self.mask = self.cook(self.target.pixels)
 
         return recipient
-
-    def cook(self, pixels: np.ndarray):
-        """
-        Pixels that match the include pixel should be set as the include pixel,
-        otherwise set as the exclude pixel
-
-        This isn't very useful, this is mostly an abstract class.
-        """
-        # tries to use self.target and defaults to the passed in pixels
-        target_pixels = pixels
-
-        if self.target is not None:
-            target_pixels = self.target.pixels
-
-        # turn pixels into boolean array
-        # True replaces a pixel that matches self.include_pixel
-        boolean_array = np.all(
-            target_pixels == self.include_pixel, axis=2
-        )
-
-        # replace True with include_pixel and False with exclude_pixel
-        binary_pixels = np.where(
-            boolean_array, self.include_pixel, self.exclude_pixel
-        )
-
-        return binary_pixels

@@ -25,15 +25,23 @@ def create_parser():
         'path',
         default='./',
         help="path to file or directory to use as input")
+    # output
     parent_parser.add_argument(
         '-o', '--output',
         default='./cooked',
         help="path and filename to save resulting image"
     )
+    # quiet
     parent_parser.add_argument(
         '-q', '--quiet',
         default=False, action='store_true',
         help="don't output the save location"
+    )
+    # frames
+    parent_parser.add_argument(
+        '-f', '--frames',
+        default=False, action='store_true',
+        help="output as individual frames instead of an animation"
     )
 
     for command, menu_item in chef.menu.items():
@@ -57,18 +65,28 @@ def parse_args(args: list):
     # parse the input args with the applicable arguments attached
     parsed = parser.parse_args(args)
     parsed_vars = vars(parsed)
-    # need the path to use as input for some recipes
-    # like opening files for ingredients
-    path = parsed_vars.pop('path')
-    # need to take out output because it is just used for cli stuff
-    output = parsed_vars.pop('output')
-    quiet = parsed_vars.pop('quiet')
 
     # get default handler parameter attached to subparsers
     # function for handling a command's options
     add_dish_desc = parsed_vars.pop('add_dish_desc')
 
-    return path, output, quiet, parsed_vars, add_dish_desc
+    return parsed_vars, add_dish_desc
+
+
+def parse_common(parsed_vars):
+    # need the path to use as input for some recipes
+    # like opening files for ingredients
+    path = parsed_vars.pop('path')
+    # need to take out output because it is just used for cli stuff
+    output = parsed_vars.pop('output')
+
+    # quiet flag lets you turn off print filename
+    quiet = parsed_vars.pop('quiet')
+
+    # frames lets you output as individual frames instead of auto animating
+    frames = parsed_vars.pop('frames')
+
+    return path, output, quiet, frames
 
 
 def cook_dish(path: str, add_dish_desc, parsed_vars):
@@ -92,7 +110,9 @@ def main(args=None):
     if args is None:
         args = sys.argv[1:]
 
-    path, output, quiet, parsed_vars, add_dish_desc = parse_args(args)
+    parsed_vars, add_dish_desc = parse_args(args)
+
+    path, output, quiet, frames = parse_common(parsed_vars)
 
     # check if the path given contains many media
     if os.path.isdir(path):

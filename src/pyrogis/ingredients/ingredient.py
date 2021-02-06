@@ -28,8 +28,7 @@ class Ingredient:
 
     default_pixel = _black_pixel
 
-    def __init__(self, pixels: np.ndarray = None, shape: tuple = (0, 0),
-                 opacity: int = 100, mask: np.ndarray = None, **kwargs):
+    def __init__(self, opacity: int = 100, mask: np.ndarray = None, **kwargs):
         """
         :param pixels: if provided, these pixels will be returned by cook
         :param shape: if provided with no pixels, defines the (width, height)
@@ -39,48 +38,7 @@ class Ingredient:
         """
         self.opacity = opacity
         self.mask = mask
-
-        if pixels is None:
-            pixels = np.full((*shape, 3), self.default_pixel)
-
-        self.pixels = pixels
-
         self.prep(**kwargs)
-
-    @property
-    def width(self):
-        """
-        width from self.pixels
-        """
-        return self.pixels.shape[0]
-
-    @property
-    def height(self):
-        """
-        height from self.pixels
-        """
-        return self.pixels.shape[1]
-
-    # @property
-    # def size(self):
-    #     """(width, height)
-    #     """
-    #     return self.width, self.height
-
-    @property
-    def shape(self):
-        """
-        (width, height, 3)
-        """
-        return self.width, self.height, 3
-
-    @property
-    def image(self):
-        """
-        turn the numpy array into a PIL Image
-        """
-        image = Image.fromarray(np.rot90(self.pixels), 'RGB')
-        return image
 
     def prep(self, **kwargs):
         """
@@ -92,7 +50,7 @@ class Ingredient:
         """
         performs actions on a pixel array and returns a cooked array
         """
-        return self.pixels
+        return pixels
 
     def apply_mask(self, uncooked_pixels, cooked_pixels):
         """
@@ -125,16 +83,3 @@ class Ingredient:
         cooked_pixels = self.cook(pixels)
         masked_pixels = self.apply_mask(pixels, cooked_pixels)
         return masked_pixels
-
-    def show(self):
-        """
-        open an image viewer to display the array
-        """
-        self.image.show()
-
-    def save(self, path, format='PNG'):
-        """
-        save the image to the given path
-        """
-
-        self.image.save(path, format=format)
