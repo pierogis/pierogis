@@ -10,6 +10,9 @@ class Recipe(Ingredient):
     when a recipe is cooked, its ingredients are cooked in order
     """
 
+    def __call__(self, frame: int, frames: int):
+        return self
+
     def prep(self, ingredients: list, **kwargs):
         """
         provide a list of ingredients to cook in sequence

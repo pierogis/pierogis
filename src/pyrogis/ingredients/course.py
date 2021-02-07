@@ -22,3 +22,5 @@ class Course:
         #     dish = Dish(pierogi, recipe)
         #
         #     dish.serve()
+
+# different generators at different frames

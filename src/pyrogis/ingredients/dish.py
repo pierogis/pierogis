@@ -1,5 +1,7 @@
+import os
 from typing import List
 
+import imageio as imageio
 import numpy as np
 
 from .ingredient import Ingredient
@@ -12,19 +14,40 @@ class Dish(Ingredient):
     crop and cook an entire recipe for all pixels
     """
 
-    def prep(self, pierogis: List[Pierogi], recipe: Recipe):
+    @property
+    def frames(self):
+        return len(self.pierogis)
+
+    def prep(self, recipe_generator, pierogis: List[Pierogi]=None, file=None, path=None):
         """
         set the recipe to cook for this dish
-
-        :param base: base to start from
-        :param recipe: recipe to cook and serve
         """
 
+        if pierogis is None:
+            pierogis = []
+
+            if file is not None:
+                images = imageio.mimread(file)
+                for image in images:
+                    pierogis.append(Pierogi(pixels=np.asarray(image)))
+            elif path is not None:
+                pierogis = self.get_path_pierogis(path)
+
         self.pierogis = pierogis
-        self.recipe = recipe
+        self.recipe_generator = recipe_generator
+
+    @staticmethod
+    def get_path_pierogis(path):
+        pierogis = []
+
+        for file in os.listdir(path):
+            if not os.path.isfile(file):
+                continue
+
+            pierogis.append(Pierogi(file=file))
 
     def cook(self, pixels: np.ndarray):
-        return self.serve().pixels
+        return self.recipe_generator(0, 0).cook(self.pierogis[0].pixels)
 
     def serve(self):
         """
@@ -32,9 +55,11 @@ class Dish(Ingredient):
         """
         cooked_pierogis = []
 
-        for pierogi in self.pierogis:
+        for frame in range(self.frames):
+            pierogi = self.pierogis[frame]
             # cook with these pixels as first input
-            cooked_pixels = self.recipe.cook(pierogi.pixels)
+            recipe = self.recipe_generator(frame + 1, self.frames)
+            cooked_pixels = recipe.cook(pierogi.pixels)
             # ensure that the cooked pixels do not overflow 0-255
             clipped_pixels = np.clip(cooked_pixels, 0, 255)
             # # set the objects own pixels to the result of cooking
@@ -42,9 +67,7 @@ class Dish(Ingredient):
 
             cooked_pierogis.append(cooked_pierogi)
 
-        animation = Animation(cooked_pierogis)
-
-        return animation
+        self.pierogis = cooked_pierogis
 
     #
     # @property

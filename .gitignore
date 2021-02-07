@@ -1,16 +1,16 @@
 # generated
 *.pyc
 *.egg-info
-
-# venv
-venv
-
-# vscode
-.vscode
 /dist/
 /build/
 /.eggs/
 
+# venv
+venv
+
+# editor
+.vscode
+.idea
 
 # rust
 /target

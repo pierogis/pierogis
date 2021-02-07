@@ -37,7 +37,7 @@ class Pierogi(Ingredient):
 
         :param pixels: numpy array
         :param image: PIL Image that has already been loaded
-        :param bytes: bytes
+        :param file: provide an input image as a file
         :param file: file path to load from
         """
         if pixels is None:
@@ -53,11 +53,6 @@ class Pierogi(Ingredient):
                 raise Exception("one of image, file, or shape must be provided")
 
         self.pixels = pixels
-
-        # if self.height > 0 and self.width > 0:
-        #     # truncate or fill pixels
-        #     self.pixels = self.pixels.resize
-        #     pass
 
     def cook(self, pixels: np.ndarray):
         """

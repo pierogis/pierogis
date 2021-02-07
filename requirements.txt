@@ -1,5 +1,5 @@
 Pillow>=8.0.1
 numpy>=1.19.4
-setuptools_rust>=0.11.6
+setuptools-rust>=0.11.6
 pytest
-imageio
+imageio>=2.9.0

@@ -18,7 +18,8 @@ setup(
     include_package_data=True,
     install_requires=[
         'Pillow>=8.0.1',
-        'numpy>=1.19.4'
+        'numpy>=1.19.4',
+        'imageio>=2.9.0',
     ],
     rust_extensions=[
         RustExtension("pierogis_rs", binding=Binding.PyO3)
