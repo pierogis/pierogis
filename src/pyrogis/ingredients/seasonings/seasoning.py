@@ -5,7 +5,7 @@ seasoning base ingredient
 import numpy as np
 
 from pyrogis.ingredients.ingredient import Ingredient
-from ..bases.base import Base
+from ..pierogi import Pierogi
 
 
 class Seasoning(Ingredient):
@@ -24,7 +24,7 @@ class Seasoning(Ingredient):
 
     def prep(
             self,
-            target: Base,
+            pierogi: Pierogi,
             include_pixel: np.ndarray = None,
             exclude_pixel: np.ndarray = None,
             **kwargs
@@ -35,7 +35,7 @@ class Seasoning(Ingredient):
         Think of them like little flakes of seasoning
         :param exclude_pixel: The color to use for excluded pixels
         """
-        self.target = target
+        self.pierogi = pierogi
 
         if include_pixel is None:
             include_pixel = self._white_pixel
@@ -74,6 +74,6 @@ class Seasoning(Ingredient):
 
         :param recipient: ingredient which will have its mask set
         """
-        self.mask = self.cook(self.target.pixels)
+        recipient.mask = self.cook(self.pierogi.pixels)
 
         return recipient

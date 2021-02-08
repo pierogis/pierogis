@@ -13,7 +13,7 @@ class Recipe(Ingredient):
     def __call__(self, frame: int, frames: int):
         return self
 
-    def prep(self, ingredients: list, **kwargs):
+    def prep(self, ingredients: list=None, **kwargs):
         """
         provide a list of ingredients to cook in sequence
 

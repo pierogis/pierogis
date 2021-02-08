@@ -4,6 +4,7 @@ import sys
 
 from PIL import UnidentifiedImageError
 
+from pyrogis import Dish, Pierogi
 from .chef import Chef
 from .chef.dish_description import DishDescription
 
@@ -16,7 +17,7 @@ def create_parser():
         description='** image processing pipelines **'
     )
     subparsers = parser.add_subparsers(
-        dest='recipe', required=True
+        dest='order', required=True
     )
 
     # create parent parser to pass down arguments only
@@ -28,20 +29,13 @@ def create_parser():
     # output
     parent_parser.add_argument(
         '-o', '--output',
-        default='./cooked',
-        help="path and filename to save resulting image"
+        help="path to save resulting image"
     )
     # quiet
     parent_parser.add_argument(
         '-q', '--quiet',
         default=False, action='store_true',
         help="don't output the save location"
-    )
-    # frames
-    parent_parser.add_argument(
-        '-f', '--frames',
-        default=False, action='store_true',
-        help="output as individual frames instead of an animation"
     )
 
     for command, menu_item in chef.menu.items():
@@ -52,6 +46,28 @@ def create_parser():
             parents=[parent_parser, menu_item.get_parser()],
             add_help=False
         )
+
+    plate_subparser = subparsers.add_parser(
+        'plate',
+        parents=[parent_parser],
+        add_help=False
+    )
+    plate_subparser.add_argument(
+        '-d', '--duration',
+        type=int,
+        help="duration in ms"
+    )
+    plate_subparser.add_argument(
+        '-f', '--fps',
+        default=25,
+        type=int
+    )
+    plate_subparser.add_argument(
+        '--no-optimize',
+        dest='optimize',
+        default=True,
+        action='store_false'
+    )
 
     return parser
 
@@ -66,11 +82,7 @@ def parse_args(args: list):
     parsed = parser.parse_args(args)
     parsed_vars = vars(parsed)
 
-    # get default handler parameter attached to subparsers
-    # function for handling a command's options
-    add_dish_desc = parsed_vars.pop('add_dish_desc')
-
-    return parsed_vars, add_dish_desc
+    return parsed_vars
 
 
 def parse_common(parsed_vars):
@@ -83,10 +95,7 @@ def parse_common(parsed_vars):
     # quiet flag lets you turn off print filename
     quiet = parsed_vars.pop('quiet')
 
-    # frames lets you output as individual frames instead of auto animating
-    frames = parsed_vars.pop('frames')
-
-    return path, output, quiet, frames
+    return path, output, quiet
 
 
 def cook_dish(path: str, add_dish_desc, parsed_vars):
@@ -105,46 +114,127 @@ def cook_dish(path: str, add_dish_desc, parsed_vars):
     return chef.cook_dish_desc(dish_desc)
 
 
+def assemble(path, output, parsed_vars):
+    frames = os.listdir(path)
+    # sort so we can gif in order
+    frames.sort()
+
+    pierogis = []
+
+    for frame in frames:
+        try:
+            pierogis.append(Pierogi(file=os.path.join(path, frame)))
+
+        except UnidentifiedImageError:
+            print("{} is not an image".format(path))
+
+        except ValueError:
+            print("{} is not an image".format(path))
+
+        except IsADirectoryError:
+            print("{} is a directory".format(path))
+
+    dish = Dish(pierogis=pierogis)
+    if output is None:
+        output = "cooked.gif"
+    duration = parsed_vars.pop('duration')
+    if duration is not None:
+        duration /= 1000
+    fps = parsed_vars.pop('fps')
+    optimize = parsed_vars.pop('optimize')
+    dish.save(output, optimize, duration=duration, fps=fps)
+
+    exit(0)
+
+
+def cook_dir(path, output, parsed_vars):
+    paths = [path + '/' + filename for filename in os.listdir(path)]
+
+    # sort so we can gif in order
+    paths.sort()
+
+    if parsed_vars['order'] == 'plate':
+        assemble(path, output, parsed_vars)
+
+    if output is None:
+        output = "cooked"
+    if not os.path.isdir(output):
+        os.makedirs(output)
+
+    else:
+        # get default handler parameter attached to subparsers
+        # function for handling a command's options
+        add_dish_desc = parsed_vars.pop('add_dish_desc')
+
+        for path in paths:
+            try:
+                cooked_dish = cook_dish(path, add_dish_desc, parsed_vars)
+                cooked_dish.pierogis[0].file = os.path.join(
+                    output,
+                    os.path.splitext(os.path.basename(path))[0] + ".png"
+                )
+                cooked_dish.save(output)
+
+            except UnidentifiedImageError:
+                print("{} is not an image".format(path))
+
+            except ValueError:
+                print("{} is not an image".format(path))
+
+            except IsADirectoryError:
+                print("{} is a directory".format(path))
+
+
+def cook_file(path, output, parsed_vars):
+    # if the path is an image, it should be cooked solo
+    # if it is a gif, it should be
+    dish = Dish(file=path)
+
+    # get default handler parameter attached to subparsers
+    # function for handling a command's options
+    add_dish_desc = parsed_vars.pop('add_dish_desc')
+
+    # input file is a video
+    if len(dish.pierogis) > 1:
+        if output is None:
+            output = "cooked"
+        if not os.path.isdir(output):
+            os.makedirs(output)
+
+        i = 1
+        for pierogi in dish.pierogis:
+            frame_path = os.path.join(output, str(i).zfill(4) + '.png')
+            i += 1
+
+            pierogi.save(frame_path)
+            cooked_dish = cook_dish(frame_path, add_dish_desc, parsed_vars)
+            cooked_dish.save(frame_path)
+
+    else:
+        cooked_dish = cook_dish(path, add_dish_desc, parsed_vars)
+        if output is None:
+            output = "cooked.png"
+        cooked_dish.pierogis[0].file = path
+        cooked_dish.save(output)
+
+
 def main(args=None):
     """cli program"""
     if args is None:
         args = sys.argv[1:]
 
-    parsed_vars, add_dish_desc = parse_args(args)
+    parsed_vars = parse_args(args)
 
-    path, output, quiet, frames = parse_common(parsed_vars)
+    path, output, quiet = parse_common(parsed_vars)
 
-    # check if the path given contains many media
     if os.path.isdir(path):
-        paths = [path + '/' + filename for filename in os.listdir(path)]
+        # if the path given contains many media
+        cook_dir(path, output, parsed_vars)
     elif os.path.isfile(path):
-        paths = [path]
+        # can be a gif/vid or an image
+        cook_file(path, output, parsed_vars)
     else:
         raise Exception('Bad path')
-
-    if not os.path.exists(output):
-        os.makedirs(output)
-
-    # loop through the potential media paths
-    for path in paths:
-        try:
-            cooked_dish = cook_dish(path, add_dish_desc, parsed_vars)
-
-            output_filename = os.path.join(
-                output, os.path.split(path)[1]
-            )
-
-            if not quiet:
-                print("Saving " + output_filename)
-
-            # save to the outcome filename
-            cooked_dish.save(output_filename)
-
-        except UnidentifiedImageError:
-            print("{} is not an image".format(path))
-
-        except IsADirectoryError:
-            print("{} is a directory".format(path))
 
 
 if __name__ == "__main__":

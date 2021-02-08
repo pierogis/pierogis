@@ -2,7 +2,7 @@ from .dish_description import DishDescription
 from .menu import menu
 from ..ingredients import (
     Dish, Pierogi, Sort,
-    SpatialQuantize, Threshold, Recipe
+    SpatialQuantize, Threshold, Recipe, Rotate
 )
 
 
@@ -14,10 +14,10 @@ class Chef:
     and cooking a parsed representation
     """
     ingredient_classes = {
-        'pierogi': Pierogi,
         'sort': Sort,
         'quantize': SpatialQuantize,
-        'threshold': Threshold
+        'threshold': Threshold,
+        'rotate': Rotate
     }
 
     # seasoning_classes = {
@@ -26,10 +26,21 @@ class Chef:
 
     menu = menu
 
+    def create_pierogi_objects(self, pierogi_descs: dict, file_links: dict):
+        pierogi_objects = {}
+
+        for pierogi_key, pierogi_desc in pierogi_descs.items():
+            file = file_links[pierogi_desc.files_key]
+            pierogi = Pierogi(file=file)
+
+            pierogi_objects[pierogi_key] = pierogi
+
+        return pierogi_objects
+
     def create_ingredient_objects(
             self,
             ingredient_descs: dict,
-            file_links: dict
+            pierogis: dict
     ):
         """
         create a dict of uuid->Ingredient
@@ -45,22 +56,47 @@ class Chef:
         for ingredient_name, ingredient_desc in ingredient_descs.items():
             # if path is one of the kwargs
             # look it up in the linking paths dictionary
-            file_name = ingredient_desc.kwargs.get('file')
-            if file_name is not None:
-                file = file_links[file_name]
-                ingredient_desc.kwargs['file'] = file
+            pierogi_name = ingredient_desc.kwargs.get('pierogi')
+            if pierogi_name is not None:
+                pierogi = pierogis[pierogi_name]
+                ingredient_desc.kwargs['pierogi'] = pierogi
 
-            # now create an ingredient as specified in the description
-            ingredient = ingredient_desc.create(self.ingredient_classes)
+            ingredient = self.get_or_create_ingredient(ingredients, ingredient_descs, ingredient_name)
 
             ingredients[ingredient_name] = ingredient
 
         return ingredients
 
+    def get_or_create_ingredient(self, ingredients: dict, ingredient_descs: dict, ingredient_name):
+        ingredient = ingredients.get(ingredient_name)
+
+        if ingredient is None:
+            ingredient_desc = ingredient_descs[ingredient_name]
+
+            # search kwargs for keys that are type names
+            # swap the value of that kwarg (reference key) for the built ingredient
+            for ingredient_type_name in self.ingredient_classes.keys():
+                ingredient_name = ingredient_desc.kwargs.get(ingredient_type_name)
+
+                if ingredient_name is not None:
+                    ingredient = self.get_or_create_ingredient(ingredients, ingredient_descs, ingredient_name)
+                    ingredient_desc.kwargs[ingredient_type_name] = ingredient
+
+            # now create an ingredient as specified in the description
+            ingredient = ingredient_desc.create(self.ingredient_classes)
+
+        return ingredient
+
+    def apply_seasonings(self, ingredients, seasoning_links):
+        for seasoning, recipient in seasoning_links.items():
+            seasoning = ingredients[seasoning]
+            recipient = ingredients[recipient]
+
+            seasoning.season(recipient)
+
     def create_recipe_object(
             self,
             ingredients: dict,
-            seasoning_links: dict,
             recipe_order: list
     ):
         """
@@ -74,28 +110,13 @@ class Chef:
         to seasoning uuid values
         :param recipe_order: order of ingredients by uuid
         """
+
         recipe = Recipe(ingredients=[])
-
-        for ingredient_name in recipe_order:
-            # loop through the ingredient keys specified by the recipe
-
+        # loop through the ingredient keys specified by the recipe
+        for ingredient_key in recipe_order:
             # there might be a bug here with the ingredient being out
             # of sync with another reference to that ingredient
-            ingredient = ingredients[ingredient_name]
-
-            # if there is a season to be applied to this ingredient
-            seasoning_name = seasoning_links.get(ingredient_name)
-            if seasoning_name is not None:
-                # get the ingredient to apply the season
-                seasoning = ingredients[seasoning_name]
-                # by default a seasoning's target
-                # is the first ingredient in the recipe
-                if seasoning.target is None:
-                    seasoning.target = recipe.ingredients[0]
-
-                # now seasoning should cook the first ingredient's pixel array
-                # and apply that as the mask on ingredient
-                seasoning.season(ingredient)
+            ingredient = ingredients[ingredient_key]
 
             # add this created ingredient to the dish recipe for return
             recipe.add(ingredient)
@@ -106,21 +127,34 @@ class Chef:
         """
         cook a dish from a series of descriptive dicts
         """
+        pierogi_descs = dish_description.pierogis
         ingredient_descs = dish_description.ingredients
-        file_links = dish_description.file_links
-        recipe_order = dish_description.recipe_order
+        file_links = dish_description.files
+        dish = dish_description.dish
         seasoning_links = dish_description.seasoning_links
+
+        pierogis = self.create_pierogi_objects(
+            pierogi_descs,
+            file_links
+        )
 
         ingredients = self.create_ingredient_objects(
             ingredient_descs,
-            file_links
+            pierogis
+        )
+
+        self.apply_seasonings(
+            ingredients,
+            seasoning_links
         )
 
         recipe = self.create_recipe_object(
             ingredients,
-            seasoning_links,
-            recipe_order
+            dish['recipe']
         )
 
-        dish = Dish(recipe=recipe)
+        dish = Dish(
+            pierogis=[pierogis[dish['pierogi']]],
+            recipe=recipe
+        )
         return dish.serve()

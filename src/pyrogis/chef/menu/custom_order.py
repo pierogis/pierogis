@@ -5,9 +5,9 @@ from .menu_item import MenuItem
 from ..dish_description import DishDescription
 
 
-class CustomDish(MenuItem):
+class CustomOrder(MenuItem):
     @staticmethod
-    def read_recipe(dish_description: DishDescription, recipe_text: str):
+    def read_recipe(dish_description: DishDescription, recipe_text: str, target_pierogi_uuid):
         """
         read a recipe from string to a DishDescription
 
@@ -47,7 +47,7 @@ class CustomDish(MenuItem):
                 add_dish_desc = parsed_vars.pop('add_dish_desc')
 
                 dish_description = add_dish_desc(
-                    dish_description, **parsed_vars
+                    dish_description, target_pierogi_uuid=target_pierogi_uuid, **parsed_vars
                 )
 
         return dish_description
@@ -57,13 +57,15 @@ class CustomDish(MenuItem):
             cls,
             dish_desc: DishDescription,
             path=None,
+            target_pierogi_uuid=None,
             **kwargs
     ):
         """
         add to dish_desc using a recipe specified in a string or a file
         """
         if path is not None:
-            dish_desc = cls.add_pierogi_desc(dish_desc, path)
+            target_pierogi_uuid = dish_desc.add_pierogi_desc(path)
+            dish_desc.dish['pierogi'] = target_pierogi_uuid
 
         # recipe can be provided as a string
         recipe = kwargs.pop('recipe')
@@ -74,7 +76,7 @@ class CustomDish(MenuItem):
             with open(recipe) as recipe_file:
                 recipe_text = recipe_file.read()
 
-        dish_desc = cls.read_recipe(dish_desc, recipe_text)
+        dish_desc = cls.read_recipe(dish_desc, recipe_text, target_pierogi_uuid)
 
         return dish_desc
 

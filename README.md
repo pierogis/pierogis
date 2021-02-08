@@ -10,7 +10,7 @@ into recipes and cooked.
 
 ```bash
 pip install pyrogis
-pyrogis chef input.png "sort; quantize"
+pyrogis chef input.png "sort; quantize" -o output.png
 ```
 
 ![sorted and quantized gnome](https://raw.githubusercontent.com/pierogis/pierogis/master/demo/out/gnome_sort_quantize.png)
@@ -89,19 +89,29 @@ You can post your creations in the demo channel as well.
 <a name="cli"></a>
 ## cli
 
+All of the cli commands look like this.
+
 ```bash
-pyrogis {recipe} {path} [-o output_dir] [...recipe options]
+pyrogis {recipe} {path} [-o output] [--frames] [...recipe options]
 ```
 
-The options for `output` file name and `path` are used for each menu item subcommand (`sort`, `quantize`, etc.).
+`recipe` is one of
+- [chef](#chef)   
+- [sort](#sort)   
+- [quantize](#quantize)   
+- [threshold](#threshold)   
+
+The options `output` and `path` are used for each `recipe` (`sort`, `quantize`, etc.).
 A directory can be used for `path`, in which case the program will try to cook each file in the directory.
-An `output` can be provided as a directory and filenames will be the same as their input.
+If an `output` is provided, it should match the expected output.
+
+In addition, each `recipe` has its own set of options.
 
 |arg|description|default|valid|
 |:----:|-----------|:-----:|:---:|
 |`recipe`|menu item to cook|`required`|`sort`, `quantize`, `chef`, `threshold`|
 |`path`|path to input media|`required`|`dir`, `file`|
-|`-o`,`--output`|name of the output directory|`./cooked`|`str`|
+|`-o`,`--output`|name of the output directory|`required`|`str`|
 
 ### sort
 
@@ -162,6 +172,25 @@ sort -u 100; quantize
 |arg|description|default|valid|
 |:----:|-----------|:-----:|:---:|
 |recipe|path to json or txt file to use as a recipe|`recipe.txt`|`str`|
+
+### threshold
+
+*pixels included or excluded based on brightness*
+
+![threshold gnome](https://raw.githubusercontent.com/pierogis/pierogis/master/demo/out/gnome_threshold.png)
+
+Pixels with brightness outside of the thresholds provided become "included".
+Pixels within the thresholds become "excluded".
+By default, included means replaced with white, excluded with black.
+
+```bash
+pyrogis threshold ./input.jpg -u 150 -l 20 
+```
+TODO:
+
+|arg|description|default|valid|
+|:----:|-----------|:-----:|:---:|
+|-u,--upper|path to json or txt file to use as a recipe|`recipe.txt`|`str`|
 
 <a name="package"></a>
 ## package

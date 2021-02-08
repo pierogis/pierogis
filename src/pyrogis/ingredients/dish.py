@@ -3,6 +3,7 @@ from typing import List
 
 import imageio as imageio
 import numpy as np
+import pygifsicle
 
 from .ingredient import Ingredient
 from .pierogi import Pierogi
@@ -18,7 +19,7 @@ class Dish(Ingredient):
     def frames(self):
         return len(self.pierogis)
 
-    def prep(self, recipe_generator, pierogis: List[Pierogi]=None, file=None, path=None):
+    def prep(self, recipe=Recipe(), pierogis: List[Pierogi] = None, file=None, path=None):
         """
         set the recipe to cook for this dish
         """
@@ -27,14 +28,17 @@ class Dish(Ingredient):
             pierogis = []
 
             if file is not None:
-                images = imageio.mimread(file)
-                for image in images:
-                    pierogis.append(Pierogi(pixels=np.asarray(image)))
+                try:
+                    images = imageio.mimread(file)
+                    for image in images:
+                        pierogis.append(Pierogi(pixels=np.rot90(np.asarray(image), axes=(1, 0))))
+                except Exception as err:
+                    pierogis = [Pierogi(file=file)]
             elif path is not None:
                 pierogis = self.get_path_pierogis(path)
 
         self.pierogis = pierogis
-        self.recipe_generator = recipe_generator
+        self.recipe = recipe
 
     @staticmethod
     def get_path_pierogis(path):
@@ -47,18 +51,19 @@ class Dish(Ingredient):
             pierogis.append(Pierogi(file=file))
 
     def cook(self, pixels: np.ndarray):
-        return self.recipe_generator(0, 0).cook(self.pierogis[0].pixels)
+        return self.recipe(0, 0).cook(self.pierogis[0].pixels)
 
     def serve(self):
         """
         cook the recipe and set the output to this object's pixel array
         """
+
         cooked_pierogis = []
 
         for frame in range(self.frames):
             pierogi = self.pierogis[frame]
             # cook with these pixels as first input
-            recipe = self.recipe_generator(frame + 1, self.frames)
+            recipe = self.recipe(frame + 1, self.frames)
             cooked_pixels = recipe.cook(pierogi.pixels)
             # ensure that the cooked pixels do not overflow 0-255
             clipped_pixels = np.clip(cooked_pixels, 0, 255)
@@ -67,7 +72,21 @@ class Dish(Ingredient):
 
             cooked_pierogis.append(cooked_pierogi)
 
-        self.pierogis = cooked_pierogis
+        return Dish(pierogis=cooked_pierogis)
+
+    def save(self, path, optimize: bool = True, duration: float = None, fps: int = 25):
+        if len(self.pierogis) > 1:
+            imageio.mimwrite(
+                path,
+                ims=[np.asarray(pierogi.image) for pierogi in self.pierogis],
+                duration=duration,
+                fps=fps
+            )
+
+            if optimize:
+                pygifsicle.optimize(path)
+        else:
+            self.pierogis[0].save(path)
 
     #
     # @property

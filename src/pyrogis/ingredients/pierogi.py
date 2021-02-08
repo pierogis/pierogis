@@ -1,6 +1,7 @@
 """
 define an image wrapper ingredient
 """
+import os
 
 import imageio
 import numpy as np
@@ -40,13 +41,15 @@ class Pierogi(Ingredient):
         :param file: provide an input image as a file
         :param file: file path to load from
         """
+
         if pixels is None:
             if image is not None:
                 # rotate the image array on receipt so that
                 # array dimensions are (width, height, 3)
                 pixels = np.rot90(np.array(image.convert('RGB')), axes=(1, 0))
             elif file is not None:
-                pixels = np.array(imageio.imread(file))
+                self.file = file
+                pixels = np.rot90(np.array(imageio.imread(file)), axes=(1, 0))
             elif shape is not None:
                 pixels = np.full((*shape, 3), self.default_pixel)
             else:
@@ -71,4 +74,10 @@ class Pierogi(Ingredient):
         save the image to the given path
         """
 
-        self.image.save(path, optimize=optimize)
+        output_filename = path
+        if os.path.isdir(path):
+            output_filename = os.path.join(
+                path, os.path.split(self.file)[1]
+            )
+
+        self.image.save(output_filename, optimize=optimize)

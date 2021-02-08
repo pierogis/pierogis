@@ -4,7 +4,7 @@ from ..dish_description import DishDescription, IngredientDesc
 from ...ingredients import Threshold
 
 
-class ThresholdDish(MenuItem):
+class ThresholdOrder(MenuItem):
     @classmethod
     def add_desc(
             cls,
@@ -16,11 +16,11 @@ class ThresholdDish(MenuItem):
         add a threshold recipe to the dish description
         """
         if path is not None:
-            dish_desc = cls.add_pierogi_desc(dish_desc, path)
+            target_pierogi_uuid = dish_desc.add_pierogi_desc(path)
+            dish_desc.dish['pierogi'] = target_pierogi_uuid
 
         ingredient_desc = IngredientDesc(
             type_name='threshold',
-            args=[],
             kwargs={
                 **kwargs
             }

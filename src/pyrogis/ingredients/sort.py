@@ -1,7 +1,7 @@
 import numpy as np
 
-from .bases import Base
 from .ingredient import Ingredient
+from .pierogi import Pierogi
 from .rotate import Rotate
 from .seasonings import Seasoning, Threshold
 
@@ -17,8 +17,11 @@ class Sort(Ingredient):
     or have it preloaded using a season method
     """
 
-    def prep(self, rotate: Rotate = None, seasoning: Seasoning = None,
-             delimiter: np.ndarray = np.array([255, 255, 255]), **kwargs):
+    def prep(
+            self, rotate: Rotate = None, seasoning: Seasoning = None,
+            delimiter: np.ndarray = np.array([255, 255, 255]),
+            **kwargs
+    ):
         """
         cook sorts from bottom to top after rotation, then unrotates
         extra kwargs get passed to the Rotate if one is not provided
@@ -26,17 +29,15 @@ class Sort(Ingredient):
         :param rotate: define the direction to rotate on
         :param seasoning: create a mask from a seasoning
         :param delimiter: pixel used as the sort subgroup delimiter
+        :param target: pierogi to use as target for an automatic seasoning
         """
         self.delimiter = delimiter
 
         if rotate is None:
-            rotate = Rotate(**kwargs)
+            rotate = Rotate(turns=0)
 
         self.rotate = rotate
 
-        # apply seasoning as mask if provided
-        if seasoning is None:
-            seasoning = Threshold(target=kwargs.pop('target'))
         self.seasoning = seasoning
 
     def cook(self, pixels: np.ndarray):
@@ -47,8 +48,7 @@ class Sort(Ingredient):
         # rotate self.mask and pixels to correspond to self.angle
         rotate = self.rotate
 
-        if self.mask is None:
-            self.seasoning.target = Base(pixels=pixels)
+        if self.seasoning is not None:
             self.seasoning.season(self)
 
         rotated_mask = rotate.cook(self.mask)

@@ -1,11 +1,11 @@
-from .custom_dish import CustomDish
-from .quantize_dish import QuantizeDish
-from .sort_dish import SortDish
-from .threshold_dish import ThresholdDish
+from .custom_order import CustomOrder
+from .quantize_order import QuantizeOrder
+from .sort_order import SortOrder
+from .threshold_order import ThresholdOrder
 
 menu = {
-    'sort': SortDish,
-    'quantize': QuantizeDish,
-    'chef': CustomDish,
-    'threshold': ThresholdDish
+    'sort': SortOrder,
+    'quantize': QuantizeOrder,
+    'chef': CustomOrder,
+    'threshold': ThresholdOrder
 }
