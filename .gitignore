@@ -4,6 +4,7 @@
 /dist/
 /build/
 /.eggs/
+/cooked*
 
 # venv
 venv

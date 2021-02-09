@@ -1,4 +1,5 @@
 import numpy as np
+from PIL import ImageColor
 from pierogis_rs import algorithms
 
 from .ingredient import Ingredient
@@ -12,22 +13,31 @@ class Quantize(Ingredient):
     PALETTE_SIZE = 8
 
     def prep(self,
-             palette=None, palette_size=PALETTE_SIZE, **kwargs):
+             colors=None, palette_size=PALETTE_SIZE, **kwargs):
         """
         parameters for spatial color quantization
 
-        :param palette: the palette to use
+        :param palette: colors to use. can be a list of str
+        or array likes
         :param palette_size: the palette size to generate
         """
 
-        if palette is None:
-            palette = np.empty((palette_size, 3))
+        if colors is None:
+            colors = np.empty((palette_size, 3))
+        elif type(colors) is list:
+            rgb_colors = []
+            for color in colors:
+                if type(color) is str:
+                    if color[0] != '#':
+                        color = '#' + color
+                    colors.append(ImageColor.getcolor(color, "RGB"))
 
-        palette = np.array(palette)
-        if palette.ndim != 2 or palette.shape[-1] != 3:
-            raise ValueError('Palette should resizable to (n, 3)')
+            colors = np.asarray(rgb_colors)
 
-        self.palette = palette
+        else:
+            colors = np.array(colors)
+
+        self.palette = colors.astype(np.dtype('uint8'))
         self.palette_size = palette_size
 
     def cook(self, pixels: np.ndarray):
@@ -108,6 +118,7 @@ class SpatialQuantize(Quantize):
         # rotating and unrotating because different orientation is expected
         cooked_pixels = np.rot90(algorithms.quantize(
             np.ascontiguousarray(np.rot90(pixels), dtype=np.dtype('uint8')),
+            self.palette,
             palette_size=self.palette_size,
             iters_per_level=self.iterations,
             repeats_per_temp=self.repeats,
@@ -119,5 +130,3 @@ class SpatialQuantize(Quantize):
         ), axes=(1, 0))
 
         return cooked_pixels
-
-

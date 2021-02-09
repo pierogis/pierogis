@@ -39,7 +39,7 @@ class QuantizeOrder(MenuItem):
 
         # add palette and palette size
         parser.add_argument(
-            '-p', '--palette',
+            '-c', '--colors',
             nargs='+',
             help='hex color codes to quantize to'
         )

@@ -1,7 +1,7 @@
 use ndarray::parallel::prelude::*;
-use numpy::{Ix1, Ix3, PyArray, PyReadonlyArray, ToPyArray};
-use pyo3::prelude::{pymodule, PyModule};
+use numpy::{Ix1, Ix2, Ix3, PyArray, PyReadonlyArray, ToPyArray};
 use pyo3::{PyResult, Python};
+use pyo3::prelude::{pymodule, PyModule};
 use rayon::prelude::*;
 
 mod quantize;
@@ -20,6 +20,7 @@ fn pierogis_rs(py: Python<'_>, m: &PyModule) -> PyResult<()> {
     fn py_quantize<'py>(
         py: Python<'py>,
         pixels_py_array: PyReadonlyArray<u8, Ix3>,
+        palette_py_array: PyReadonlyArray<u8, Ix2>,
         palette_size: u8,
         iters_per_level: usize,
         repeats_per_temp: usize,
@@ -30,6 +31,7 @@ fn pierogis_rs(py: Python<'_>, m: &PyModule) -> PyResult<()> {
         seed: Option<u64>,
     ) -> PyResult<&'py PyArray<u8, Ix3>> {
         let array = pixels_py_array.as_slice()?;
+        let palette = palette_py_array.as_slice()?;
 
         let shape = pixels_py_array.shape();
         let width = shape[0];
@@ -39,6 +41,7 @@ fn pierogis_rs(py: Python<'_>, m: &PyModule) -> PyResult<()> {
             &array,
             width,
             height,
+            &palette,
             palette_size,
             iters_per_level,
             repeats_per_temp,

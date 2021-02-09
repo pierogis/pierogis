@@ -1,4 +1,5 @@
 import argparse
+import math
 import os
 import sys
 
@@ -144,48 +145,61 @@ def assemble(path, output, parsed_vars):
     optimize = parsed_vars.pop('optimize')
     dish.save(output, optimize, duration=duration, fps=fps)
 
-    exit(0)
-
 
 def cook_dir(path, output, parsed_vars):
+    """
+    handle directory input
+
+    plate order will not process the files, just save them collected
+
+    other orders will be processed by the chef
+    """
     paths = [path + '/' + filename for filename in os.listdir(path)]
 
     # sort so we can gif in order
     paths.sort()
 
+    # if plate is the order, just assemble the plate from files in path
     if parsed_vars['order'] == 'plate':
         assemble(path, output, parsed_vars)
+        return
 
     if output is None:
         output = "cooked"
     if not os.path.isdir(output):
         os.makedirs(output)
 
-    else:
-        # get default handler parameter attached to subparsers
-        # function for handling a command's options
-        add_dish_desc = parsed_vars.pop('add_dish_desc')
+    # get default handler parameter attached to subparsers
+    # function for handling a command's options
+    add_dish_desc = parsed_vars.pop('add_dish_desc')
 
-        for path in paths:
-            try:
-                cooked_dish = cook_dish(path, add_dish_desc, parsed_vars)
-                cooked_dish.pierogis[0].file = os.path.join(
-                    output,
-                    os.path.splitext(os.path.basename(path))[0] + ".png"
-                )
-                cooked_dish.save(output)
+    for path in paths:
+        try:
+            # make a separate dish for each path
+            cooked_dish = cook_dish(path, add_dish_desc, parsed_vars)
+            # set the file on the cooked pierogi based on the input path
+            output_filename = os.path.join(
+                output,
+                os.path.splitext(os.path.basename(path))[0] + ".png"
+            )
+            cooked_dish.save(output_filename)
 
-            except UnidentifiedImageError:
-                print("{} is not an image".format(path))
+        except UnidentifiedImageError:
+            print("{} is not an image".format(path))
 
-            except ValueError:
-                print("{} is not an image".format(path))
+        except ValueError:
+            print("{} is not an image".format(path))
 
-            except IsADirectoryError:
-                print("{} is a directory".format(path))
+        except IsADirectoryError:
+            print("{} is a directory".format(path))
 
 
 def cook_file(path, output, parsed_vars):
+    """
+    handle a single file
+
+    can be a gif/video or a single image
+    """
     # if the path is an image, it should be cooked solo
     # if it is a gif, it should be
     dish = Dish(file=path)
@@ -193,6 +207,8 @@ def cook_file(path, output, parsed_vars):
     # get default handler parameter attached to subparsers
     # function for handling a command's options
     add_dish_desc = parsed_vars.pop('add_dish_desc')
+
+    digits = math.ceil(math.log(len(dish.pierogis), 10))
 
     # input file is a video
     if len(dish.pierogis) > 1:
@@ -203,7 +219,8 @@ def cook_file(path, output, parsed_vars):
 
         i = 1
         for pierogi in dish.pierogis:
-            frame_path = os.path.join(output, str(i).zfill(4) + '.png')
+            # make frame file names like 0001.png
+            frame_path = os.path.join(output, str(i).zfill(digits + 1) + '.png')
             i += 1
 
             pierogi.save(frame_path)

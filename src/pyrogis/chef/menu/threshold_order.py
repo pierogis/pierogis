@@ -10,6 +10,7 @@ class ThresholdOrder(MenuItem):
             cls,
             dish_desc: DishDescription,
             path: str = None,
+            target_pierogi_uuid=None,
             **kwargs
     ):
         """
@@ -22,6 +23,7 @@ class ThresholdOrder(MenuItem):
         ingredient_desc = IngredientDesc(
             type_name='threshold',
             kwargs={
+                'pierogi': target_pierogi_uuid,
                 **kwargs
             }
         )
@@ -41,11 +43,23 @@ class ThresholdOrder(MenuItem):
             '-l', '--lower-threshold',
             default=Threshold.LOWER_THRESHOLD, type=int,
             help="Pixels with lightness below"
-                 "this threshold will not get sorted"
+                 "this threshold are included"
         )
         parser.add_argument(
             '-u', '--upper-threshold',
             default=Threshold.UPPER_THRESHOLD, type=int,
             help="Pixels with lightness above"
-                 "this threshold will not get sorted"
+                 "this threshold are included"
+        )
+        parser.add_argument(
+            '-i', '--include',
+            dest='include',
+            default="ffffff", type=str,
+            help="Hex color for included pixels"
+        )
+        parser.add_argument(
+            '-e', '--exclude',
+            dest='exclude',
+            default="000000", type=str,
+            help="Hex color for excluded pixels"
         )

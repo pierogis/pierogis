@@ -3,6 +3,7 @@ seasoning base ingredient
 """
 
 import numpy as np
+from PIL import ImageColor
 
 from pyrogis.ingredients.ingredient import Ingredient
 from ..pierogi import Pierogi
@@ -25,8 +26,8 @@ class Seasoning(Ingredient):
     def prep(
             self,
             pierogi: Pierogi,
-            include_pixel: np.ndarray = None,
-            exclude_pixel: np.ndarray = None,
+            include: str = None,
+            exclude: str = None,
             **kwargs
     ):
         """
@@ -37,12 +38,26 @@ class Seasoning(Ingredient):
         """
         self.pierogi = pierogi
 
-        if include_pixel is None:
+        if include is None:
             include_pixel = self._white_pixel
+        elif type(include) is str:
+            if include[0] != '#':
+                include = '#' + include
+            include_pixel = ImageColor.getcolor(include, "RGB")
+        else:
+            include_pixel = include
+
         self.include_pixel = np.asarray(include_pixel)
 
-        if exclude_pixel is None:
+        if exclude is None:
             exclude_pixel = self._black_pixel
+        elif type(exclude) is str:
+            if exclude[0] != '#':
+                exclude = '#' + exclude
+            exclude_pixel = ImageColor.getcolor(exclude, "RGB")
+        else:
+            exclude_pixel = exclude
+
         self.exclude_pixel = np.asarray(exclude_pixel)
 
     def cook(self, pixels: np.ndarray):
