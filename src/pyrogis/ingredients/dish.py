@@ -19,7 +19,7 @@ class Dish(Ingredient):
     def frames(self):
         return len(self.pierogis)
 
-    def prep(self, recipe=Recipe(), pierogis: List[Pierogi] = None, file=None, path=None):
+    def prep(self, recipe=None, pierogis: List[Pierogi] = None, file=None, path=None):
         """
         set the recipe to cook for this dish
         """
@@ -37,11 +37,17 @@ class Dish(Ingredient):
             elif path is not None:
                 pierogis = self.get_path_pierogis(path)
 
+            else:
+                raise ValueError("Could not create pierogis")
+
         self.pierogis = pierogis
+
+        if recipe is None:
+            Recipe()
         self.recipe = recipe
 
     @staticmethod
-    def get_path_pierogis(path):
+    def get_path_pierogis(path: str) -> List[Pierogi]:
         pierogis = []
 
         for file in os.listdir(path):
@@ -49,6 +55,8 @@ class Dish(Ingredient):
                 continue
 
             pierogis.append(Pierogi(file=file))
+
+        return pierogis
 
     def cook(self, pixels: np.ndarray):
         return self.recipe(0, 0).cook(self.pierogis[0].pixels)
@@ -85,8 +93,11 @@ class Dish(Ingredient):
 
             if optimize:
                 pygifsicle.optimize(path)
-        else:
+        elif len(self.pierogis) == 1:
             self.pierogis[0].save(path)
+
+        else:
+            raise Exception("Dish has no pierogis")
 
     #
     # @property

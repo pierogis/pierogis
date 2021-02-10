@@ -1,7 +1,9 @@
+from typing import Dict, List
+
 from .dish_description import DishDescription
 from .menu import menu
 from ..ingredients import (
-    Dish, Pierogi, Sort,
+    Ingredient, Dish, Pierogi, Sort,
     SpatialQuantize, Threshold, Recipe, Rotate
 )
 
@@ -51,7 +53,7 @@ class Chef:
         :param file_links: map of uuid keys to file paths,
         usually for Pierogi
         """
-        ingredients = {}
+        ingredients: Dict[str, Ingredient] = {}
 
         for ingredient_name, ingredient_desc in ingredient_descs.items():
             # if path is one of the kwargs
@@ -96,8 +98,8 @@ class Chef:
 
     def create_recipe_object(
             self,
-            ingredients: dict,
-            recipe_order: list
+            ingredients: Dict[str, Ingredient],
+            recipe_order: List[str]
     ):
         """
         create a recipe from:
@@ -129,13 +131,13 @@ class Chef:
         """
         pierogi_descs = dish_description.pierogis
         ingredient_descs = dish_description.ingredients
-        file_links = dish_description.files
-        dish = dish_description.dish
+        files = dish_description.files
+        dish_kwargs = dish_description.dish
         seasoning_links = dish_description.seasoning_links
 
         pierogis = self.create_pierogi_objects(
             pierogi_descs,
-            file_links
+            files
         )
 
         ingredients = self.create_ingredient_objects(
@@ -150,11 +152,12 @@ class Chef:
 
         recipe = self.create_recipe_object(
             ingredients,
-            dish['recipe']
+            dish_kwargs['recipe']
         )
 
         dish = Dish(
-            pierogis=[pierogis[dish['pierogi']]],
+            pierogis=[pierogis[dish_kwargs['pierogi']]],
             recipe=recipe
         )
+
         return dish.serve()

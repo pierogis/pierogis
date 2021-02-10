@@ -31,10 +31,14 @@ class Seasoning(Ingredient):
             **kwargs
     ):
         """
-        :param target: If set, target will be the pixels that are cooked
-        :param include_pixel: The color to use for included pixels
-        Think of them like little flakes of seasoning
-        :param exclude_pixel: The color to use for excluded pixels
+        :param pierogi: If set, target will be the pixels that are cooked
+        :param include: color to use for included pixels
+
+        like little flakes of seasoning.
+
+        can be hex
+
+        :param exclude: color to use for excluded pixels
         """
         self.pierogi = pierogi
 

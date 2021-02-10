@@ -17,6 +17,8 @@ class Pierogi(Ingredient):
     uses PIL.Image to load to self.pixels
     """
 
+    RESAMPLE = Image.NEAREST
+
     @property
     def image(self):
         """
@@ -24,6 +26,20 @@ class Pierogi(Ingredient):
         """
         image = Image.fromarray(np.rot90(self.pixels), 'RGB')
         return image
+
+    @property
+    def width(self):
+        """
+        1st dimension of the underlying pixel array
+        """
+        return self.pixels.shape[0]
+
+    @property
+    def height(self):
+        """
+        2nd dimension of the underlying pixel array
+        """
+        return self.pixels.shape[1]
 
     def prep(
             self,
@@ -81,3 +97,26 @@ class Pierogi(Ingredient):
             )
 
         self.image.save(output_filename, optimize=optimize)
+
+    def resize(self, width: int, height: int, resample: int = RESAMPLE):
+        """
+        resize pixels to new width and height
+
+        :param width: width to resize to
+        :param height: height to resize to
+        :param resample: resample method to use in Image.resize. PIL documentation:
+            "An optional resampling filter.
+            This can be one of PIL.Image.NEAREST (use nearest neighbour),
+            PIL.Image.BILINEAR (linear interpolation),
+            PIL.Image.BICUBIC (cubic spline interpolation),
+            or PIL.Image.LANCZOS (a high-quality downsampling filter).
+            If omitted, or if the image has mode “1” or “P”, it is set PIL.Image.NEAREST."
+        """
+
+        self.pixels = np.array(
+            Image.fromarray(
+                self.pixels
+            ).resize(
+                (height, width), resample
+            )
+        )

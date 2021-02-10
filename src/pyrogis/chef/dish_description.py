@@ -1,4 +1,5 @@
 import uuid
+from typing import Dict, Union, List
 
 from ..ingredients import Ingredient
 from ..ingredients import Pierogi
@@ -45,9 +46,12 @@ class DishDescription:
     """
 
     def __init__(
-            self, pierogis: dict = None, files: dict = None,
-            ingredients: dict = None, dish: list = None,
-            seasoning_links: dict = None
+            self,
+            pierogis: Dict[str, PierogiDesc] = None,
+            files: Dict[str, str] = None,
+            ingredients: Dict[str, IngredientDesc] = None,
+            dish: Dict[str, Union[List[str], Pierogi]] = None,
+            seasoning_links: Dict[str, dict] = None
     ):
         """
         create a DishDescription
