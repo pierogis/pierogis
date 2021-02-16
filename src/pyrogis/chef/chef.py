@@ -4,7 +4,8 @@ from .dish_description import DishDescription
 from .menu import menu
 from ..ingredients import (
     Ingredient, Dish, Pierogi, Sort,
-    SpatialQuantize, Threshold, Recipe, Rotate
+    SpatialQuantize, Threshold, Recipe, Rotate,
+    Resize
 )
 
 
@@ -19,7 +20,8 @@ class Chef:
         'sort': Sort,
         'quantize': SpatialQuantize,
         'threshold': Threshold,
-        'rotate': Rotate
+        'rotate': Rotate,
+        'resize': Resize
     }
 
     # seasoning_classes = {

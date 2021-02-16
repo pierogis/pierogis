@@ -1,3 +1,5 @@
+from typing import List
+
 import numpy as np
 
 from .ingredient import Ingredient
@@ -18,7 +20,7 @@ class Sort(Ingredient):
     """
 
     def prep(
-            self, rotate: Rotate = None, seasoning: Seasoning = None,
+            self, rotate: Rotate = None,
             delimiter: np.ndarray = np.array([255, 255, 255]),
             **kwargs
     ):
@@ -38,8 +40,6 @@ class Sort(Ingredient):
 
         self.rotate = rotate
 
-        self.seasoning = seasoning
-
     def cook(self, pixels: np.ndarray):
         """
         sort within each sequence group of contiguous white pixels
@@ -48,10 +48,9 @@ class Sort(Ingredient):
         # rotate self.mask and pixels to correspond to self.angle
         rotate = self.rotate
 
-        if self.seasoning is not None:
-            self.seasoning.season(self)
+        mask = self.mask_pixels(pixels)
 
-        rotated_mask = rotate.cook(self.mask)
+        rotated_mask = rotate.cook(mask)
         rotated_pixels = rotate.cook(pixels)
 
         # false indicates that the pixel should not be sorted

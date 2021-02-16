@@ -60,23 +60,28 @@ pub fn cook(
         width,  // where this lib expects (height, width, 3)
     );
 
-    let colors = colors.chunks(3).map(|c| {
-        Rgb {
-            red: c[0] as f64 / 255.0,
-            green: c[1] as f64 / 255.0,
-            blue: c[2] as f64 / 255.0,
-        }
-    })
-        .collect::<Vec<Rgb>>();
+    if colors.len() >= 3 {
+        // map colors slice to Vec<Rgb>
+        let colors = colors.chunks(3).map(|c| {
+            Rgb {
+                red: c[0] as f64 / 255.0,
+                green: c[1] as f64 / 255.0,
+                blue: c[2] as f64 / 255.0,
+            }
+        })
+            .collect::<Vec<Rgb>>();
 
-    let mut palette = Vec::with_capacity(colors.len());
+        // use this Vec in the conditions for dithering
+        conditions.palette(colors);
+    }
 
-    conditions.palette(colors);
+    // also create a palette for the outcome of the algorithm
+    let mut palette = Vec::with_capacity(palette_size as usize);
 
     // perform the quantization, filling these refs
     rscolorq::spatial_color_quant(&image, &mut quantized_image, &mut palette, &conditions).unwrap();
 
-    // Convert the Rgb<f64> palette to Rgb<u8>
+    // convert the Rgb<f64> palette to Rgb<u8>
     let palette = palette
         .iter()
         .map(|&c| {

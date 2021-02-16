@@ -39,6 +39,7 @@ class Ingredient:
         self.opacity = opacity
         self.mask = mask
         self.prep(**kwargs)
+        self.seasonings = []
 
     def prep(self, **kwargs):
         """
@@ -52,34 +53,51 @@ class Ingredient:
         """
         return pixels
 
-    def apply_mask(self, uncooked_pixels, cooked_pixels):
-        """
-        choose cooked over uncooked for white pixels in self.mask
+    def mask_pixels(self, pixels):
+        masks = []
 
-        :param uncooked_pixels: the pixels which will be covered
-        :param cooked_pixels: the overlaying pixels
-        """
-        # use uncooked pixels as base
-        masked_pixels = np.copy(uncooked_pixels)
+        for seasoning in self.seasonings:
+            masks.append(seasoning.cook(pixels))
 
-        # use the mask as guide for where to overlay
-        mask = self.mask
-        if mask is None:
-            # all True
-            binary_array = np.full(cooked_pixels.shape[:2], True)
-        else:
-            # True if white
-            binary_array = np.all(mask == self._white_pixel, axis=2)
+        mask = np.all(np.asarray(masks) == 255)
 
-        # layer cooked pixels over uncooked for true pixels (white in mask)
-        masked_pixels[binary_array] = cooked_pixels[binary_array]
+        return mask
 
-        return masked_pixels
+    def season(self, seasoning):
+        self.seasonings.append(seasoning)
 
-    def cook_mask(self, pixels: np.ndarray):
-        """
-        cook the pixels, then apply the ingredient's mask
-        """
-        cooked_pixels = self.cook(pixels)
-        masked_pixels = self.apply_mask(pixels, cooked_pixels)
-        return masked_pixels
+    # def apply_mask(self, uncooked_pixels, cooked_pixels):
+    #     """
+    #     choose cooked over uncooked for white pixels in self.mask
+    #
+    #     :param uncooked_pixels: the pixels which will be covered
+    #     :param cooked_pixels: the overlaying pixels
+    #     """
+    #     # use uncooked pixels as base
+    #     masked_pixels = np.copy(uncooked_pixels)
+    #
+    #     # use the mask as guide for where to overlay
+    #     mask = self.mask
+    #     if mask is None:
+    #         # all True
+    #         binary_array = np.full(cooked_pixels.shape[:2], True)
+    #     else:
+    #         # True if white
+    #         binary_array = np.all(mask == self._white_pixel, axis=2)
+    #
+    #     cooked_width = cooked_pixels.shape[0]
+    #     cooked_height = cooked_pixels.shape[1]
+    #     masked_pixels = np.resize(masked_pixels, (cooked_width, cooked_height, 3))
+    #
+    #     # layer cooked pixels over uncooked for true pixels (white in mask)
+    #     masked_pixels[binary_array] = cooked_pixels[binary_array]
+    #
+    #     return masked_pixels
+    #
+    # def cook_mask(self, pixels: np.ndarray):
+    #     """
+    #     cook the pixels, then apply the ingredient's mask
+    #     """
+    #     cooked_pixels = self.cook(pixels)
+    #     masked_pixels = self.apply_mask(pixels, cooked_pixels)
+    #     return masked_pixels

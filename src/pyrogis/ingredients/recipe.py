@@ -13,7 +13,7 @@ class Recipe(Ingredient):
     def __call__(self, frame: int, frames: int):
         return self
 
-    def prep(self, ingredients: list=None, **kwargs):
+    def prep(self, ingredients: list = None, **kwargs):
         """
         provide a list of ingredients to cook in sequence
 
@@ -35,9 +35,20 @@ class Recipe(Ingredient):
         under_pixels = pixels
         for ingredient in self.ingredients:
             # cook the lower layer
-            cooked_pixels = ingredient.cook_mask(under_pixels)
+            cooked_pixels = ingredient.cook(under_pixels)
+            mask = ingredient.mask_pixels(cooked_pixels)
+            binary_array = np.all(mask == self._white_pixel, axis=2)
+
+            # resize under array to cooked array
+            cooked_width = cooked_pixels.shape[0]
+            cooked_height = cooked_pixels.shape[1]
+            masked_pixels = np.resize(under_pixels, (cooked_width, cooked_height, 3))
+
+            # layer cooked pixels over uncooked for true pixels (white in mask)
+            masked_pixels[binary_array] = cooked_pixels[binary_array]
+
             # mix them based on the overlaying opacity
-            mixed_pixels = (cooked_pixels.astype(np.dtype(float))
+            mixed_pixels = (masked_pixels.astype(np.dtype(float))
                             * ingredient.opacity
                             +
                             under_pixels.astype(np.dtype(float))

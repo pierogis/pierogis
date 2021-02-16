@@ -1,34 +1,10 @@
 from .menu_item import MenuItem
 
-from ..dish_description import DishDescription, IngredientDesc
 from ...ingredients import SpatialQuantize
 
 
 class QuantizeOrder(MenuItem):
-    @classmethod
-    def add_desc(
-            cls,
-            dish_desc: DishDescription,
-            path: str = None,
-            **kwargs
-    ):
-        """
-        add a description of a quantize recipe
-        """
-        if path is not None:
-            target_pierogi_uuid = dish_desc.add_pierogi_desc(path)
-            dish_desc.dish['pierogi'] = target_pierogi_uuid
-
-        quantize_desc = IngredientDesc(
-            type_name='quantize',
-            kwargs=kwargs
-        )
-
-        quantize_uuid = dish_desc.add_ingredient_desc(quantize_desc)
-
-        dish_desc.extend_recipe([quantize_uuid])
-
-        return dish_desc
+    type_name = 'quantize'
 
     @classmethod
     def add_parser_arguments(cls, parser):

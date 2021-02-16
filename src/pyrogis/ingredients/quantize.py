@@ -23,7 +23,7 @@ class Quantize(Ingredient):
         """
 
         if colors is None:
-            colors = np.empty((palette_size, 3))
+            colors = np.asarray([[]])
         elif type(colors) is list:
             rgb_colors = []
             for color in colors:

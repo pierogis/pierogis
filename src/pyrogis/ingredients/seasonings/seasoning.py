@@ -25,7 +25,7 @@ class Seasoning(Ingredient):
 
     def prep(
             self,
-            pierogi: Pierogi,
+            # pierogi: Pierogi,
             include: str = None,
             exclude: str = None,
             **kwargs
@@ -40,7 +40,7 @@ class Seasoning(Ingredient):
 
         :param exclude: color to use for excluded pixels
         """
-        self.pierogi = pierogi
+        # self.pierogi = pierogi
 
         if include is None:
             include_pixel = self._white_pixel
@@ -84,15 +84,15 @@ class Seasoning(Ingredient):
 
         return binary_pixels
 
-    def season(self, recipient: Ingredient):
-        """
-        Set the input ingredient's mask to the output of a cook.
-
-        If self.target is none,
-        recipient will be the pixels that are cooked as well.
-
-        :param recipient: ingredient which will have its mask set
-        """
-        recipient.mask = self.cook(self.pierogi.pixels)
-
-        return recipient
+    # def season(self, recipient: Ingredient):
+    #     """
+    #     Set the input ingredient's mask to the output of a cook.
+    #
+    #     If self.target is none,
+    #     recipient will be the pixels that are cooked as well.
+    #
+    #     :param recipient: ingredient which will have its mask set
+    #     """
+    #     recipient.mask = self.cook(self.pierogi.pixels)
+    #
+    #     return recipient

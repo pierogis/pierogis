@@ -3,6 +3,7 @@ from .flip import Flip
 from .ingredient import Ingredient
 from .quantize import Quantize, SpatialQuantize
 from .recipe import Recipe
+from .resize import Resize
 from .rotate import Rotate
 from .seasonings import Threshold
 from .sort import Sort
@@ -18,5 +19,6 @@ __all__ = [
     'Sort',
     'Flip',
     'Rotate',
-    'Threshold'
+    'Threshold',
+    'Resize'
 ]

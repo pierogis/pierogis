@@ -1,4 +1,7 @@
+from typing import Union
+
 import numpy as np
+from PIL import Image
 
 from .ingredient import Ingredient
 from .pierogi import Pierogi
@@ -8,13 +11,22 @@ class Resize(Ingredient):
     """
     resize using width, height, and scale
     """
+    FILTERS = {
+        'default': Image.NEAREST,
+        'nearest': Image.NEAREST,
+        'box': Image.BOX,
+        'bicubic': Image.BICUBIC,
+        'bilinear': Image.BILINEAR,
+        'hamming': Image.HAMMING,
+        'lanczos': Image.LANCZOS,
+    }
 
     def prep(
             self,
             width: int = None,
             height: int = None,
             scale: int = 1,
-            resample: int = Pierogi.RESAMPLE,
+            resample: Union[int, str] = FILTERS['default'],
             **kwargs
     ):
         """
@@ -39,6 +51,9 @@ class Resize(Ingredient):
         self.width = width
         self.height = height
         self.scale = scale
+
+        if resample in self.FILTERS:
+            resample = self.FILTERS[resample]
         self.resample = resample
 
     def cook(self, pixels: np.ndarray):
