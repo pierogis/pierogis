@@ -1,7 +1,20 @@
 # changelog
 
-## v0.1.4
+## v0.2.0
 - ingredients
+    - add frames support in `Dish` (and cli)
+    - add `Resize` ingredient
+    - refactor how seasonings are handled
+  
+- chef 
+    - add `Threshold` option to provide hex color for include and exclude
+    - add `Quantize` option to provide colors for palette
+  
+- testing
+    - add `Resize` testing
+    - add cli testing
+
+- misc
     - change references to `rpierogis` to `pierogis_rs`
 
 ## v0.1.3

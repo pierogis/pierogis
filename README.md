@@ -15,12 +15,12 @@ pyrogis chef input.png "sort; quantize" -o output.png
 
 ![sorted and quantized gnome](https://raw.githubusercontent.com/pierogis/pierogis/master/demo/out/gnome_sort_quantize.png)
 
-- [install](#install)   
-- [features](#features)   
-- [issues and contributing](#issues-and-contributing)   
-- [cli](#cli)   
+- [install](#install)
+- [features](#features)
+- [cli](#cli)
 - [package](#package)
 - [acknowledgements](#acknowledgements)
+- [issues and contributing](#issues-and-contributing)
 
 <a name="install"></a>
 ## install
@@ -51,39 +51,6 @@ pip install .
 - **Numpy or Rust backend** - Image processing functions use Numpy for (python relative) fast operations.
 Some ingredients use compiled `Rust` for more speed.
 
-<a name="issues-and-contributing"></a>
-## issues and contributing
-
-When you encounter an error, there are some guidelines that will make it easier to help you:
-- Ensure that you are using the latest version of the package.
-  It's early days so errors and updates will be frequent.
-  Use `pip uninstall pyrogis` then `pip install pyrogis --no-cache-dir` to reinstall.
-- Provide the version of `pyrogis` that you are using in issues to rule that out.
-  `pip list` -> pyrogis \_.\_.\_
-- Provide the traceback or error message if you can.
-- Provide your os and any other specific information relevant to how you are trying to use the package.
-- Provide the code or the cli command that triggered the error.
-- If the problem is visual: that can be more difficult to debug.
-  Try to use an image hosting site if you want to share what you are seeing in an issue.
-- If you are getting different behavior than you expect: that could be an error or a feature too.
-- If your problem is with installation: try conda, preinstall `numpy` and `pillow`,
-  install the rust toolchain, and start praying.
-  There will be a website with a visual editor for this software so stay tuned.
-
-Hopefully all levels of skills can use this package.
-Any form of contributing is appreciated;
-passive-aggressive semi-anonymous thumbs down is not appreciated.
-
-Everyone using and contributing to this package
-is doing it for the love of the game.
-
-Don't feel like your issue is too small to make an issue.
-Pull requests are always welcome and anyone interested in dev work should join the
-[discord](https://discord.gg/9XpEjMw3Rx).
-
-`Ingredient` type algorithm/function suggestions can go in the ingredients channel.
-You can post your creations in the demo channel as well.
-
 # usage
 
 <a name="cli"></a>
@@ -92,7 +59,7 @@ You can post your creations in the demo channel as well.
 All of the cli commands look like this.
 
 ```bash
-pyrogis {order} {path} [-o output] [--frames] [...recipe options]
+pyrogis {order} {path} [-o output] [--frames] [... order options]
 ```
 
 `order` is one of
@@ -101,7 +68,7 @@ pyrogis {order} {path} [-o output] [--frames] [...recipe options]
 - [quantize](#quantize)   
 - [threshold](#threshold)   
 
-The options `output` and `path` are used for each `recipe` (`sort`, `quantize`, etc.).
+The options `output` and `path` are used for each `order` (`sort`, `quantize`, etc.).
 A directory can be used for `path`, in which case the program will try to cook each file in the directory.
 If an `output` is provided, it should match the expected output.
 
@@ -109,7 +76,7 @@ In addition, each `order` or "menu item" has its own set of options.
 
 |arg|description|default|valid|
 |:----:|-----------|:-----:|:---:|
-|`recipe`|menu item to cook|`required`|`sort`, `quantize`, `chef`, `threshold`|
+|`order`|menu item to cook|`required`|sort, quantize, chef, threshold, plate, resize|
 |`path`|path to input media|`required`|`dir`, `file`|
 |`-o`,`--output`|name of the output directory|`required`|`str`|
 |`--frames`|if provided, only frames will be generated|False|flag|
@@ -138,11 +105,12 @@ pyrogis sort ./input.jpg -o ./output -l 50 -u 180 -t 1
 ![quantized gnome](https://raw.githubusercontent.com/pierogis/pierogis/master/demo/out/gnome_magic.png)
 
 ```bash
-pyrogis quantize input.jpg -n 16 -r 3 -i 3
+pyrogis quantize input.jpg -c aaaaaa 43ad32 696969 -n 16 -r 3 -i 3
 ```
 
 |arg|description|default|valid|
 |:----:|-----------|:-----:|:---:|
+|`-c`, `--colors`|hex colors to base palette on|`None`|`int`|
 |`-n`, `--palette_size`|number of colors in the palette to cluster for|8|`int`|
 |`-r`, `--repeats`|number of times to repeat a temperature for DA|1|`int`|
 |`-i`, `--iterations`|number of times to repeat an iteration of a coarseness level|1|`int`|
@@ -221,3 +189,36 @@ supposed to be functionally the same, details of the implementation may differ, 
 The quantizing algorithm used in this package is implemented by [`rscolorq`](https://github.com/okaneco/rscolorq), which
 is a port of [`scolorq`](http://people.eecs.berkeley.edu/~dcoetzee/downloads/scolorq/), itself an implementation
 of Spatial Color Quantization.
+
+<a name="issues-and-contributing"></a>
+## issues and contributing
+
+When you encounter an error, there are some guidelines that will make it easier to help you:
+- Ensure that you are using the latest version of the package.
+  It's early days so errors and updates will be frequent.
+  Use `pip uninstall pyrogis` then `pip install pyrogis --no-cache-dir` to reinstall.
+- Provide the version of `pyrogis` that you are using in issues to rule that out.
+  `pip list` -> pyrogis \_.\_.\_
+- Provide the traceback or error message if you can.
+- Provide your os and any other specific information relevant to how you are trying to use the package.
+- Provide the code or the cli command that triggered the error.
+- If the problem is visual: that can be more difficult to debug.
+  Try to use an image hosting site if you want to share what you are seeing in an issue.
+- If you are getting different behavior than you expect: that could be an error or a feature too.
+- If your problem is with installation: try conda, preinstall `numpy` and `pillow`,
+  install the rust toolchain, and start praying.
+  There will be a website with a visual editor for this software so stay tuned.
+
+Hopefully all levels of skills can use this package.
+Any form of contributing is appreciated;
+passive-aggressive semi-anonymous thumbs down is not appreciated.
+
+Everyone using and contributing to this package
+is doing it for the love of the game.
+
+Don't feel like your issue is too small to make an issue.
+Pull requests are always welcome and anyone interested in dev work should join the
+[discord](https://discord.gg/9XpEjMw3Rx).
+
+`Ingredient` type algorithm/function suggestions can go in the ingredients channel.
+You can post your creations in the demo channel as well.
