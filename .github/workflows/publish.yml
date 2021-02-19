@@ -9,6 +9,7 @@ on:
       - v*
     branches:
       - test
+      - develop
 
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -63,20 +64,28 @@ jobs:
         run: |
           source .env/bin/activate
           pip install flake8
-          flake8 src
+          flake8 src/pyrogis
 
       - name: pylint python
         continue-on-error: true
         run: |
           source .env/bin/activate
           pip install pylint
-          cd src
-          pylint pyrogis
+          pylint src/pyrogis
+
+      - name: run mypy
+        continue-on-error: true
+        run: |
+          source .env/bin/activate
+          pip install mypy
+          mypy src/pyrogis
 
       - name: run tests
         run: |
           source .env/bin/activate
-          python -m pytest -s -v tests
+          pip install pytest
+          pytest -s -v tests
+
   manylinux-build:
     runs-on: ubuntu-latest
     needs: [ test ]
@@ -129,6 +138,7 @@ jobs:
           python -m awscli s3 sync --exact-timestamps ./dist "s3://pierogis/dist/$DIST_DIR"
 
   publish:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
     runs-on: ubuntu-latest
     needs: [ manylinux-build, macos-windows-build ]
     steps:

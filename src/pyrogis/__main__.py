@@ -231,10 +231,18 @@ def cook_file(path, output, parsed_vars):
 
     # input file is a video
     if len(dish.pierogis) > 1:
+        frames_path = None
+
+        if parsed_vars.get('plate'):
+            frames_path = "cooked"
         if output is None:
-            output = "cooked"
-        if not os.path.isdir(output):
-            os.makedirs(output)
+            frames_path = "cooked"
+
+        if frames_path is None:
+            frames_path = output
+
+        if not os.path.isdir(frames_path):
+            os.makedirs(frames_path)
 
         digits = math.floor(math.log(len(dish.pierogis), 10))
 
@@ -249,6 +257,9 @@ def cook_file(path, output, parsed_vars):
             cooked_dish.save(frame_path)
 
             i += 1
+
+        if parsed_vars.get('plate'):
+            plate(frames_path, output, parsed_vars)
 
     else:
         if output is None:
@@ -288,11 +299,8 @@ def main(args=None):
 
         elif os.path.isfile(input_path):
             # can be a gif/vid or an image
-            if parsed_vars.get('plate'):
-                frames_path = cook_file(input_path, None, parsed_vars)
-                plate(frames_path, output, parsed_vars)
-            else:
-                output_path = cook_file(input_path, output, parsed_vars)
+            frames_path = cook_file(input_path, output, parsed_vars)
+
         else:
             raise Exception('Bad path')
 

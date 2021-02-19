@@ -102,6 +102,13 @@ def test_pyrogis_chef_1():
     os.remove("cooked.png")
 
 
+def test_pyrogis_image_with_output():
+    main(args=["resize", "demo/gnome.jpg", "--output", "output.png"])
+
+    assert os.path.isfile("output.png")
+    os.remove("output.png")
+
+
 def test_pyrogis_animation():
     """
     test making an animation order

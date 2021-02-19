@@ -112,8 +112,8 @@ pyrogis quantize input.jpg -c aaaaaa 43ad32 696969 -n 16 -r 3 -i 3
 |:----:|-----------|:-----:|:---:|
 |`-c`, `--colors`|hex colors to base palette on|`None`|`int`|
 |`-n`, `--palette_size`|number of colors in the palette to cluster for|8|`int`|
-|`-r`, `--repeats`|number of times to repeat a temperature for DA|1|`int`|
-|`-i`, `--iterations`|number of times to repeat an iteration of a coarseness level|1|`int`|
+|`--repeats`|number of times to repeat a temperature for DA|1|`int`|
+|`--iterations`|number of times to repeat an iteration of a coarseness level|1|`int`|
 |`--initial_temp`|initial temp to use in DA for optimization|1|`float`|
 |`--final_temp`|final temp to use in DA for optimization|0.001|`float`|
 |`-d`, `--dithering_level`|relative dithering level (use .5-1.5)|0.8|`float`|

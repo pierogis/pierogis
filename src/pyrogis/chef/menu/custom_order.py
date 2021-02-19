@@ -7,12 +7,17 @@ from ..dish_description import DishDescription
 
 class CustomOrder(MenuItem):
     @staticmethod
-    def read_recipe(dish_description: DishDescription, recipe_text: str, target_pierogi_uuid):
+    def read_recipe(
+            dish_description: DishDescription,
+            recipe_text: str,
+            target_pierogi_uuid
+    ):
         """
-        read a recipe from string to a DishDescription
+        read a recipe from string, adding to a DishDescription
 
         :param dish_description: the dish description to extend
         :param recipe_text: the recipe as a string like 'sort; quantize'
+        :param target_pierogi_uuid: the uuid of the base pierogi for the dish
         """
         # split the recipe text by semi colons
         lines = recipe_text.split(';')

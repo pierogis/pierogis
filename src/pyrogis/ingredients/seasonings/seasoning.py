@@ -6,7 +6,6 @@ import numpy as np
 from PIL import ImageColor
 
 from pyrogis.ingredients.ingredient import Ingredient
-from ..pierogi import Pierogi
 
 
 class Seasoning(Ingredient):
