@@ -20,7 +20,7 @@ class CustomOrder(MenuItem):
         :param target_pierogi_uuid: the uuid of the base pierogi for the dish
         """
         # split the recipe text by semi colons
-        lines = recipe_text.split(';')
+        recipe_items = recipe_text.split(';')
 
         # create the base parser for the recipe text
         parser = argparse.ArgumentParser()
@@ -36,12 +36,13 @@ class CustomOrder(MenuItem):
             )
 
         # now parse each line
-        for i in range(len(lines)):
-            line = lines[i]
+        for order in recipe_items:
             # line may be just whitespace
-            if not line.isspace():
+            if order.isspace() or order == '':
+                continue
+            else:
                 # split into different words
-                phrases = line.strip().split()
+                phrases = order.strip().split()
 
                 # use the parser with attached subparsers for the recipe names
                 parsed, unknown = parser.parse_known_args(phrases)

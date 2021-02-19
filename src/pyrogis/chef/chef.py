@@ -24,10 +24,6 @@ class Chef:
         'resize': Resize
     }
 
-    # seasoning_classes = {
-    #     'threshold': Threshold
-    # }
-
     menu = menu
 
     def create_pierogi_objects(self, pierogi_descs: dict, file_links: dict):

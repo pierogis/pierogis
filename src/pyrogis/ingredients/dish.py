@@ -46,7 +46,7 @@ class Dish(Ingredient):
             if file is not None:
                 try:
                     # first try to load as video/animation
-                    images = imageio.mimread(file)
+                    images = imageio.mimread(file, memtest=False)
                     for image in images:
                         pierogis.append(
                             Pierogi(pixels=np.rot90(
@@ -54,9 +54,10 @@ class Dish(Ingredient):
                             ))
                         )
 
-                except Exception as err:
+                except ValueError:
                     # then load as a single image
                     pierogis = [Pierogi(file=file)]
+
             elif path is not None:
                 pierogis = self.get_path_pierogis(path)
 

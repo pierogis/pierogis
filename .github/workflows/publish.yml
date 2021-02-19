@@ -46,6 +46,14 @@ jobs:
           command: clippy
           args: --manifest-path ./Cargo.toml --all-targets --all-features -- -D warnings
 
+      - name: create pyrogis environment
+        run: |
+          python -m venv .env
+          source .env/bin/activate
+          pip install wheel
+          pip install -r requirements.txt
+          pip install .
+
       - name: flake8 python
         continue-on-error: true
         run: |
@@ -69,10 +77,7 @@ jobs:
 
       - name: run tests
         run: |
-          python -m venv .env
           source .env/bin/activate
-          pip install -r requirements.txt
-          pip install .
           pip install pytest
           pytest -s -v tests
 

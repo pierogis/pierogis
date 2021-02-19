@@ -42,12 +42,12 @@ def create_parser():
     # add parser options for outputting as animation (gif)
     plate_parser = argparse.ArgumentParser(add_help=False)
     plate_parser.add_argument(
-        '-d', '--duration',
+        '--duration',
         type=int,
         help="duration in ms"
     )
     plate_parser.add_argument(
-        '-f', '--fps',
+        '--fps',
         default=25,
         type=int
     )
@@ -196,7 +196,7 @@ def cook_dir(path, output, parsed_vars):
                 os.path.splitext(os.path.basename(path))[0] + ".png"
             )
 
-            print("cooking '{}' to '{}'".format(path, output_filename))
+            print("cooking '{}' to '{}'".format(path, output_filename), end='\r')
 
             # make a separate dish for each path
             cooked_dish = cook_dish(path, add_dish_desc, parsed_vars)
@@ -248,7 +248,7 @@ def cook_file(path, output, parsed_vars):
             # make frame file names like 0001.png
             frame_path = os.path.join(frames_path, str(i).zfill(digits) + '.png')
 
-            print("cooking frame '{}' to '{}'".format(i, frame_path))
+            print("cooking frame '{}' to '{}'".format(i, frame_path), end='\r')
             pierogi.save(frame_path)
             cooked_dish = cook_dish(frame_path, add_dish_desc, parsed_vars)
             cooked_dish.save(frame_path)
@@ -262,7 +262,7 @@ def cook_file(path, output, parsed_vars):
         if output is None:
             output = "cooked.png"
 
-        print("cooking '{}' to '{}'".format(path, output), end="\r")
+        print("cooking '{}' to '{}'".format(path, output))
 
         cooked_dish = cook_dish(path, add_dish_desc, parsed_vars)
 
