@@ -22,6 +22,11 @@ class Threshold(Seasoning):
     LOWER_THRESHOLD = 64
     UPPER_THRESHOLD = 180
 
+    lower_threshold: int
+    """pixels below are `True`"""
+    upper_threshold: int
+    """pixels above are `True`"""
+
     def prep(
             self,
             lower_threshold: int = None,
@@ -31,8 +36,10 @@ class Threshold(Seasoning):
         """
         set the threshold intensity levels
 
-        pixels lower than :param lower_threshold
-        or higher that :param upper_threshold
+        calls Seasoning.prep with leftover kwargs
+
+        pixels lower than lower_threshold
+        or higher that upper_threshold
         are true (include_pixel)
         """
         # set include/exclude_pixel and target, if provided
@@ -74,7 +81,7 @@ class Threshold(Seasoning):
 
     def cook_np(self, pixels: np.ndarray):
         """
-        perform the same operation as cook, but only in numpy
+        perform the same operation as Threshold.cook, but only in numpy
         """
 
         include_pixels = np.resize(self.include_pixel, pixels.shape)

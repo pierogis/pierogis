@@ -22,53 +22,60 @@ def create_parser():
     )
 
     # create parent parser to pass down arguments only
-    parent_parser = argparse.ArgumentParser()
-    parent_parser.add_argument(
+    base_parser = argparse.ArgumentParser()
+    base_parser.add_argument(
         'path',
         default='./',
         help="path to file or directory to use as input")
     # output
-    parent_parser.add_argument(
+    base_parser.add_argument(
         '-o', '--output',
         help="path to save resulting image"
     )
     # quiet
-    parent_parser.add_argument(
+    base_parser.add_argument(
         '-q', '--quiet',
         default=False, action='store_true',
         help="don't output the save location"
     )
 
-    for command, menu_item in chef.menu.items():
-        # inherit the parent class arguments
-        # and arguments specific to a subcommand
-        subparsers.add_parser(
-            command,
-            parents=[parent_parser, menu_item.get_parser()],
-            add_help=False
-        )
-
-    plate_subparser = subparsers.add_parser(
-        'plate',
-        parents=[parent_parser],
-        add_help=False
-    )
-    plate_subparser.add_argument(
+    # add parser options for outputting as animation (gif)
+    plate_parser = argparse.ArgumentParser(add_help=False)
+    plate_parser.add_argument(
         '-d', '--duration',
         type=int,
         help="duration in ms"
     )
-    plate_subparser.add_argument(
+    plate_parser.add_argument(
         '-f', '--fps',
         default=25,
         type=int
     )
-    plate_subparser.add_argument(
+    plate_parser.add_argument(
         '--no-optimize',
         dest='optimize',
         default=True,
-        action='store_false'
+        action='store_false',
+        help="duration in ms"
     )
+
+    subparsers.add_parser('plate', parents=[base_parser, plate_parser], add_help=False)
+
+    for command, menu_item in chef.menu.items():
+        # inherit the parent class arguments
+        # and arguments specific to a subcommand
+        menu_item_parser = subparsers.add_parser(
+            command,
+            parents=[base_parser, plate_parser, menu_item.get_parser()],
+            add_help=False
+        )
+
+        menu_item_parser.add_argument(
+            '--frames',
+            dest='plate',
+            default=True, action='store_false',
+            help="save as frames. 'output' is assumed to be a directory"
+        )
 
     return parser
 
@@ -115,34 +122,47 @@ def cook_dish(path: str, add_dish_desc, parsed_vars):
     return chef.cook_dish_desc(dish_desc)
 
 
-def assemble(path, output, parsed_vars):
-    frames = os.listdir(path)
-    # sort so we can gif in order
-    frames.sort()
-
-    pierogis = []
-
-    for frame in frames:
-        try:
-            pierogis.append(Pierogi(file=os.path.join(path, frame)))
-
-        except UnidentifiedImageError:
-            print("{} is not an image".format(path))
-
-        except ValueError:
-            print("{} is not an image".format(path))
-
-        except IsADirectoryError:
-            print("{} is a directory".format(path))
-
-    dish = Dish(pierogis=pierogis)
-    if output is None:
-        output = "cooked.gif"
+def plate(path, output, parsed_vars):
     duration = parsed_vars.pop('duration')
     if duration is not None:
         duration /= 1000
+
     fps = parsed_vars.pop('fps')
     optimize = parsed_vars.pop('optimize')
+
+    if os.path.isdir(path):
+        frames = os.listdir(path)
+        # sort so we can gif in order
+        frames.sort()
+
+        pierogis = []
+
+        for frame in frames:
+            try:
+                pierogis.append(Pierogi(file=os.path.join(path, frame)))
+
+            except UnidentifiedImageError:
+                print("{} is not an image".format(frame))
+
+            except ValueError:
+                print("{} is not an image".format(frame))
+
+            except IsADirectoryError:
+                print("{} is a directory".format(path))
+
+        dish = Dish(pierogis=pierogis)
+
+        if output is None:
+            output = "cooked.gif"
+
+    else:
+        dish = Dish(file=path)
+
+        if output is None:
+            output = "cooked.png"
+
+    print("plating '{}' to '{}'".format(path, output))
+
     dish.save(output, optimize, duration=duration, fps=fps)
 
 
@@ -159,11 +179,6 @@ def cook_dir(path, output, parsed_vars):
     # sort so we can gif in order
     paths.sort()
 
-    # if plate is the order, just assemble the plate from files in path
-    if parsed_vars['order'] == 'plate':
-        assemble(path, output, parsed_vars)
-        return
-
     if output is None:
         output = "cooked"
     if not os.path.isdir(output):
@@ -175,13 +190,17 @@ def cook_dir(path, output, parsed_vars):
 
     for path in paths:
         try:
-            # make a separate dish for each path
-            cooked_dish = cook_dish(path, add_dish_desc, parsed_vars)
             # set the file on the cooked pierogi based on the input path
             output_filename = os.path.join(
                 output,
                 os.path.splitext(os.path.basename(path))[0] + ".png"
             )
+
+            print("cooking '{}' to '{}'".format(path, output_filename))
+
+            # make a separate dish for each path
+            cooked_dish = cook_dish(path, add_dish_desc, parsed_vars)
+
             cooked_dish.save(output_filename)
 
         except UnidentifiedImageError:
@@ -192,6 +211,8 @@ def cook_dir(path, output, parsed_vars):
 
         except IsADirectoryError:
             print("{} is a directory".format(path))
+
+    return output
 
 
 def cook_file(path, output, parsed_vars):
@@ -208,8 +229,6 @@ def cook_file(path, output, parsed_vars):
     # function for handling a command's options
     add_dish_desc = parsed_vars.pop('add_dish_desc')
 
-    digits = math.ceil(math.log(len(dish.pierogis), 10))
-
     # input file is a video
     if len(dish.pierogis) > 1:
         if output is None:
@@ -217,22 +236,32 @@ def cook_file(path, output, parsed_vars):
         if not os.path.isdir(output):
             os.makedirs(output)
 
+        digits = math.floor(math.log(len(dish.pierogis), 10))
+
         i = 1
         for pierogi in dish.pierogis:
             # make frame file names like 0001.png
             frame_path = os.path.join(output, str(i).zfill(digits + 1) + '.png')
-            i += 1
 
+            print("cooking frame '{}' to '{}'".format(i, frame_path))
             pierogi.save(frame_path)
             cooked_dish = cook_dish(frame_path, add_dish_desc, parsed_vars)
             cooked_dish.save(frame_path)
 
+            i += 1
+
     else:
-        cooked_dish = cook_dish(path, add_dish_desc, parsed_vars)
         if output is None:
             output = "cooked.png"
+
+        print("cooking '{}' to '{}'".format(path, output), end="\r")
+
+        cooked_dish = cook_dish(path, add_dish_desc, parsed_vars)
+
         cooked_dish.pierogis[0].file = path
         cooked_dish.save(output)
+
+    return output
 
 
 def main(args=None):
@@ -242,17 +271,30 @@ def main(args=None):
 
     parsed_vars = parse_args(args)
 
-    path, output, quiet = parse_common(parsed_vars)
+    input_path, output, quiet = parse_common(parsed_vars)
 
-    if os.path.isdir(path):
-        # if the path given contains many media
-        cook_dir(path, output, parsed_vars)
-    elif os.path.isfile(path):
-        # can be a gif/vid or an image
-        cook_file(path, output, parsed_vars)
+    # if plate is the order, just assemble the plate from files in path
+    if parsed_vars['order'] == 'plate':
+        plate(input_path, output, parsed_vars)
+
     else:
-        raise Exception('Bad path')
+        if os.path.isdir(input_path):
+            # if the path given contains many media
+            if parsed_vars.get('plate'):
+                frames_path = cook_dir(input_path, None, parsed_vars)
+                plate(frames_path, output, parsed_vars)
+            else:
+                output_path = cook_dir(input_path, output, parsed_vars)
 
+        elif os.path.isfile(input_path):
+            # can be a gif/vid or an image
+            if parsed_vars.get('plate'):
+                frames_path = cook_file(input_path, None, parsed_vars)
+                plate(frames_path, output, parsed_vars)
+            else:
+                output_path = cook_file(input_path, output, parsed_vars)
+        else:
+            raise Exception('Bad path')
 
 if __name__ == "__main__":
     sys.exit(main())

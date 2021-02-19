@@ -31,7 +31,7 @@ class ResizeOrder(MenuItem):
         )
         parser.add_argument(
             '-r', '--resample',
-            type=int, default=Resize.FILTERS['default'],
+            default=Resize.FILTERS['default'],
             choices=Resize.FILTERS.keys(),
             help='resample filter for resize'
         )

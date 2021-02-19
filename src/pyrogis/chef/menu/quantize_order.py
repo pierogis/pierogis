@@ -26,27 +26,27 @@ class QuantizeOrder(MenuItem):
         )
 
         parser.add_argument(
-            '-i', '--iters',
+            '--iterations',
             type=int, default=SpatialQuantize.ITERATIONS, dest='iterations',
             help='iterations per coarseness level'
         )
         parser.add_argument(
-            '-r', '--repeats',
+            '--repeats',
             type=int, default=SpatialQuantize.REPEATS,
             help='repeats per annealing temperature'
         )
         parser.add_argument(
-            '--initial_temp',
+            '--initial-temp',
             type=float, default=SpatialQuantize.INITIAL_TEMP,
             help='repeats per annealing temperature'
         )
         parser.add_argument(
-            '--final_temp',
+            '--final-temp',
             type=float, default=SpatialQuantize.FINAL_TEMP,
             help='repeats per annealing temperature'
         )
         parser.add_argument(
-            '-d', '--dithering_level',
+            '--dithering-level',
             type=float, default=SpatialQuantize.DITHERING_LEVEL,
             help='repeats per annealing temperature'
         )

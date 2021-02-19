@@ -96,7 +96,7 @@ class Chef:
             seasoning = ingredients[seasoning]
             recipient = ingredients[recipient]
 
-            seasoning.season(recipient)
+            recipient.season(seasoning)
 
     def create_recipe_object(
             self,

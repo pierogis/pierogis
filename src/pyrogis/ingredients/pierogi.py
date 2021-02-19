@@ -18,9 +18,13 @@ class Pierogi(Ingredient):
     """
 
     RESAMPLE = Image.NEAREST
+    """default resize algorithm is nearest neighbor"""
+
+    pixels: np.ndarray
+    """underlying numpy pixels array"""
 
     @property
-    def image(self):
+    def image(self) -> Image.Image:
         """
         turn the numpy array into a PIL Image
         """
@@ -28,14 +32,14 @@ class Pierogi(Ingredient):
         return image
 
     @property
-    def width(self):
+    def width(self) -> int:
         """
         1st dimension of the underlying pixel array
         """
         return self.pixels.shape[0]
 
     @property
-    def height(self):
+    def height(self) -> int:
         """
         2nd dimension of the underlying pixel array
         """
@@ -45,16 +49,19 @@ class Pierogi(Ingredient):
             self,
             pixels: np.ndarray = None,
             shape: tuple = (0, 0),
-            image: Image = None,
+            image: Image.Image = None,
             file: str = None,
             **kwargs
-    ):
+    ) -> None:
         """
         provide the source image in a number of ways
 
         :param pixels: numpy array
+
+        :param shape: shape to make simple pixels array
+
         :param image: PIL Image that has already been loaded
-        :param file: provide an input image as a file
+
         :param file: file path to load from
         """
 
@@ -67,25 +74,25 @@ class Pierogi(Ingredient):
                 self.file = file
                 pixels = np.rot90(np.array(imageio.imread(file)), axes=(1, 0))
             elif shape is not None:
-                pixels = np.full((*shape, 3), self.default_pixel)
+                pixels = np.full((*shape, 3), self._default_pixel)
             else:
                 raise Exception("one of image, file, or shape must be provided")
 
         self.pixels = pixels
 
-    def cook(self, pixels: np.ndarray):
+    def cook(self, pixels: np.ndarray) -> np.ndarray:
         """
         performs actions on a pixel array and returns a cooked array
         """
         return self.pixels
 
-    def show(self):
+    def show(self) -> None:
         """
         open an image viewer to display the array
         """
         self.image.show()
 
-    def save(self, path, optimize=False):
+    def save(self, path: str, optimize: bool =False) -> None:
         """
         save the image to the given path
         """
@@ -103,14 +110,18 @@ class Pierogi(Ingredient):
         resize pixels to new width and height
 
         :param width: width to resize to
+
         :param height: height to resize to
-        :param resample: resample method to use in Image.resize. PIL documentation:
-            "An optional resampling filter.
-            This can be one of PIL.Image.NEAREST (use nearest neighbour),
-            PIL.Image.BILINEAR (linear interpolation),
-            PIL.Image.BICUBIC (cubic spline interpolation),
-            or PIL.Image.LANCZOS (a high-quality downsampling filter).
-            If omitted, or if the image has mode “1” or “P”, it is set PIL.Image.NEAREST."
+
+        :param resample: resample method to use in Image.resize.
+        PIL documentation:
+
+        >    "An optional resampling filter.
+        >    This can be one of PIL.Image.NEAREST (use nearest neighbour),
+        >    PIL.Image.BILINEAR (linear interpolation),
+        >    PIL.Image.BICUBIC (cubic spline interpolation),
+        >    or PIL.Image.LANCZOS (a high-quality downsampling filter).
+        >    If omitted, or if the image has mode “1” or “P”, it is set PIL.Image.NEAREST."
         """
 
         self.pixels = np.array(

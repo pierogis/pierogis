@@ -10,16 +10,13 @@ class Quantize(Ingredient):
     quantize reduces the color palette of the input pixels to a smaller set.
     """
 
-    PALETTE_SIZE = 8
-
     def prep(self,
-             colors=None, palette_size=PALETTE_SIZE, **kwargs):
+             colors=None, **kwargs):
         """
         parameters for spatial color quantization
 
-        :param palette: colors to use. can be a list of str
-        or array likes
-        :param palette_size: the palette size to generate
+        :param colors: colors to use. can be a list of str
+        or pixel array likes
         """
 
         if colors is None:
@@ -30,7 +27,7 @@ class Quantize(Ingredient):
                 if type(color) is str:
                     if color[0] != '#':
                         color = '#' + color
-                    colors.append(ImageColor.getcolor(color, "RGB"))
+                    rgb_colors.append(ImageColor.getcolor(color, "RGB"))
 
             colors = np.asarray(rgb_colors)
 
@@ -38,7 +35,7 @@ class Quantize(Ingredient):
             colors = np.array(colors)
 
         self.palette = colors.astype(np.dtype('uint8'))
-        self.palette_size = palette_size
+        """palette to use"""
 
     def cook(self, pixels: np.ndarray):
         """
@@ -79,6 +76,7 @@ class SpatialQuantize(Quantize):
 
     also performs dithering to make the palette appear richer.
     """
+    PALETTE_SIZE = 8
     ITERATIONS = 3
     REPEATS = 1
     INITIAL_TEMP = 1
@@ -86,28 +84,49 @@ class SpatialQuantize(Quantize):
     FILTER_SIZE = 3
     DITHERING_LEVEL = .8
 
-    def prep(self, iterations=ITERATIONS, repeats=REPEATS,
-             initial_temp=INITIAL_TEMP, final_temp=FINAL_TEMP,
-             dithering_level=DITHERING_LEVEL, seed=0, **kwargs):
+    palette_size: int
+    """number of colors"""
+    iterations: int
+    """number of iterations to do at each coarseness level"""
+    repeats: int
+    """number of repeats to do of each annealing temp"""
+    initial_temp: float
+    """starting annealing temp (around 1)"""
+    final_temp: float
+    """final annealing temp (decimal near but above 0)"""
+    filter_size: int
+    """filter size for dithering"""
+    dithering_level: float
+    """relative amount of dithering (.5-1.5)"""
+    seed: int
+    """seed for rng"""
+
+    def prep(
+            self, palette_size=PALETTE_SIZE,
+            iterations=ITERATIONS, repeats=REPEATS,
+            initial_temp=INITIAL_TEMP, final_temp=FINAL_TEMP,
+            dithering_level=DITHERING_LEVEL, seed=0, **kwargs
+    ):
         """
 
-        :param iterations: number of iterations to do at each coarseness level
-        :param repeats: number of repeats to do of each annealing temp
-        :param initial_temp: starting annealing temp (around 1)
-        :param final_temp: final annealing temp (decimal near but above 0)
-        :param dithering_level: relative amount of dithering (.5-1.5)
-        :param seed: seed for rng
         """
-
         super().prep(**kwargs)
 
+        self.palette_size = palette_size
+        """number of colors"""
         self.iterations = iterations
+        """number of iterations to do at each coarseness level"""
         self.repeats = repeats
+        """number of repeats to do of each annealing temp"""
         self.initial_temp = initial_temp
+        """starting annealing temp (around 1)"""
         self.final_temp = final_temp
+        """final annealing temp (decimal near but above 0)"""
         self.filter_size = self.FILTER_SIZE
         self.dithering_level = dithering_level
+        """relative amount of dithering (.5-1.5)"""
         self.seed = seed
+        """seed for rng"""
 
     def cook(self, pixels: np.ndarray):
         """

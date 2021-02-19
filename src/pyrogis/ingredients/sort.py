@@ -19,19 +19,18 @@ class Sort(Ingredient):
     or have it preloaded using a season method
     """
 
+    delimiter: np.ndarray
+    """pixel used as the sort subgroup delimiter"""
+    rotate: Rotate
+    """define the direction to rotate on"""
+
     def prep(
             self, rotate: Rotate = None,
-            delimiter: np.ndarray = np.array([255, 255, 255]),
+            delimiter: np.ndarray = np.asarray([255, 255, 255]),
             **kwargs
     ):
         """
-        cook sorts from bottom to top after rotation, then unrotates
         extra kwargs get passed to the Rotate if one is not provided
-
-        :param rotate: define the direction to rotate on
-        :param seasoning: create a mask from a seasoning
-        :param delimiter: pixel used as the sort subgroup delimiter
-        :param target: pierogi to use as target for an automatic seasoning
         """
         self.delimiter = delimiter
 
@@ -42,6 +41,7 @@ class Sort(Ingredient):
 
     def cook(self, pixels: np.ndarray):
         """
+        cook sorts from bottom to top after rotation, then unrotates.
         sort within each sequence group of contiguous white pixels
         in the mask (may be all white)
         """
@@ -75,7 +75,9 @@ class Sort(Ingredient):
                 # if the subgroup to be sorted contains 0 or 1 pixels, ignore
                 if group.size > 3:
                     # intensity as the sorting criterion
-                    intensities = np.average(group, axis=1)
+                    intensities = np.sum(
+                        group * np.asarray([0.299, 0.587, 0.114]), axis=1
+                    )
                     # get "sort order" indices of the intensities of this group
                     indices = np.argsort(intensities)
                     # sort the group by these indices

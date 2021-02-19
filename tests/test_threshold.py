@@ -24,7 +24,7 @@ def test_threshold_1(array):
     assert np.all(cooked_array[1, 1] == 255)
 
 
-def test_threshold_2(array):
+def test_threshold_upper(array):
     """
     upper threshold provided
     lower threshold should be 0
@@ -41,7 +41,24 @@ def test_threshold_2(array):
     assert np.all(cooked_array[1, 1] == 0)
 
 
-def test_threshold_3(array):
+def test_threshold_lower(array):
+    """
+    upper threshold provided
+    lower threshold should be 0
+    """
+    threshold = Threshold(
+        lower_threshold=100
+    )
+
+    cooked_array = threshold.cook(array)
+
+    assert np.all(cooked_array[0, 0] == 0)
+    assert np.all(cooked_array[0, 1] == 255)
+    assert np.all(cooked_array[1, 0] == 0)
+    assert np.all(cooked_array[1, 1] == 255)
+
+
+def test_threshold_both(array):
     """
     both thresholds provided
     """
@@ -58,7 +75,7 @@ def test_threshold_3(array):
     assert np.all(cooked_array[1, 1] == 0)
 
 
-def test_threshold_4(array):
+def test_threshold_include_exclude(array):
     """
     using different pixels for replace
     """
@@ -66,8 +83,8 @@ def test_threshold_4(array):
     exclude_pixel = np.asarray([0, 0, 0])
 
     threshold = Threshold(
-        include_pixel=include_pixel,
-        exclude_pixel=exclude_pixel
+        include=include_pixel,
+        exclude=exclude_pixel
     )
 
     cooked_array = threshold.cook(array)
