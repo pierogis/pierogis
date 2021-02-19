@@ -9,10 +9,11 @@
 - chef 
     - add `Threshold` option to provide hex color for include and exclude
     - add `Quantize` option to provide colors for palette
+    - add `Resize` order
   
 - testing
     - add `Resize` testing
-    - add cli testing
+    - add cli/parser testing
 
 - misc
     - change references to `rpierogis` to `pierogis_rs`

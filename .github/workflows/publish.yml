@@ -11,12 +11,6 @@ on:
       - test
       - develop
 
-env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_DEFAULT_REGION: us-east-1
-  DIST_DIR: ${{ github.sha }}
-
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -52,13 +46,6 @@ jobs:
           command: clippy
           args: --manifest-path ./Cargo.toml --all-targets --all-features -- -D warnings
 
-      - name: install package
-        run: |
-          python -m venv .env
-          source .env/bin/activate
-          pip install -r requirements.txt
-          python setup.py develop
-
       - name: flake8 python
         continue-on-error: true
         run: |
@@ -82,7 +69,10 @@ jobs:
 
       - name: run tests
         run: |
+          python -m venv .env
           source .env/bin/activate
+          pip install -r requirements.txt
+          pip install .
           pip install pytest
           pytest -s -v tests
 
@@ -95,6 +85,11 @@ jobs:
       - uses: actions/checkout@v1
       - name: build wheels
         run: 'sh build_wheels.sh'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+          DIST_DIR: ${{ github.sha }}
 
   macos-windows-build:
     runs-on: ${{ matrix.platform.os }}
@@ -133,6 +128,11 @@ jobs:
 
       - name: upload to aws
         shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+          DIST_DIR: ${{ github.sha }}
         run: |
           pip install -U awscli
           python -m awscli s3 sync --exact-timestamps ./dist "s3://pierogis/dist/$DIST_DIR"
@@ -149,6 +149,11 @@ jobs:
 
       - name: retrieve all wheels
         shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+          DIST_DIR: ${{ github.sha }}
         run: |
           pip install awscli
           aws s3 sync "s3://pierogis/dist/$DIST_DIR" ./dist

@@ -231,25 +231,22 @@ def cook_file(path, output, parsed_vars):
 
     # input file is a video
     if len(dish.pierogis) > 1:
-        frames_path = None
-
         if parsed_vars.get('plate'):
             frames_path = "cooked"
-        if output is None:
+        elif output is None:
             frames_path = "cooked"
-
-        if frames_path is None:
+        else:
             frames_path = output
 
         if not os.path.isdir(frames_path):
             os.makedirs(frames_path)
 
-        digits = math.floor(math.log(len(dish.pierogis), 10))
+        digits = math.floor(math.log(len(dish.pierogis), 10)) + 1
 
         i = 1
         for pierogi in dish.pierogis:
             # make frame file names like 0001.png
-            frame_path = os.path.join(output, str(i).zfill(digits + 1) + '.png')
+            frame_path = os.path.join(frames_path, str(i).zfill(digits) + '.png')
 
             print("cooking frame '{}' to '{}'".format(i, frame_path))
             pierogi.save(frame_path)

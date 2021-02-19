@@ -4,7 +4,7 @@ import shutil
 from pyrogis.__main__ import main
 
 
-def test_pyrogis_sort_1():
+def test_pyrogis_sort():
     main(args=["sort", "demo/gnome.jpg"])
 
     assert os.path.isfile("cooked.png")
@@ -12,7 +12,7 @@ def test_pyrogis_sort_1():
     os.remove("cooked.png")
 
 
-def test_pyrogis_sort_2():
+def test_pyrogis_sort_options():
     """
     test sort order with options
     """
@@ -23,14 +23,14 @@ def test_pyrogis_sort_2():
     os.remove("cooked.png")
 
 
-def test_pyrogis_quantize_1():
+def test_pyrogis_quantize():
     main(args=["quantize", "demo/gnome.jpg"])
 
     assert os.path.isfile("cooked.png")
     os.remove("cooked.png")
 
 
-def test_pyrogis_quantize_2():
+def test_pyrogis_quantize_options():
     """
     test quantize order with options
     """
@@ -49,14 +49,14 @@ def test_pyrogis_quantize_2():
     os.remove("cooked.png")
 
 
-def test_pyrogis_threshold_1():
+def test_pyrogis_threshold():
     main(args=["threshold", "demo/gnome.jpg"])
 
     assert os.path.isfile("cooked.png")
     os.remove("cooked.png")
 
 
-def test_pyrogis_threshold_2():
+def test_pyrogis_threshold_options():
     """
     test threshold order with options
     """
@@ -72,14 +72,14 @@ def test_pyrogis_threshold_2():
     os.remove("cooked.png")
 
 
-def test_pyrogis_resize_1():
+def test_pyrogis_resize():
     main(args=["resize", "demo/gnome.jpg"])
 
     assert os.path.isfile("cooked.png")
     os.remove("cooked.png")
 
 
-def test_pyrogis_resize_2():
+def test_pyrogis_resize_options():
     """
     test resize order with options
     """
@@ -95,7 +95,7 @@ def test_pyrogis_resize_2():
     os.remove("cooked.png")
 
 
-def test_pyrogis_chef_1():
+def test_pyrogis_chef():
     main(args=["chef", "demo/gnome.jpg", "sort; quantize"])
 
     assert os.path.isfile("cooked.png")
