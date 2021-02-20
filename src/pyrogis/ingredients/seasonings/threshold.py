@@ -2,7 +2,7 @@
 threshold ingredient(s)
 """
 import numpy as np
-from rpierogis import recipes
+from pierogis_rs import algorithms
 
 from .seasoning import Seasoning
 
@@ -22,6 +22,11 @@ class Threshold(Seasoning):
     LOWER_THRESHOLD = 64
     UPPER_THRESHOLD = 180
 
+    lower_threshold: int
+    """pixels below are `True`"""
+    upper_threshold: int
+    """pixels above are `True`"""
+
     def prep(
             self,
             lower_threshold: int = None,
@@ -31,10 +36,15 @@ class Threshold(Seasoning):
         """
         set the threshold intensity levels
 
-        pixels lower than :param lower_threshold
-        or higher that :param upper_threshold
+        calls Seasoning.prep with leftover kwargs
+
+        pixels lower than lower_threshold
+        or higher that upper_threshold
         are true (include_pixel)
         """
+        # set include/exclude_pixel and target, if provided
+        super().prep(**kwargs)
+
         if lower_threshold is None and upper_threshold is None:
             lower_threshold = self.LOWER_THRESHOLD
             upper_threshold = self.UPPER_THRESHOLD
@@ -48,26 +58,19 @@ class Threshold(Seasoning):
         self.lower_threshold = lower_threshold
         self.upper_threshold = upper_threshold
 
-        # set include/exclude_pixel and target, if provided
-        super().prep(**kwargs)
-
     def cook(self, pixels: np.ndarray):
         """
         pixels with brightness >= upper_threshold
-        or <= lower_threshold are replaced by include pixel
+        or <= lower_threshold are replaced by include pixel (white)
 
         brightness = r * 0.299 + g * 0.587 + b * 0.114
 
         parallel computation in rust is 10x speedup
         """
-
-        if self.target is not None:
-            pixels = self.target.pixels
-
         cooked_pixels = pixels.copy()
 
         # cook using the rust function
-        cooked_pixels = recipes.threshold(
+        cooked_pixels = algorithms.threshold(
             cooked_pixels.astype(np.dtype('uint8')),
             self.lower_threshold, self.upper_threshold,
             self.include_pixel.astype(np.dtype('uint8')),
@@ -78,22 +81,17 @@ class Threshold(Seasoning):
 
     def cook_np(self, pixels: np.ndarray):
         """
-        perform the same operation as cook, but only in numpy
+        perform the same operation as Threshold.cook, but only in numpy
         """
 
         include_pixels = np.resize(self.include_pixel, pixels.shape)
         exclude_pixels = np.resize(self.exclude_pixel, pixels.shape)
 
-        # use target, if available
-        target_pixels = pixels
-        if self.target is not None:
-            target_pixels = self.target.pixels
-
         # use exclude_pixels as the base
         cooked_pixels = exclude_pixels
         # get intensities from average of rgb
         intensities_array = np.sum(
-            target_pixels * np.asarray([0.299, 0.587, 0.114]), axis=2
+            pixels * np.asarray([0.299, 0.587, 0.114]), axis=2
         )
         # if intensity <= lower or >= upper, True
         boolean_array = np.logical_or(

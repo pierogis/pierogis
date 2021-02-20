@@ -3,6 +3,7 @@ seasoning base ingredient
 """
 
 import numpy as np
+from PIL import ImageColor
 
 from pyrogis.ingredients.ingredient import Ingredient
 
@@ -23,42 +24,44 @@ class Seasoning(Ingredient):
 
     def prep(
             self,
-            target: Ingredient = None,
-            include_pixel: np.ndarray = None,
-            exclude_pixel: np.ndarray = None,
+            # pierogi: Pierogi,
+            include: str = None,
+            exclude: str = None,
             **kwargs
     ):
         """
-        :param target: If set, target will be the pixels that are cooked
-        :param include_pixel: The color to use for included pixels
-        Think of them like little flakes of seasoning
-        :param exclude_pixel: The color to use for excluded pixels
-        """
-        self.target = target
+        :param pierogi: If set, target will be the pixels that are cooked
+        :param include: color to use for included pixels
 
-        if include_pixel is None:
+        like little flakes of seasoning.
+
+        can be hex
+
+        :param exclude: color to use for excluded pixels
+        """
+        # self.pierogi = pierogi
+
+        if include is None:
             include_pixel = self._white_pixel
+        elif type(include) is str:
+            if include[0] != '#':
+                include = '#' + include
+            include_pixel = ImageColor.getcolor(include, "RGB")
+        else:
+            include_pixel = include
+
         self.include_pixel = np.asarray(include_pixel)
 
-        if exclude_pixel is None:
+        if exclude is None:
             exclude_pixel = self._black_pixel
+        elif type(exclude) is str:
+            if exclude[0] != '#':
+                exclude = '#' + exclude
+            exclude_pixel = ImageColor.getcolor(exclude, "RGB")
+        else:
+            exclude_pixel = exclude
+
         self.exclude_pixel = np.asarray(exclude_pixel)
-
-    def season(self, recipient: Ingredient):
-        """
-        Set the input ingredient's mask to the output of a cook.
-
-        If self.target is none,
-        recipient will be the pixels that are cooked as well.
-
-        :param recipient: ingredient which will have its mask set
-        """
-
-        recipient_pixels = recipient.pixels
-
-        recipient.mask = self.cook(recipient_pixels)
-
-        return recipient
 
     def cook(self, pixels: np.ndarray):
         """
@@ -67,16 +70,10 @@ class Seasoning(Ingredient):
 
         This isn't very useful, this is mostly an abstract class.
         """
-        # tries to use self.target and defaults to the passed in pixels
-        target_pixels = pixels
-
-        if self.target is not None:
-            target_pixels = self.target.pixels
-
         # turn pixels into boolean array
         # True replaces a pixel that matches self.include_pixel
         boolean_array = np.all(
-            target_pixels == self.include_pixel, axis=2
+            pixels == self.include_pixel, axis=2
         )
 
         # replace True with include_pixel and False with exclude_pixel
@@ -85,3 +82,16 @@ class Seasoning(Ingredient):
         )
 
         return binary_pixels
+
+    # def season(self, recipient: Ingredient):
+    #     """
+    #     Set the input ingredient's mask to the output of a cook.
+    #
+    #     If self.target is none,
+    #     recipient will be the pixels that are cooked as well.
+    #
+    #     :param recipient: ingredient which will have its mask set
+    #     """
+    #     recipient.mask = self.cook(self.pierogi.pixels)
+    #
+    #     return recipient

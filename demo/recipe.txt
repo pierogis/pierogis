@@ -1,2 +1,4 @@
-sort
-sort -t 1
+resize -s .5;
+sort;
+quantize;
+resize -s 2;

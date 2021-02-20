@@ -480,6 +480,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c5d65c4d95931acda4498f675e332fcbdc9a06705cd07086c510e9b6009cd1c1"
 
 [[package]]
+name = "pierogis_rs"
+version = "0.1.0"
+dependencies = [
+ "image",
+ "ndarray",
+ "numpy",
+ "pyo3",
+ "rayon",
+ "rscolorq",
+]
+
+[[package]]
 name = "png"
 version = "0.16.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -664,18 +676,6 @@ name = "redox_syscall"
 version = "0.1.57"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "41cc0f7e4d5d4544e8861606a285bb08d3e70712ccc7d2b84d7c0ccfaf4b05ce"
-
-[[package]]
-name = "rpierogis"
-version = "0.1.0"
-dependencies = [
- "image",
- "ndarray",
- "numpy",
- "pyo3",
- "rayon",
- "rscolorq",
-]
 
 [[package]]
 name = "rscolorq"

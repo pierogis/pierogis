@@ -1,13 +1,13 @@
 from .dish import Dish
 from .flip import Flip
 from .ingredient import Ingredient
-from .pierogi import Pierogi
-from .quantize import Quantize
-from .quantize import SpatialQuantize
+from .quantize import Quantize, SpatialQuantize
 from .recipe import Recipe
+from .resize import Resize
 from .rotate import Rotate
-from .sort import Sort
 from .seasonings import Threshold
+from .sort import Sort
+from .pierogi import Pierogi
 
 __all__ = [
     'Ingredient',
@@ -19,5 +19,6 @@ __all__ = [
     'Sort',
     'Flip',
     'Rotate',
-    'Threshold'
+    'Threshold',
+    'Resize'
 ]

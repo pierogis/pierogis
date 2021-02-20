@@ -1,25 +1,26 @@
 use ndarray::parallel::prelude::*;
-use numpy::{Ix1, Ix3, PyArray, PyReadonlyArray, ToPyArray};
-use pyo3::prelude::{pymodule, PyModule};
+use numpy::{Ix1, Ix2, Ix3, PyArray, PyReadonlyArray, ToPyArray};
 use pyo3::{PyResult, Python};
+use pyo3::prelude::{pymodule, PyModule};
 use rayon::prelude::*;
 
 mod quantize;
 
 #[pymodule]
-fn rpierogis(py: Python<'_>, m: &PyModule) -> PyResult<()> {
-    let recipes_module = PyModule::new(py, "recipes")?;
-    m.add_submodule(recipes_module)?;
+fn pierogis_rs(py: Python<'_>, m: &PyModule) -> PyResult<()> {
+    let module = PyModule::new(py, "algorithms")?;
+    m.add_submodule(module)?;
 
     /// quantize(py_array, palette_size, /)
     /// --
     ///
     /// This function adds two unsigned 64-bit integers.
-    #[pyfn(recipes_module, "quantize")]
+    #[pyfn(module, "quantize")]
     #[allow(clippy::too_many_arguments)]
     fn py_quantize<'py>(
         py: Python<'py>,
         pixels_py_array: PyReadonlyArray<u8, Ix3>,
+        palette_py_array: PyReadonlyArray<u8, Ix2>,
         palette_size: u8,
         iters_per_level: usize,
         repeats_per_temp: usize,
@@ -30,6 +31,7 @@ fn rpierogis(py: Python<'_>, m: &PyModule) -> PyResult<()> {
         seed: Option<u64>,
     ) -> PyResult<&'py PyArray<u8, Ix3>> {
         let array = pixels_py_array.as_slice()?;
+        let palette = palette_py_array.as_slice()?;
 
         let shape = pixels_py_array.shape();
         let width = shape[0];
@@ -39,6 +41,7 @@ fn rpierogis(py: Python<'_>, m: &PyModule) -> PyResult<()> {
             &array,
             width,
             height,
+            &palette,
             palette_size,
             iters_per_level,
             repeats_per_temp,
@@ -53,7 +56,7 @@ fn rpierogis(py: Python<'_>, m: &PyModule) -> PyResult<()> {
         PyArray::from_vec(py, cooked_array).reshape((width, height, 3))
     }
 
-    #[pyfn(recipes_module, "threshold")]
+    #[pyfn(module, "threshold")]
     #[allow(clippy::too_many_arguments)]
     fn py_threshold<'py>(
         py: Python<'py>,

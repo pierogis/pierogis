@@ -5,17 +5,22 @@ from .menu_item import MenuItem
 from ..dish_description import DishDescription
 
 
-class CustomDish(MenuItem):
+class CustomOrder(MenuItem):
     @staticmethod
-    def read_recipe(dish_description: DishDescription, recipe_text: str):
+    def read_recipe(
+            dish_description: DishDescription,
+            recipe_text: str,
+            target_pierogi_uuid
+    ):
         """
-        read a recipe from string to a DishDescription
+        read a recipe from string, adding to a DishDescription
 
         :param dish_description: the dish description to extend
         :param recipe_text: the recipe as a string like 'sort; quantize'
+        :param target_pierogi_uuid: the uuid of the base pierogi for the dish
         """
         # split the recipe text by semi colons
-        lines = recipe_text.split(';')
+        recipe_items = recipe_text.split(';')
 
         # create the base parser for the recipe text
         parser = argparse.ArgumentParser()
@@ -31,12 +36,13 @@ class CustomDish(MenuItem):
             )
 
         # now parse each line
-        for i in range(len(lines)):
-            line = lines[i]
+        for order in recipe_items:
             # line may be just whitespace
-            if not line.isspace():
+            if order.isspace() or order == '':
+                continue
+            else:
                 # split into different words
-                phrases = line.strip().split()
+                phrases = order.strip().split()
 
                 # use the parser with attached subparsers for the recipe names
                 parsed, unknown = parser.parse_known_args(phrases)
@@ -47,7 +53,7 @@ class CustomDish(MenuItem):
                 add_dish_desc = parsed_vars.pop('add_dish_desc')
 
                 dish_description = add_dish_desc(
-                    dish_description, **parsed_vars
+                    dish_description, target_pierogi_uuid=target_pierogi_uuid, **parsed_vars
                 )
 
         return dish_description
@@ -57,13 +63,15 @@ class CustomDish(MenuItem):
             cls,
             dish_desc: DishDescription,
             path=None,
+            target_pierogi_uuid=None,
             **kwargs
     ):
         """
         add to dish_desc using a recipe specified in a string or a file
         """
         if path is not None:
-            dish_desc = cls.add_pierogi_desc(dish_desc, path)
+            target_pierogi_uuid = dish_desc.add_pierogi_desc(path)
+            dish_desc.dish['pierogi'] = target_pierogi_uuid
 
         # recipe can be provided as a string
         recipe = kwargs.pop('recipe')
@@ -74,7 +82,7 @@ class CustomDish(MenuItem):
             with open(recipe) as recipe_file:
                 recipe_text = recipe_file.read()
 
-        dish_desc = cls.read_recipe(dish_desc, recipe_text)
+        dish_desc = cls.read_recipe(dish_desc, recipe_text, target_pierogi_uuid)
 
         return dish_desc
 

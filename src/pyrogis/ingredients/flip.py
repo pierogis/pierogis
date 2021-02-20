@@ -8,7 +8,7 @@ class Flip(Ingredient):
     flip pixels about an axis
     """
 
-    def prep(self, axis: int = 0):
+    def prep(self, axis: int = 0, **kwargs):
         """
         :param axis: 0 to flip vertically, 1 to flip horizontally
         """

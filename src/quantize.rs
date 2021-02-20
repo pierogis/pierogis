@@ -1,11 +1,12 @@
-use rscolorq::color::Rgb;
 use rscolorq::{FilterSize, Matrix2d, Params};
+use rscolorq::color::Rgb;
 
 #[allow(clippy::too_many_arguments)]
 pub fn cook(
     pixels_array: &&[u8],
     width: usize,
     height: usize,
+    colors: &&[u8],
     palette_size: u8,
     iters_per_level: usize,
     repeats_per_temp: usize,
@@ -59,13 +60,28 @@ pub fn cook(
         width,  // where this lib expects (height, width, 3)
     );
 
-    // create and empty vector of Rgb to hold the palette
+    if colors.len() >= 3 {
+        // map colors slice to Vec<Rgb>
+        let colors = colors.chunks(3).map(|c| {
+            Rgb {
+                red: c[0] as f64 / 255.0,
+                green: c[1] as f64 / 255.0,
+                blue: c[2] as f64 / 255.0,
+            }
+        })
+            .collect::<Vec<Rgb>>();
+
+        // use this Vec in the conditions for dithering
+        conditions.palette(colors);
+    }
+
+    // also create a palette for the outcome of the algorithm
     let mut palette = Vec::with_capacity(palette_size as usize);
 
     // perform the quantization, filling these refs
     rscolorq::spatial_color_quant(&image, &mut quantized_image, &mut palette, &conditions).unwrap();
 
-    // Convert the Rgb<f64> palette to Rgb<u8>
+    // convert the Rgb<f64> palette to Rgb<u8>
     let palette = palette
         .iter()
         .map(|&c| {

@@ -4,24 +4,26 @@ from ..dish_description import DishDescription, IngredientDesc
 from ...ingredients import Threshold
 
 
-class ThresholdDish(MenuItem):
+class ThresholdOrder(MenuItem):
     @classmethod
     def add_desc(
             cls,
             dish_desc: DishDescription,
             path: str = None,
+            target_pierogi_uuid=None,
             **kwargs
     ):
         """
         add a threshold recipe to the dish description
         """
         if path is not None:
-            dish_desc = cls.add_pierogi_desc(dish_desc, path)
+            target_pierogi_uuid = dish_desc.add_pierogi_desc(path)
+            dish_desc.dish['pierogi'] = target_pierogi_uuid
 
         ingredient_desc = IngredientDesc(
             type_name='threshold',
-            args=[],
             kwargs={
+                'pierogi': target_pierogi_uuid,
                 **kwargs
             }
         )
@@ -41,11 +43,23 @@ class ThresholdDish(MenuItem):
             '-l', '--lower-threshold',
             default=Threshold.LOWER_THRESHOLD, type=int,
             help="Pixels with lightness below"
-                 "this threshold will not get sorted"
+                 "this threshold are included"
         )
         parser.add_argument(
             '-u', '--upper-threshold',
             default=Threshold.UPPER_THRESHOLD, type=int,
             help="Pixels with lightness above"
-                 "this threshold will not get sorted"
+                 "this threshold are included"
+        )
+        parser.add_argument(
+            '-i', '--include',
+            dest='include',
+            default="ffffff", type=str,
+            help="Hex color for included pixels"
+        )
+        parser.add_argument(
+            '-e', '--exclude',
+            dest='exclude',
+            default="000000", type=str,
+            help="Hex color for excluded pixels"
         )

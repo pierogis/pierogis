@@ -1,11 +1,11 @@
 [package]
-name = "rpierogis"
+name = "pierogis_rs"
 version = "0.1.0"
 authors = ["Kyle Moore <moore.kyle39@gmail.com>"]
 edition = "2018"
 
 [lib]
-name = "quantize"
+name = "pierogis"
 crate-type = ["cdylib"]
 
 [dependencies]
