@@ -104,12 +104,19 @@ If you don't understand what output type to expect from your command, don't prov
 pyrogis sort ./input.jpg -l 50 -u 180 -t 1
 ```
 
+Use `-l` and `-u` as lower and upper thresholds
+where contiguous groups of pixels
+with brightness outside of the thresholds are sorted.
+
+If only lower is provided, upper is set to 255.
+If only upper is provided, lower is set to 0.
+
 ![sorted gnome](https://raw.githubusercontent.com/pierogis/pierogis/master/demo/out/gnome_sort.png)
 
 |arg|description|default|valid|
 |------|-----------|:-----:|:---:|
-|`-l`, `--lower-threshold`|pixels with intensity *below* this value serve as sort boundaries|`64`|`0-255`|
-|`-u`, `--upper-threshold`|pixels with intensity *above* this value serve as sort boundaries|`180`|`0-255`|
+|`-l`, `--lower-threshold`|pixels with intensity *below* this value are sorted|`64`|`0-255`|
+|`-u`, `--upper-threshold`|pixels with intensity *above* this value are sorted|`180`|`0-255`|
 |`-t`, `--turns`|number of clockwise turns from sorting bottom to top|`0`|`0-3`|
 |`--ccw`|if provided, `turns` will be applied counter-clockwise|False|flag|
 
@@ -125,6 +132,9 @@ pyrogis quantize input.jpg -c aaaaaa 43ad32 696969 --repeats 3 --iterations 3
 pyrogis quantize input.jpg -n 16 --repeats 3 --iterations 3
 ```
 
+Wraps [`rscolorq`](https://github.com/okaneco/rscolorq)) in python.
+Thank you to the author of that package.
+
 |arg|description|default|valid|
 |:----:|-----------|:-----:|:---:|
 |`-c`, `--colors`|hex colors to base palette on (palette size ignored)|`None`|`int`|
@@ -134,8 +144,6 @@ pyrogis quantize input.jpg -n 16 --repeats 3 --iterations 3
 |`--initial-temp`|initial temp to use in DA for optimization|1|`float`|
 |`--final-temp`|final temp to use in DA for optimization|0.001|`float`|
 |`--dithering-level`|relative dithering level (use .5-1.5)|0.8|`float`|
-
-(See more documentation on [`rscolorq`](https://github.com/okaneco/rscolorq))
 
 ### chef
 
@@ -213,8 +221,8 @@ pyrogis resize ./input.jpg -h 800
 
 |arg|description|default|valid|
 |:----:|-----------|:-----:|:---:|
-|`-w`, `--width`|width to resize to|`None`|`int`|
-|`-hi`, `--height`|height to resize to|`None`|`int`|
+|`--width`|width to resize to|`None`|`int`|
+|`--height`|height to resize to|`None`|`int`|
 |`--scale`|scale multiplier for width and height|1|`float`|
 |`--filter`|a filter to be used with resizing|nearest|nearest, bicubic, bilinear, box, hamming, lanczos|
 

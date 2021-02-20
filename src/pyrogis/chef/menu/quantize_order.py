@@ -20,7 +20,7 @@ class QuantizeOrder(MenuItem):
             help='hex color codes to quantize to'
         )
         parser.add_argument(
-            '-n', '--palette_size',
+            '-n', '--palette-size',
             type=int, default=SpatialQuantize.PALETTE_SIZE,
             help='number of colors in the palette'
         )

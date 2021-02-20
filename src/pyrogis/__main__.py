@@ -161,6 +161,7 @@ def plate(path, output, parsed_vars):
         if output is None:
             output = "cooked.png"
 
+    print()
     print("plating '{}' to '{}'".format(path, output))
 
     dish.save(output, optimize, duration=duration, fps=fps)
@@ -243,12 +244,13 @@ def cook_file(path, output, parsed_vars):
 
         digits = math.floor(math.log(len(dish.pierogis), 10)) + 1
 
+        frames_count = len(dish.pierogis)
         i = 1
         for pierogi in dish.pierogis:
             # make frame file names like 0001.png
             frame_path = os.path.join(frames_path, str(i).zfill(digits) + '.png')
 
-            print("cooking frame '{}' to '{}'".format(i, frame_path), end='\r')
+            print("cooking frame {}/{} to '{}'".format(i, frames_count, frame_path), end='\r')
             pierogi.save(frame_path)
             cooked_dish = cook_dish(frame_path, add_dish_desc, parsed_vars)
             cooked_dish.save(frame_path)

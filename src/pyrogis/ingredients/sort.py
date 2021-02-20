@@ -63,9 +63,9 @@ class Sort(Ingredient):
             axis = rotated_pixels[i]
             # and the axis for the mask-truth
             boolean_axis = boolean_array[i]
-            # get the indices for this row on the mask that are True
-            masked_indices_axis = np.nonzero(boolean_axis)[0]
-            # split up the axis into sub groups at indices where mask is black
+            # get the indices for this row on the mask that are false
+            masked_indices_axis = np.nonzero(np.invert(boolean_axis))[0]
+            # split up the axis into sub groups at indices where mask is black (false)
             sort_groups = np.split(axis, masked_indices_axis)
 
             sorted_groups = []

@@ -83,6 +83,7 @@ jobs:
           pytest -s -v tests
 
   manylinux-build:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
     runs-on: ubuntu-latest
     needs: [ test ]
     container: quay.io/pypa/manylinux2014_x86_64
@@ -98,6 +99,7 @@ jobs:
           DIST_DIR: ${{ github.sha }}
 
   macos-windows-build:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
     runs-on: ${{ matrix.platform.os }}
     needs: [ test ]
     strategy:

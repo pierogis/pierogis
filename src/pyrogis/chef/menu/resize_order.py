@@ -15,12 +15,12 @@ class ResizeOrder(MenuItem):
 
         # add palette and palette size
         parser.add_argument(
-            '-w', '--width',
+            '--width',
             type=int,
             help='width to resize to'
         )
         parser.add_argument(
-            '-hi', '--height',
+            '--height',
             type=int,
             help='height to resize to'
         )

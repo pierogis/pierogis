@@ -61,7 +61,7 @@ class Threshold(Seasoning):
     def cook(self, pixels: np.ndarray):
         """
         pixels with brightness >= upper_threshold
-        or <= lower_threshold are replaced by include pixel
+        or <= lower_threshold are replaced by include pixel (white)
 
         brightness = r * 0.299 + g * 0.587 + b * 0.114
 
