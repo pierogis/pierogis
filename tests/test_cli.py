@@ -101,6 +101,26 @@ def test_pyrogis_chef():
     assert os.path.isfile("cooked.png")
     os.remove("cooked.png")
 
+def test_pyrogis_chef_txt():
+    main(args=["chef", "demo/gnome.jpg", "demo/recipe.txt"])
+
+    assert os.path.isfile("cooked.png")
+    os.remove("cooked.png")
+
+
+def test_pyrogis_plate():
+    main(args=["plate", "demo/out"])
+
+    assert os.path.isfile("cooked.gif")
+    os.remove("cooked.gif")
+
+
+def test_pyrogis_plate_options():
+    main(args=["plate", "demo", "--fps", "25", "--duration", "20", "--no-optimize"])
+
+    assert os.path.isfile("cooked.gif")
+    os.remove("cooked.gif")
+
 
 def test_pyrogis_image_with_output():
     main(args=["resize", "demo/gnome.jpg", "--output", "output.png"])

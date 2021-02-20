@@ -17,6 +17,9 @@
 
 - misc
     - change references to `rpierogis` to `pierogis_rs`
+  
+- bugs
+    - fix `chef` handle trailing semi-colon in recipe
 
 ## v0.1.3
 
