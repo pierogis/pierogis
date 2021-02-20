@@ -2625,9 +2625,9 @@ to perform an optimization in quantizing and dithering</p>
             <span class="n">axis</span> <span class="o">=</span> <span class="n">rotated_pixels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="c1"># and the axis for the mask-truth</span>
             <span class="n">boolean_axis</span> <span class="o">=</span> <span class="n">boolean_array</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="c1"># get the indices for this row on the mask that are True</span>
-            <span class="n">masked_indices_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">boolean_axis</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="c1"># split up the axis into sub groups at indices where mask is black</span>
+            <span class="c1"># get the indices for this row on the mask that are false</span>
+            <span class="n">masked_indices_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span><span class="n">boolean_axis</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># split up the axis into sub groups at indices where mask is black (false)</span>
             <span class="n">sort_groups</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">masked_indices_axis</span><span class="p">)</span>
 
             <span class="n">sorted_groups</span> <span class="o">=</span> <span class="p">[]</span>
@@ -2762,9 +2762,9 @@ or have it preloaded using a season method</p>
             <span class="n">axis</span> <span class="o">=</span> <span class="n">rotated_pixels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="c1"># and the axis for the mask-truth</span>
             <span class="n">boolean_axis</span> <span class="o">=</span> <span class="n">boolean_array</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="c1"># get the indices for this row on the mask that are True</span>
-            <span class="n">masked_indices_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">boolean_axis</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="c1"># split up the axis into sub groups at indices where mask is black</span>
+            <span class="c1"># get the indices for this row on the mask that are false</span>
+            <span class="n">masked_indices_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span><span class="n">boolean_axis</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># split up the axis into sub groups at indices where mask is black (false)</span>
             <span class="n">sort_groups</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">masked_indices_axis</span><span class="p">)</span>
 
             <span class="n">sorted_groups</span> <span class="o">=</span> <span class="p">[]</span>
@@ -2881,7 +2881,7 @@ in the mask (may be all white)</p>
     <span class="k">def</span> <span class="nf">cook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pixels</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        pixels with brightness &gt;= upper_threshold</span>
-<span class="sd">        or &lt;= lower_threshold are replaced by include pixel</span>
+<span class="sd">        or &lt;= lower_threshold are replaced by include pixel (white)</span>
 
 <span class="sd">        brightness = r * 0.299 + g * 0.587 + b * 0.114</span>
 
@@ -3051,7 +3051,7 @@ are true (include_pixel)</p>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">cook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pixels</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        pixels with brightness &gt;= upper_threshold</span>
-<span class="sd">        or &lt;= lower_threshold are replaced by include pixel</span>
+<span class="sd">        or &lt;= lower_threshold are replaced by include pixel (white)</span>
 
 <span class="sd">        brightness = r * 0.299 + g * 0.587 + b * 0.114</span>
 
@@ -3073,7 +3073,7 @@ are true (include_pixel)</p>
         </details>
 
             <div class="docstring"><p>pixels with brightness &gt;= upper_threshold
-or &lt;= lower_threshold are replaced by include pixel</p>
+or &lt;= lower_threshold are replaced by include pixel (white)</p>
 
 <p>brightness = r * 0.299 + g * 0.587 + b * 0.114</p>
 

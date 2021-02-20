@@ -5,6 +5,7 @@
     - add frames support in `Dish` (and cli)
     - add `Resize` ingredient
     - refactor how seasonings are handled
+    - swap sort logic (sort white pixels)
   
 - chef 
     - add `Threshold` option to provide hex color for include and exclude

@@ -85,8 +85,8 @@ def test_pyrogis_resize_options():
     """
     main(args=[
         "resize", "demo/gnome.jpg",
-        "-w", "200",
-        "-hi", "300",
+        "--width", "200",
+        "--height", "300",
         "-s", "2",
         "-r", "bicubic"
     ])
