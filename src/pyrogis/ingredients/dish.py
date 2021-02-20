@@ -3,7 +3,6 @@ from typing import List
 
 import imageio as imageio
 import numpy as np
-import pygifsicle
 
 from .ingredient import Ingredient
 from .pierogi import Pierogi
@@ -129,7 +128,11 @@ class Dish(Ingredient):
                 )
 
             if optimize and os.path.splitext(path)[1] == ".gif":
-                pygifsicle.optimize(path)
+                try:
+                    import pygifsicle
+                    pygifsicle.optimize(path)
+                except FileNotFoundError as err:
+                    print(err)
 
         elif len(self.pierogis) == 1:
             self.pierogis[0].save(path)
