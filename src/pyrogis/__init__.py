@@ -130,12 +130,12 @@ class Custom(Ingredient):
         self.brighten = brighten
         self.scale = scale
     def cook(self, pixels: np.ndarray):
-        return (self.pixels + self.brighten) / self.scale
+        return (self.pixels + self.brighten) /*self.scale
 ```
 
 ### prep
 
-Use `prep` to parameterize your manipulation.
+*Override `prep` to parameterize your manipulation.*
 
 This means any settings, constants,
 or inputs that configure the new functionality.
@@ -150,20 +150,20 @@ def prep(self, brighten: int, scale: int, *args, **kwargs):
 
 ### cook
 
-Use `cook` to perform the manipulation.
+*Override `cook` to perform the manipulation.*
 
-This is the function that you are applying to each pixel.
-More specifically, this function has
+This is the function that you acts on an input pixel grid.
+More specifically, this function receives
 a `(width, height, 3)` `ndarray`
 and should return a 3d array that is also size 3 in the last dimension.
 
 ```python
 def cook(self, pixels: np.ndarray):
-    return (self.pixels + self.brighten) / self.scale
+    return (self.pixels + self.brighten) * self.scale
 ```
 
 This function increases the r, g, and b of every pixel by `self.brighten`
-then divides them each by `self.scale`.
+then multiplies that sum for each by `self.scale`.
 
 Numpy operations can be pretty fast if you can keep them vectorized.
 This means try to avoid looping over the columns

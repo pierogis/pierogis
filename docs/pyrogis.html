@@ -432,12 +432,12 @@ methods.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">brighten</span> <span class="o">=</span> <span class="n">brighten</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">scale</span>
     <span class="k">def</span> <span class="nf">cook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pixels</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pixels</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">brighten</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pixels</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">brighten</span><span class="p">)</span> <span class="o">/*</span><span class="bp">self</span><span class="o">.</span><span class="n">scale</span>
 </code></pre></div>
 
 <h3 id="prep">prep</h3>
 
-<p>Use <code>prep</code> to parameterize your manipulation.</p>
+<p><em>Override <code>prep</code> to parameterize your manipulation.</em></p>
 
 <p>This means any settings, constants,
 or inputs that configure the new functionality.
@@ -451,19 +451,19 @@ quantization.</p>
 
 <h3 id="cook">cook</h3>
 
-<p>Use <code>cook</code> to perform the manipulation.</p>
+<p><em>Override <code>cook</code> to perform the manipulation.</em></p>
 
-<p>This is the function that you are applying to each pixel.
-More specifically, this function has
+<p>This is the function that you acts on an input pixel grid.
+More specifically, this function receives
 a <code>(width, height, 3)</code> <code>ndarray</code>
 and should return a 3d array that is also size 3 in the last dimension.</p>
 
 <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">cook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pixels</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pixels</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">brighten</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span>
+    <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pixels</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">brighten</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span>
 </code></pre></div>
 
 <p>This function increases the r, g, and b of every pixel by <code>self.brighten</code>
-then divides them each by <code>self.scale</code>.</p>
+then multiplies that sum for each by <code>self.scale</code>.</p>
 
 <p>Numpy operations can be pretty fast if you can keep them vectorized.
 This means try to avoid looping over the columns
@@ -604,12 +604,12 @@ and rows of an array.</p>
 <span class="sd">        self.brighten = brighten</span>
 <span class="sd">        self.scale = scale</span>
 <span class="sd">    def cook(self, pixels: np.ndarray):</span>
-<span class="sd">        return (self.pixels + self.brighten) / self.scale</span>
+<span class="sd">        return (self.pixels + self.brighten) /*self.scale</span>
 <span class="sd">```</span>
 
 <span class="sd">### prep</span>
 
-<span class="sd">Use `prep` to parameterize your manipulation.</span>
+<span class="sd">*Override `prep` to parameterize your manipulation.*</span>
 
 <span class="sd">This means any settings, constants,</span>
 <span class="sd">or inputs that configure the new functionality.</span>
@@ -624,20 +624,20 @@ and rows of an array.</p>
 
 <span class="sd">### cook</span>
 
-<span class="sd">Use `cook` to perform the manipulation.</span>
+<span class="sd">*Override `cook` to perform the manipulation.*</span>
 
-<span class="sd">This is the function that you are applying to each pixel.</span>
-<span class="sd">More specifically, this function has</span>
+<span class="sd">This is the function that you acts on an input pixel grid.</span>
+<span class="sd">More specifically, this function receives</span>
 <span class="sd">a `(width, height, 3)` `ndarray`</span>
 <span class="sd">and should return a 3d array that is also size 3 in the last dimension.</span>
 
 <span class="sd">```python</span>
 <span class="sd">def cook(self, pixels: np.ndarray):</span>
-<span class="sd">    return (self.pixels + self.brighten) / self.scale</span>
+<span class="sd">    return (self.pixels + self.brighten) * self.scale</span>
 <span class="sd">```</span>
 
 <span class="sd">This function increases the r, g, and b of every pixel by `self.brighten`</span>
-<span class="sd">then divides them each by `self.scale`.</span>
+<span class="sd">then multiplies that sum for each by `self.scale`.</span>
 
 <span class="sd">Numpy operations can be pretty fast if you can keep them vectorized.</span>
 <span class="sd">This means try to avoid looping over the columns</span>
@@ -1139,7 +1139,7 @@ PIL documentation:</p>
             <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="c1"># first try to load as video/animation</span>
-                    <span class="n">images</span> <span class="o">=</span> <span class="n">imageio</span><span class="o">.</span><span class="n">mimread</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+                    <span class="n">images</span> <span class="o">=</span> <span class="n">imageio</span><span class="o">.</span><span class="n">mimread</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">memtest</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">images</span><span class="p">:</span>
                         <span class="n">pierogis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                             <span class="n">Pierogi</span><span class="p">(</span><span class="n">pixels</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">rot90</span><span class="p">(</span>
@@ -1147,9 +1147,10 @@ PIL documentation:</p>
                             <span class="p">))</span>
                         <span class="p">)</span>
 
-                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                     <span class="c1"># then load as a single image</span>
                     <span class="n">pierogis</span> <span class="o">=</span> <span class="p">[</span><span class="n">Pierogi</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">file</span><span class="p">)]</span>
+
             <span class="k">elif</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">pierogis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_path_pierogis</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
@@ -1221,7 +1222,11 @@ PIL documentation:</p>
                 <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">optimize</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">path</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;.gif&quot;</span><span class="p">:</span>
-                <span class="n">pygifsicle</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="kn">import</span> <span class="nn">pygifsicle</span>
+                    <span class="n">pygifsicle</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pierogis</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pierogis</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
@@ -1289,7 +1294,7 @@ PIL documentation:</p>
             <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="c1"># first try to load as video/animation</span>
-                    <span class="n">images</span> <span class="o">=</span> <span class="n">imageio</span><span class="o">.</span><span class="n">mimread</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+                    <span class="n">images</span> <span class="o">=</span> <span class="n">imageio</span><span class="o">.</span><span class="n">mimread</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">memtest</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">images</span><span class="p">:</span>
                         <span class="n">pierogis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                             <span class="n">Pierogi</span><span class="p">(</span><span class="n">pixels</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">rot90</span><span class="p">(</span>
@@ -1297,9 +1302,10 @@ PIL documentation:</p>
                             <span class="p">))</span>
                         <span class="p">)</span>
 
-                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                     <span class="c1"># then load as a single image</span>
                     <span class="n">pierogis</span> <span class="o">=</span> <span class="p">[</span><span class="n">Pierogi</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">file</span><span class="p">)]</span>
+
             <span class="k">elif</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">pierogis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_path_pierogis</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
@@ -1458,7 +1464,11 @@ Any Ingredient (including recipe) is an example of this</p>
                 <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">optimize</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">path</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;.gif&quot;</span><span class="p">:</span>
-                <span class="n">pygifsicle</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="kn">import</span> <span class="nn">pygifsicle</span>
+                    <span class="n">pygifsicle</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pierogis</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pierogis</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
@@ -3155,10 +3165,6 @@ or &lt;= lower_threshold are replaced by include pixel</p>
         <span class="s1">&#39;resize&#39;</span><span class="p">:</span> <span class="n">Resize</span>
     <span class="p">}</span>
 
-    <span class="c1"># seasoning_classes = {</span>
-    <span class="c1">#     &#39;threshold&#39;: Threshold</span>
-    <span class="c1"># }</span>
-
     <span class="n">menu</span> <span class="o">=</span> <span class="n">menu</span>
 
     <span class="k">def</span> <span class="nf">create_pierogi_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pierogi_descs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">file_links</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
@@ -3196,25 +3202,41 @@ or &lt;= lower_threshold are replaced by include pixel</p>
                 <span class="n">pierogi</span> <span class="o">=</span> <span class="n">pierogis</span><span class="p">[</span><span class="n">pierogi_name</span><span class="p">]</span>
                 <span class="n">ingredient_desc</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;pierogi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pierogi</span>
 
-            <span class="n">ingredient</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_or_create_ingredient</span><span class="p">(</span><span class="n">ingredients</span><span class="p">,</span> <span class="n">ingredient_descs</span><span class="p">,</span> <span class="n">ingredient_name</span><span class="p">)</span>
+            <span class="n">ingredient</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_or_create_ingredient</span><span class="p">(</span>
+                <span class="n">ingredients</span><span class="p">,</span> <span class="n">ingredient_descs</span><span class="p">,</span> <span class="n">ingredient_name</span>
+            <span class="p">)</span>
 
             <span class="n">ingredients</span><span class="p">[</span><span class="n">ingredient_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ingredient</span>
 
         <span class="k">return</span> <span class="n">ingredients</span>
 
-    <span class="k">def</span> <span class="nf">get_or_create_ingredient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ingredients</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">ingredient_descs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">ingredient_name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_or_create_ingredient</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">ingredients</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+            <span class="n">ingredient_descs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+            <span class="n">ingredient_name</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        look to see if an ingredient object has already been created</span>
+<span class="sd">        otherwise create it and swap it in the dictionary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ingredient</span> <span class="o">=</span> <span class="n">ingredients</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ingredient_name</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">ingredient</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">ingredient_desc</span> <span class="o">=</span> <span class="n">ingredient_descs</span><span class="p">[</span><span class="n">ingredient_name</span><span class="p">]</span>
 
             <span class="c1"># search kwargs for keys that are type names</span>
-            <span class="c1"># swap the value of that kwarg (reference key) for the built ingredient</span>
+            <span class="c1"># swap the value of that kwarg (reference key)</span>
+            <span class="c1"># for the created ingredient obj</span>
             <span class="k">for</span> <span class="n">ingredient_type_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ingredient_classes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="n">ingredient_name</span> <span class="o">=</span> <span class="n">ingredient_desc</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ingredient_type_name</span><span class="p">)</span>
+                <span class="n">ingredient_name</span> <span class="o">=</span> <span class="n">ingredient_desc</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="n">ingredient_type_name</span>
+                <span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">ingredient_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">ingredient</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_or_create_ingredient</span><span class="p">(</span><span class="n">ingredients</span><span class="p">,</span> <span class="n">ingredient_descs</span><span class="p">,</span> <span class="n">ingredient_name</span><span class="p">)</span>
+                    <span class="n">ingredient</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_or_create_ingredient</span><span class="p">(</span>
+                        <span class="n">ingredients</span><span class="p">,</span> <span class="n">ingredient_descs</span><span class="p">,</span> <span class="n">ingredient_name</span>
+                    <span class="p">)</span>
                     <span class="n">ingredient_desc</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="n">ingredient_type_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ingredient</span>
 
             <span class="c1"># now create an ingredient as specified in the description</span>
@@ -3394,7 +3416,9 @@ and cooking a parsed representation</p>
                 <span class="n">pierogi</span> <span class="o">=</span> <span class="n">pierogis</span><span class="p">[</span><span class="n">pierogi_name</span><span class="p">]</span>
                 <span class="n">ingredient_desc</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;pierogi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pierogi</span>
 
-            <span class="n">ingredient</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_or_create_ingredient</span><span class="p">(</span><span class="n">ingredients</span><span class="p">,</span> <span class="n">ingredient_descs</span><span class="p">,</span> <span class="n">ingredient_name</span><span class="p">)</span>
+            <span class="n">ingredient</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_or_create_ingredient</span><span class="p">(</span>
+                <span class="n">ingredients</span><span class="p">,</span> <span class="n">ingredient_descs</span><span class="p">,</span> <span class="n">ingredient_name</span>
+            <span class="p">)</span>
 
             <span class="n">ingredients</span><span class="p">[</span><span class="n">ingredient_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ingredient</span>
 
@@ -3424,19 +3448,33 @@ usually for Pierogi</p>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_or_create_ingredient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ingredients</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">ingredient_descs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">ingredient_name</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_or_create_ingredient</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">ingredients</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+            <span class="n">ingredient_descs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+            <span class="n">ingredient_name</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        look to see if an ingredient object has already been created</span>
+<span class="sd">        otherwise create it and swap it in the dictionary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ingredient</span> <span class="o">=</span> <span class="n">ingredients</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ingredient_name</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">ingredient</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">ingredient_desc</span> <span class="o">=</span> <span class="n">ingredient_descs</span><span class="p">[</span><span class="n">ingredient_name</span><span class="p">]</span>
 
             <span class="c1"># search kwargs for keys that are type names</span>
-            <span class="c1"># swap the value of that kwarg (reference key) for the built ingredient</span>
+            <span class="c1"># swap the value of that kwarg (reference key)</span>
+            <span class="c1"># for the created ingredient obj</span>
             <span class="k">for</span> <span class="n">ingredient_type_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ingredient_classes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="n">ingredient_name</span> <span class="o">=</span> <span class="n">ingredient_desc</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ingredient_type_name</span><span class="p">)</span>
+                <span class="n">ingredient_name</span> <span class="o">=</span> <span class="n">ingredient_desc</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="n">ingredient_type_name</span>
+                <span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">ingredient_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">ingredient</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_or_create_ingredient</span><span class="p">(</span><span class="n">ingredients</span><span class="p">,</span> <span class="n">ingredient_descs</span><span class="p">,</span> <span class="n">ingredient_name</span><span class="p">)</span>
+                    <span class="n">ingredient</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_or_create_ingredient</span><span class="p">(</span>
+                        <span class="n">ingredients</span><span class="p">,</span> <span class="n">ingredient_descs</span><span class="p">,</span> <span class="n">ingredient_name</span>
+                    <span class="p">)</span>
                     <span class="n">ingredient_desc</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="n">ingredient_type_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ingredient</span>
 
             <span class="c1"># now create an ingredient as specified in the description</span>
@@ -3447,7 +3485,10 @@ usually for Pierogi</p>
 
         </details>
 
-    
+            <div class="docstring"><p>look to see if an ingredient object has already been created
+otherwise create it and swap it in the dictionary</p>
+</div>
+
 
                             </div>
                             <div id="Chef.apply_seasonings" class="classattr">
