@@ -91,7 +91,21 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: build wheels
-        run: 'sh build_wheels.sh'
+        run: 'sh build_wheels_manylinux.sh'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+          DIST_DIR: ${{ github.sha }}
+
+  macos-arm-build:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
+    runs-on: [ "self-hosted", "macos" ]
+    needs: [ test ]
+    steps:
+      - uses: actions/checkout@v1
+      - name: build wheels
+        run: 'arch -arm64 sh build_wheels_mac_arm.sh'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -103,11 +117,12 @@ jobs:
     runs-on: ${{ matrix.platform.os }}
     needs: [ test ]
     strategy:
-      fail-fast: false  # If one platform fails, allow the rest to keep testing.
+      fail-fast: true
       matrix:
         python-version: [ 3.6, 3.7, 3.8, 3.9 ]
         platform: [
-          { os: "macOS-latest",   python-architecture: "x64", rust-target: "x86_64-apple-darwin" },
+          { os: "macOS-10.15",   python-architecture: "x64", rust-target: "x86_64-apple-darwin" },
+          { os: "macOS-11.0",   python-architecture: "x64", rust-target: "x86_64-apple-darwin" },
           { os: "windows-latest", python-architecture: "x64", rust-target: "x86_64-pc-windows-msvc" },
           { os: "windows-latest", python-architecture: "x86", rust-target: "i686-pc-windows-msvc" },
         ]
