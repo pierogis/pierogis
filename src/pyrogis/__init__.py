@@ -171,6 +171,7 @@ and rows of an array.
 """
 
 from .chef import Chef
+from .kitchen import Kitchen
 from .ingredients import Dish
 from .ingredients import Ingredient
 from .ingredients import Pierogi
@@ -183,14 +184,15 @@ from .ingredients import Threshold
 __version__ = '0.2.0'
 
 __all__ = [
-    'Pierogi',
-    'Dish',
     'Ingredient',
+    'Pierogi',
     'Recipe',
+    'Dish',
     'Pierogi',
     'Quantize',
     'SpatialQuantize',
     'Sort',
     'Threshold',
-    'Chef'
+    'Chef',
+    'Kitchen'
 ]

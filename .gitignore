@@ -16,4 +16,4 @@ venv
 # rust
 /target
 /build
-/src/pierogis_rs*
+/src/pymodule.rs

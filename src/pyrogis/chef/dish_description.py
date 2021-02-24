@@ -43,6 +43,38 @@ class IngredientDesc:
 class DishDescription:
     """
     describe a dish using a json style object
+
+    {
+        "pierogis": {
+            "pierogi_uuid": {               << PierogiDesc
+                "files_key": "file_uuid"
+            }
+        },
+        "files": {
+            "file_uuid": "input/001.png"
+        },
+        "ingredients": {
+            "sort_uuid": {
+                type: "sort",
+                "kwargs": {
+                    "upper_threshold": 150
+                }
+            },
+            "quantize_uuid": {
+                "type": "quantize",
+                "kwargs": {
+                    "palette_size": 16
+                }
+            },
+        },
+        "dish": {
+            "recipe": [],
+            "pierogi:
+        },
+        "seasoning_links": {
+
+        }
+    }
     """
 
     def __init__(
