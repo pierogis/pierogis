@@ -9,10 +9,20 @@ into recipes and cooked.
 
 ```bash
 pip install pyrogis
-pyrogis chef input.png "sort; quantize" -o output.png
+pyrogis chef teton.png "resize --width 768 --height 768; sort; quantize; resize --scale 4" -o output.png
+# or
+pyrogis chef teton.png recipe.txt -o output.png
 ```
 
-![sorted and quantized gnome](https://raw.githubusercontent.com/pierogis/pierogis/master/demo/out/gnome_sort_quantize.png)
+*recipe.txt*
+```text
+resize --width 768 --height 768;
+sort;
+quantize -c 000000 ffffff 668a61 cbb8a2 b6d655 434d1f 5fb7d2 6d8ab9 3876c1 515b5e a8725f d7b6aa 3c2329 f78693 637186 00407A;
+resize -s 4;
+```
+
+![sorted and quantized teton](https://raw.githubusercontent.com/pierogis/pierogis/develop/demo/out/teton.png)
 
 - [install](#install)
 - [features](#features)
@@ -111,7 +121,7 @@ with brightness outside of the thresholds are sorted.
 If only lower is provided, upper is set to 255.
 If only upper is provided, lower is set to 0.
 
-![sorted gnome](https://raw.githubusercontent.com/pierogis/pierogis/master/demo/out/gnome_sort.png)
+![sorted gnome](https://raw.githubusercontent.com/pierogis/pierogis/develop/demo/out/gnome_sort.png)
 
 |arg|description|default|valid|
 |------|-----------|:-----:|:---:|
@@ -124,7 +134,7 @@ If only upper is provided, lower is set to 0.
 
 *quantize an image to a smaller set of colors*
 
-![quantized gnome](https://raw.githubusercontent.com/pierogis/pierogis/master/demo/out/gnome_magic.png)
+![quantized gnome](https://raw.githubusercontent.com/pierogis/pierogis/develop/demo/out/gnome_magic.png)
 
 ```bash
 pyrogis quantize input.jpg -c aaaaaa 43ad32 696969 --repeats 3 --iterations 3
@@ -149,7 +159,7 @@ Thank you to the author of that package.
 
 *parse text for a recipe*
 
-![sorted and quantized gnome](https://raw.githubusercontent.com/pierogis/pierogis/master/demo/out/gnome_sort_quantize.png)
+![sorted and quantized gnome](https://raw.githubusercontent.com/pierogis/pierogis/develop/demo/out/gnome_sort_quantize.png)
 
 .txt files and quoted strings can describe a series of CLI recipes, piped from one to the next.
 
@@ -172,7 +182,7 @@ sort -u 100; quantize
 
 *pixels included or excluded based on brightness*
 
-![threshold gnome](https://raw.githubusercontent.com/pierogis/pierogis/master/demo/out/gnome_threshold.png)
+![threshold gnome](https://raw.githubusercontent.com/pierogis/pierogis/develop/demo/out/gnome_threshold.png)
 
 Pixels with brightness outside of the thresholds provided become "included".
 Pixels within the thresholds become "excluded" (greater than lower, but less than upper).
