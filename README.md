@@ -1,9 +1,7 @@
 # pierogis
 
-**image processing framework**
-
-`pierogis` is a framework for image processing. Ingredients that describe image processing functions can be assembled
-into recipes and cooked.
+`pierogis` is a framework for image and animation processing. Ingredients that describe image processing functions can be assembled
+into recipes and used to cook an image or animation.
 
 `pyrogis` is a python library and cli tool implementing this framework.
 
