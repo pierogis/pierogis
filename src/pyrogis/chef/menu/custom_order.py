@@ -2,20 +2,20 @@ import argparse
 import os
 
 from .menu_item import MenuItem
-from ..dish_description import DishDescription
+from ..ticket import Ticket
 
 
 class CustomOrder(MenuItem):
     @staticmethod
     def read_recipe(
-            dish_description: DishDescription,
+            ticket: Ticket,
             recipe_text: str,
             target_pierogi_uuid
     ):
         """
         read a recipe from string, adding to a DishDescription
 
-        :param dish_description: the dish description to extend
+        :param ticket: the dish description to extend
         :param recipe_text: the recipe as a string like 'sort; quantize'
         :param target_pierogi_uuid: the uuid of the base pierogi for the dish
         """
@@ -50,18 +50,18 @@ class CustomOrder(MenuItem):
 
                 # this corresponds to one of the menu item's parser's
                 # it links to a method on this class
-                add_dish_desc = parsed_vars.pop('add_dish_desc')
+                extend_ticket = parsed_vars.pop('extend_ticket')
 
-                dish_description = add_dish_desc(
-                    dish_description, target_pierogi_uuid=target_pierogi_uuid, **parsed_vars
+                ticket = extend_ticket(
+                    ticket, target_pierogi_uuid=target_pierogi_uuid, **parsed_vars
                 )
 
-        return dish_description
+        return ticket
 
     @classmethod
-    def add_desc(
+    def generate_ticket(
             cls,
-            dish_desc: DishDescription,
+            ticket: Ticket,
             path=None,
             target_pierogi_uuid=None,
             **kwargs
@@ -70,8 +70,8 @@ class CustomOrder(MenuItem):
         add to dish_desc using a recipe specified in a string or a file
         """
         if path is not None:
-            target_pierogi_uuid = dish_desc.add_pierogi_desc(path)
-            dish_desc.dish['pierogi'] = target_pierogi_uuid
+            target_pierogi_uuid = ticket.add_pierogi(path)
+            ticket.dish['pierogi'] = target_pierogi_uuid
 
         # recipe can be provided as a string
         recipe = kwargs.pop('recipe')
@@ -82,9 +82,9 @@ class CustomOrder(MenuItem):
             with open(recipe) as recipe_file:
                 recipe_text = recipe_file.read()
 
-        dish_desc = cls.read_recipe(dish_desc, recipe_text, target_pierogi_uuid)
+        ticket = cls.read_recipe(ticket, recipe_text, target_pierogi_uuid)
 
-        return dish_desc
+        return ticket
 
     @classmethod
     def add_parser_arguments(cls, parser):

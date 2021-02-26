@@ -1,1 +1,0 @@
-from pierogis_rs import Kitchen

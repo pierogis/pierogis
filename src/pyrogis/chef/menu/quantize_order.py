@@ -1,10 +1,10 @@
 from .menu_item import MenuItem
-
 from ...ingredients import SpatialQuantize
 
 
 class QuantizeOrder(MenuItem):
     type_name = 'quantize'
+    type = SpatialQuantize
 
     @classmethod
     def add_parser_arguments(cls, parser):

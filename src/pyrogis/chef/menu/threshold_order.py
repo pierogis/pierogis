@@ -1,14 +1,17 @@
 from .menu_item import MenuItem
 
-from ..dish_description import DishDescription, IngredientDesc
+from ..ticket import Ticket, IngredientDesc
 from ...ingredients import Threshold
 
 
 class ThresholdOrder(MenuItem):
+    type_name = 'threshold'
+    type = Threshold
+
     @classmethod
     def add_desc(
             cls,
-            dish_desc: DishDescription,
+            dish_desc: Ticket,
             path: str = None,
             target_pierogi_uuid=None,
             **kwargs

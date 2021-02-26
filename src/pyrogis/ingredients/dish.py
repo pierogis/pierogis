@@ -74,10 +74,11 @@ class Dish(Ingredient):
         pierogis = []
 
         for file in os.listdir(path):
-            if not os.path.isfile(file):
+            file_path = os.path.join(path, file)
+            if not os.path.isfile(file_path):
                 continue
 
-            pierogis.append(Pierogi(file=file))
+            pierogis.append(Pierogi(file=file_path))
 
         return pierogis
 
@@ -109,11 +110,11 @@ class Dish(Ingredient):
             self, path, optimize: bool = True, duration: float = None, fps: int = 25
     ) -> None:
         """
-        :param duration: s duration between frames
+        :param duration: ms duration between frames
         """
         if len(self.pierogis) > 1:
             ims = [np.asarray(pierogi.image) for pierogi in self.pierogis]
-            if duration is not None:
+            if duration is not None and os.path.splitext(path) == 'gif':
                 imageio.mimwrite(
                     path,
                     ims=ims,
@@ -139,25 +140,3 @@ class Dish(Ingredient):
 
         else:
             raise Exception("Dish has no pierogis")
-
-    #
-    # @property
-    # def width(self):
-    #     """
-    #     width from self.pixels
-    #     """
-    #     return self.base.shape[0]
-    #
-    # @property
-    # def height(self):
-    #     """
-    #     height from self.pixels
-    #     """
-    #     return self.recipe.base.shape[1]
-    #
-    # @property
-    # def shape(self):
-    #     """
-    #     (width, height, 3)
-    #     """
-    #     return self.width, self.height, 3

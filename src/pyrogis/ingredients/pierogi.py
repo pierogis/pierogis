@@ -98,10 +98,10 @@ class Pierogi(Ingredient):
         """
 
         output_filename = path
-        if os.path.isdir(path):
-            output_filename = os.path.join(
-                path, os.path.split(self.file)[1]
-            )
+        # if os.path.isdir(path):
+        #     output_filename = os.path.join(
+        #         path, os.path.split(self.file)[1]
+        #     )
 
         self.image.save(output_filename, optimize=optimize)
 

@@ -5,6 +5,7 @@ from ...ingredients import Resize
 
 class ResizeOrder(MenuItem):
     type_name = 'resize'
+    type = Resize
 
     @classmethod
     def add_parser_arguments(cls, parser):

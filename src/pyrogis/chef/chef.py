@@ -1,11 +1,10 @@
+import os
 from typing import Dict, List
 
-from .dish_description import DishDescription
 from .menu import menu
+from .ticket import Ticket
 from ..ingredients import (
-    Ingredient, Dish, Pierogi, Sort,
-    SpatialQuantize, Threshold, Recipe, Rotate,
-    Resize
+    Ingredient, Dish, Pierogi, Recipe
 )
 
 
@@ -16,13 +15,6 @@ class Chef:
     implements parsing into a standard representation
     and cooking a parsed representation
     """
-    ingredient_classes = {
-        'sort': Sort,
-        'quantize': SpatialQuantize,
-        'threshold': Threshold,
-        'rotate': Rotate,
-        'resize': Resize
-    }
 
     menu = menu
 
@@ -77,7 +69,7 @@ class Chef:
     ):
         """
         look to see if an ingredient object has already been created
-        otherwise create it and swap it in the dictionary
+        otherwise create it and swap it in the ingredients dictionary
         """
         ingredient = ingredients.get(ingredient_name)
 
@@ -87,7 +79,7 @@ class Chef:
             # search kwargs for keys that are type names
             # swap the value of that kwarg (reference key)
             # for the created ingredient obj
-            for ingredient_type_name in self.ingredient_classes.keys():
+            for ingredient_type_name in self.menu.keys():
                 ingredient_name = ingredient_desc.kwargs.get(
                     ingredient_type_name
                 )
@@ -99,7 +91,7 @@ class Chef:
                     ingredient_desc.kwargs[ingredient_type_name] = ingredient
 
             # now create an ingredient as specified in the description
-            ingredient = ingredient_desc.create(self.ingredient_classes)
+            ingredient = ingredient_desc.create(self.menu)
 
         return ingredient
 
@@ -122,8 +114,6 @@ class Chef:
         order of ingredients
 
         :param ingredients: map of uuid key to ingredient object value
-        :param seasoning_links: map of "recipient ingredient" uuid keys
-        to seasoning uuid values
         :param recipe_order: order of ingredients by uuid
         """
 
@@ -139,39 +129,46 @@ class Chef:
 
         return recipe
 
-    def cook_dish_desc(self, dish_description: DishDescription):
+    def cook_tickets(self, order_name, tickets: List[Ticket]) -> None:
         """
         cook a dish from a series of descriptive dicts
         """
-        pierogi_descs = dish_description.pierogis
-        ingredient_descs = dish_description.ingredients
-        files = dish_description.files
-        dish_kwargs = dish_description.dish
-        seasoning_links = dish_description.seasoning_links
+        cooked_dishes = []
 
-        pierogis = self.create_pierogi_objects(
-            pierogi_descs,
-            files
-        )
+        for ticket in tickets:
+            pierogi_descs = ticket.pierogis
+            ingredient_descs = ticket.ingredients
+            files = ticket.files
+            recipe = ticket.recipe
+            base = ticket.base
+            seasoning_links = ticket.seasoning_links
 
-        ingredients = self.create_ingredient_objects(
-            ingredient_descs,
-            pierogis
-        )
+            pierogis = self.create_pierogi_objects(
+                pierogi_descs,
+                files
+            )
 
-        self.apply_seasonings(
-            ingredients,
-            seasoning_links
-        )
+            ingredients = self.create_ingredient_objects(
+                ingredient_descs,
+                pierogis
+            )
 
-        recipe = self.create_recipe_object(
-            ingredients,
-            dish_kwargs['recipe']
-        )
+            self.apply_seasonings(
+                ingredients,
+                seasoning_links
+            )
 
-        dish = Dish(
-            pierogis=[pierogis[dish_kwargs['pierogi']]],
-            recipe=recipe
-        )
+            recipe_object = self.create_recipe_object(
+                ingredients,
+                recipe
+            )
 
-        return dish.serve()
+            dish = Dish(
+                pierogis=[pierogis[base]],
+                recipe=recipe_object
+            )
+
+            output_path = os.path.join('cooked', order_name, os.path.basename(pierogis[base].file))
+
+            cooked_dish = dish.serve()
+            cooked_dish.save(output_path)

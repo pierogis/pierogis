@@ -1,5 +1,5 @@
 import uuid
-from typing import Dict, Union, List
+from typing import Dict, List
 
 from ..ingredients import Ingredient
 from ..ingredients import Pierogi
@@ -34,13 +34,13 @@ class IngredientDesc:
 
         :param ingredient_classes: map of a type name to an ingredient class
         """
-        ingredient_type = ingredient_classes[self.type_name]
-        ingredient = ingredient_type(**self.kwargs)
+        order = ingredient_classes[self.type_name]
+        ingredient = order.type(**self.kwargs)
 
         return ingredient
 
 
-class DishDescription:
+class Ticket:
     """
     describe a dish using a json style object
 
@@ -82,11 +82,12 @@ class DishDescription:
             pierogis: Dict[str, PierogiDesc] = None,
             files: Dict[str, str] = None,
             ingredients: Dict[str, IngredientDesc] = None,
-            dish: Dict[str, Union[List[str], Pierogi]] = None,
+            recipe: List[str] = None,
+            base: str = None,
             seasoning_links: Dict[str, dict] = None
     ):
         """
-        create a DishDescription
+        create a Ticket
         """
         if pierogis is None:
             pierogis = {}
@@ -94,18 +95,16 @@ class DishDescription:
             files = {}
         if ingredients is None:
             ingredients = {}
-        if dish is None:
-            dish = {
-                'pierogi': None,
-                'recipe': []
-            }
+        if recipe is None:
+            recipe = []
         if seasoning_links is None:
             seasoning_links = {}
 
         self.pierogis = pierogis
         self.files = files
         self.ingredients = ingredients
-        self.dish = dish
+        self.recipe = recipe
+        self.base = base
         self.seasoning_links = seasoning_links
 
     def add_file(self, path: str):
@@ -120,7 +119,7 @@ class DishDescription:
         # this uuid can be used to reference this file
         return file_uuid
 
-    def add_pierogi_desc(self, path):
+    def add_pierogi(self, path):
         pierogi_key = str(uuid.uuid4())
 
         files_key = self.add_file(path)
@@ -147,7 +146,7 @@ class DishDescription:
 
         :param new_instructions: the IngredientDesc to add
         """
-        self.dish['recipe'].extend(new_instructions)
+        self.recipe.extend(new_instructions)
 
     def add_seasoning_link(self, seasoning_key, ingredient_key):
         """

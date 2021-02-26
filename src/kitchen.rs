@@ -2,20 +2,11 @@ use pyo3::{Python, PyResult, PyAny};
 use pyo3::types::IntoPyDict;
 use std::thread;
 
+
 #[pyclass]
 pub struct Kitchen {
     chef_type: PyAny,
 }
-
-
-// Kitchen is a pyobj shared from Rust
-// it can be used by the wasm module and by python cli
-
-// It gets a series of dish descriptions and uses its chefs
-
-// rust should take many input dish description and cook each
-// python should dump into frames and create a list of dish descriptions
-// rust should do a chef.cook_dish_desc for each
 
 #[pymethods]
 impl Kitchen {

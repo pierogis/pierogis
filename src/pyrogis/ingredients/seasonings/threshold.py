@@ -19,8 +19,8 @@ class Threshold(Seasoning):
     a Threshold instance has a season method to work with or without a target
     """
 
-    LOWER_THRESHOLD = 64
-    UPPER_THRESHOLD = 180
+    LOWER_THRESHOLD = 100
+    UPPER_THRESHOLD = 150
 
     lower_threshold: int
     """pixels below are `True`"""

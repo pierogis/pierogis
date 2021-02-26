@@ -1,13 +1,18 @@
 from .menu_item import MenuItem
+from .rotate_order import RotateOrder
 from .threshold_order import ThresholdOrder
-from ..dish_description import DishDescription, IngredientDesc
+from ..ticket import Ticket, IngredientDesc
+from ...ingredients import Sort
 
 
 class SortOrder(MenuItem):
+    type_name = 'sort'
+    type = Sort
+
     @classmethod
-    def add_desc(
+    def generate_ticket(
             cls,
-            dish_desc: DishDescription,
+            ticket: Ticket,
             path: str = None,
             target_pierogi_uuid=None,
             **kwargs
@@ -16,8 +21,8 @@ class SortOrder(MenuItem):
         add the description of a sort from this path to the dish
         """
         if path is not None:
-            target_pierogi_uuid = dish_desc.add_pierogi_desc(path)
-            dish_desc.dish['pierogi'] = target_pierogi_uuid
+            target_pierogi_uuid = ticket.add_pierogi(path)
+            ticket.base = target_pierogi_uuid
 
         turns = kwargs.pop('turns')
         clockwise = kwargs.pop('clockwise')
@@ -30,7 +35,7 @@ class SortOrder(MenuItem):
                 'clockwise': clockwise,
             }
         )
-        rotate_uuid = dish_desc.add_ingredient_desc(rotate_desc)
+        rotate_uuid = ticket.add_ingredient_desc(rotate_desc)
 
         # check for implied threshold
         lower_threshold = kwargs.pop('lower_threshold')
@@ -44,7 +49,7 @@ class SortOrder(MenuItem):
                 **kwargs
             }
         )
-        sort_uuid = dish_desc.add_ingredient_desc(sort_desc)
+        sort_uuid = ticket.add_ingredient_desc(sort_desc)
 
         # create threshold desc
         threshold_desc = IngredientDesc(
@@ -56,23 +61,18 @@ class SortOrder(MenuItem):
             }
         )
         # add seasoning link for threshold to season sort
-        season_uuid = dish_desc.add_ingredient_desc(threshold_desc)
-        dish_desc.add_seasoning_link(season_uuid, sort_uuid)
+        season_uuid = ticket.add_ingredient_desc(threshold_desc)
+        ticket.add_seasoning_link(season_uuid, sort_uuid)
 
-        dish_desc.extend_recipe([sort_uuid])
+        ticket.extend_recipe([sort_uuid])
 
-        return dish_desc
+        return ticket
 
     @classmethod
     def add_parser_arguments(cls, parser):
         """
         add the arguments that a sort parser would need
         """
-        parser.add_argument('-t', '--turns', default=0, type=int)
-        parser.add_argument(
-            '--ccw',
-            dest='clockwise',
-            action='store_false'
-        )
+        RotateOrder.add_parser_arguments(parser)
 
         ThresholdOrder.add_parser_arguments(parser)
