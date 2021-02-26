@@ -30,7 +30,6 @@ resize -s 4;
 - [issues and contributing](#issues-and-contributing)
 
 <a name="install"></a>
-
 ## install
 
 **install from a wheel with pip**
@@ -53,7 +52,6 @@ pip install .
 ```
 
 <a name="features"></a>
-
 ## features
 
 - **CLI** - Use the CLI to cook à la carte recipes, or provide a recipe in a document
@@ -66,7 +64,6 @@ pip install .
 # usage
 
 <a name="cli"></a>
-
 ## cli
 
 All of the cli commands look like this.
@@ -140,13 +137,13 @@ pyrogis quantize input.jpg -c aaaaaa 43ad32 696969 --repeats 3 --iterations 3
 pyrogis quantize input.jpg -n 16 --repeats 3 --iterations 3
 ```
 
-Wraps [`rscolorq`](https://github.com/okaneco/rscolorq)) in python.
+Wraps [`rscolorq`](https://github.com/okaneco/rscolorq) in python.
 Thank you to the author of that package.
 
 |arg|description|default|valid|
 |:----:|-----------|:-----:|:---:|
 |`-c`, `--colors`|hex colors to base palette on (palette size ignored)|`None`|`int`|
-|`-n`, `--palette_size`|number of colors in the palette to cluster for|8|`int`|
+|`-n`, `--palette-size`|number of colors in the palette to cluster for|8|`int`|
 |`--repeats`|number of times to repeat a temperature for DA|1|`int`|
 |`--iterations`|number of times to repeat an iteration of a coarseness level|1|`int`|
 |`--initial-temp`|initial temp to use in DA for optimization|1|`float`|
@@ -260,7 +257,6 @@ pyrogis plate ./cooked --fps 50
 |`--no-optimize`|if present and output would be .gif, the gif is not optimized using pygifsicle|`False`|`int`|
 
 <a name="package"></a>
-
 ## package
 
 > *"`pierogis` is the name of the framework;*
@@ -278,7 +274,6 @@ import pyrogis
 The created files can be found in this repository in the `docs` folder
 
 <a name="acknowledgements"></a>
-
 ## acknowledgements
 
 The original python [pixelsort](https://github.com/satyarth/pixelsort) package inspired this package. While the
@@ -291,7 +286,6 @@ is a port of [`scolorq`](http://people.eecs.berkeley.edu/~dcoetzee/downloads/sco
 Spatial Color Quantization.
 
 <a name="issues-and-contributing"></a>
-
 ## issues and contributing
 
 When you encounter an error, there are some guidelines that will make it easier to help you:
@@ -320,3 +314,36 @@ work should join the
 
 `Ingredient` type algorithm/function suggestions can go in the ingredients channel. You can post your creations in the
 demo channel as well.
+
+<a name="disclaimer"></a>
+## disclaimer
+
+This library is licensed under the [AGPL v3](LICENSE).
+
+Art used for demos is the property of their respective owners.
+
+The following statements are not necessarily legally binding.
+If they seem to contradict the license, follow the license.
+
+The licenses of packages used by this software vary, but are understood to be compatible with AGPL.
+If you take issue with this package's use of other software regardless of legal concern,
+please reach out, and it can be removed from this package.
+
+Also understand that there may be implications from *those* licenses on your use of *this* package.
+
+Review the AGPL yourself if you intend to use this package in any software,
+but know that it was chosen to encourage that all related works be open source.
+
+The use of AGPL does not mean that this cannot be monetized,
+but it does generally mean that you will need to share source code of improvements on this package;
+at least modules related to this package.
+
+If your paid derivative work adds marginal value to what is included in this package,
+the author reserves the right to go to great lengths to make a free (and better) alternative to your derivative work.
+
+Do not mint NFTs for works made with this package, especially if they are ugly.
+Consider that you do
+[communal damage](https://memoakten.medium.com/the-unreasonable-ecological-cost-of-cryptoart-2221d3eb2053)
+by trying to profit individually.
+Surely if someone would pay you to pretend they own your png,
+they would pay to support you through other means.
