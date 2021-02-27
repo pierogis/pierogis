@@ -170,7 +170,6 @@ This means try to avoid looping over the columns
 and rows of an array.
 """
 
-from .chef import Chef, Kitchen
 from .ingredients import Dish
 from .ingredients import Ingredient
 from .ingredients import Pierogi
@@ -192,6 +191,4 @@ __all__ = [
     'SpatialQuantize',
     'Sort',
     'Threshold',
-    'Chef',
-    'Kitchen'
 ]

@@ -1,7 +1,7 @@
 from .menu_item import MenuItem
 
 from ..ticket import Ticket, IngredientDesc
-from ...ingredients import Threshold
+from ...ingredients import Threshold, Pierogi
 
 
 class ThresholdOrder(MenuItem):
@@ -9,19 +9,19 @@ class ThresholdOrder(MenuItem):
     type = Threshold
 
     @classmethod
-    def add_desc(
+    def generate_ticket(
             cls,
             dish_desc: Ticket,
-            path: str = None,
+            pierogi: Pierogi = None,
             target_pierogi_uuid=None,
             **kwargs
     ):
         """
         add a threshold recipe to the dish description
         """
-        if path is not None:
-            target_pierogi_uuid = dish_desc.add_pierogi_desc(path)
-            dish_desc.dish['pierogi'] = target_pierogi_uuid
+        if pierogi is not None:
+            target_pierogi_uuid = dish_desc.add_pierogi(pierogi)
+            dish_desc.base = target_pierogi_uuid
 
         ingredient_desc = IngredientDesc(
             type_name='threshold',

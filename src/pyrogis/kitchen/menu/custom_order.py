@@ -3,6 +3,7 @@ import os
 
 from .menu_item import MenuItem
 from ..ticket import Ticket
+from ...ingredients import Pierogi
 
 
 class CustomOrder(MenuItem):
@@ -62,16 +63,16 @@ class CustomOrder(MenuItem):
     def generate_ticket(
             cls,
             ticket: Ticket,
-            path=None,
+            pierogi: Pierogi = None,
             target_pierogi_uuid=None,
             **kwargs
     ):
         """
         add to dish_desc using a recipe specified in a string or a file
         """
-        if path is not None:
-            target_pierogi_uuid = ticket.add_pierogi(path)
-            ticket.dish['pierogi'] = target_pierogi_uuid
+        if pierogi is not None:
+            target_pierogi_uuid = ticket.add_pierogi(pierogi)
+            ticket.base = target_pierogi_uuid
 
         # recipe can be provided as a string
         recipe = kwargs.pop('recipe')

@@ -1,32 +1,46 @@
+import os
 import sys
+import time
 
-from .chef import Chef, Server, Kitchen
+from pyrogis import Dish
+from .kitchen import Chef, Server, Kitchen, menu
 
 
-def main(args=None):
+def main(args=None, order_name = None, output_filename=None):
     """cli program"""
     if args is None:
         args = sys.argv[1:]
 
     server = Server()
-    order_name = 'sort'
-    tickets = server.take_orders(order_name, args)
+    if order_name is None:
+        order_name = 'sort'
+    tickets = server.take_orders(order_name, args, menu)
 
-    kitchen = Kitchen([Chef()])
-    kitchen.cook_tickets(order_name, tickets)
+    if len(tickets) > 0:
+        kitchen = Kitchen([Chef()])
+        kitchen.cook_tickets(order_name, tickets)
 
-    # waits for the dishes to all be cooked
-    server.plate(order_name)
+        # waits for the dishes to all be cooked
+        order_dir = os.path.join(server.cooked_dir, str(order_name))
+        cooked_tickets = server.check(order_dir)
+        while cooked_tickets < len(tickets):
+            cooked_tickets = server.check(order_dir)
 
-    output_filename = 'sort.png'
-    # all cooked
-    while True:
-        try:
-            server.togo(order_name, output_filename)
-            break
+            time.sleep(1)
 
-        except:
-            print("Try again")
+        if output_filename is None:
+            output_filename = 'sort.png'
+
+        # all cooked
+        frame_duration = 15
+        fps = None
+        optimize = True
+        if frame_duration is not None:
+            fps = 1000 / frame_duration
+
+        dish = Dish.from_path(order_dir)
+
+        server.togo(dish, output_filename, fps, optimize)
 
 
 if __name__ == "__main__":

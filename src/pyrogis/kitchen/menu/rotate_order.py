@@ -1,4 +1,4 @@
-from pyrogis.chef.menu.menu_item import MenuItem
+from pyrogis.kitchen.menu.menu_item import MenuItem
 from pyrogis.ingredients import Rotate
 
 

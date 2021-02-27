@@ -2,6 +2,7 @@ import argparse
 from abc import ABC, abstractmethod
 
 from ..ticket import Ticket, IngredientDesc
+from ...ingredients import Pierogi
 
 
 class MenuItem(ABC):
@@ -10,28 +11,28 @@ class MenuItem(ABC):
     @classmethod
     def generate_ticket(
             cls,
-            dish_desc: Ticket,
-            path: str = None,
+            ticket: Ticket,
+            pierogi: Pierogi = None,
             target_pierogi_uuid=None,
             **kwargs
     ):
         """
         add a description of a quantize recipe
         """
-        if path is not None:
-            target_pierogi_uuid = dish_desc.add_pierogi(path)
-            dish_desc.dish['pierogi'] = target_pierogi_uuid
+        if pierogi is not None:
+            target_pierogi_uuid = ticket.add_pierogi(pierogi)
+            ticket.base = target_pierogi_uuid
 
         ingredient_desc = IngredientDesc(
             type_name=cls.type_name,
             kwargs=kwargs
         )
 
-        quantize_uuid = dish_desc.add_ingredient_desc(ingredient_desc)
+        ingredient_uuid = ticket.add_ingredient_desc(ingredient_desc)
 
-        dish_desc.extend_recipe([quantize_uuid])
+        ticket.extend_recipe([ingredient_uuid])
 
-        return dish_desc
+        return ticket
 
     @classmethod
     def get_parser(cls):

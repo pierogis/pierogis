@@ -1,8 +1,10 @@
+import math
 import os
 from typing import List
 
 import imageio as imageio
 import numpy as np
+from PIL import UnidentifiedImageError
 
 from .ingredient import Ingredient
 from .pierogi import Pierogi
@@ -19,10 +21,9 @@ class Dish(Ingredient):
         return len(self.pierogis)
 
     def prep(
-            self, recipe=None,
-            pierogis: List[Pierogi] = None,
-            file=None,
-            path=None,
+            self,
+            pierogis: List[Pierogi],
+            recipe=None,
             **kwargs
     ):
         """
@@ -33,35 +34,7 @@ class Dish(Ingredient):
         Any Ingredient (including recipe) is an example of this
 
         :param pierogis: a list of Pierogi to cook
-
-        :param file: a file to use as input to
-
-        :param path: a list of Pierogi to cook
         """
-
-        if pierogis is None:
-            pierogis = []
-
-            if file is not None:
-                try:
-                    # first try to load as video/animation
-                    images = imageio.mimread(file, memtest=False)
-                    for image in images:
-                        pierogis.append(
-                            Pierogi(pixels=np.rot90(
-                                np.asarray(image), axes=(1, 0)
-                            ))
-                        )
-
-                except ValueError:
-                    # then load as a single image
-                    pierogis = [Pierogi(file=file)]
-
-            elif path is not None:
-                pierogis = self.get_path_pierogis(path)
-
-            else:
-                raise ValueError("Could not create pierogis")
 
         self.pierogis = pierogis
 
@@ -69,18 +42,52 @@ class Dish(Ingredient):
             Recipe()
         self.recipe = recipe
 
-    @staticmethod
-    def get_path_pierogis(path: str) -> List[Pierogi]:
+    @classmethod
+    def _from_file(cls, file: str) -> 'Dish':
         pierogis = []
 
-        for file in os.listdir(path):
+        try:
+            # first try to load as video/animation
+            images = imageio.mimread(file, memtest=False)
+            for image in images:
+                pierogis.append(
+                    Pierogi(pixels=np.rot90(
+                        np.asarray(image), axes=(1, 0)
+                    ))
+                )
+
+        except ValueError:
+            # then load as a single image
+            pierogis = [Pierogi(file=file)]
+
+        return cls(pierogis=pierogis)
+
+    @classmethod
+    def from_path(cls, path: str) -> 'Dish':
+        pierogis = []
+
+        if os.path.isfile(path):
+            return cls._from_file(path)
+
+        files = sorted(os.listdir(path))
+
+        for file in files:
             file_path = os.path.join(path, file)
             if not os.path.isfile(file_path):
                 continue
+            try:
+                pierogis.append(Pierogi(file=file_path))
 
-            pierogis.append(Pierogi(file=file_path))
+            except UnidentifiedImageError:
+                print("{} is not an image".format(path))
 
-        return pierogis
+            except ValueError:
+                print("{} is not an image".format(path))
+
+            except IsADirectoryError:
+                print("{} is a directory".format(path))
+
+        return cls(pierogis=pierogis)
 
     def cook(self, pixels: np.ndarray) -> np.ndarray:
         return self.recipe(0, 0).cook(self.pierogis[0].pixels)
@@ -107,26 +114,21 @@ class Dish(Ingredient):
         return Dish(pierogis=cooked_pierogis)
 
     def save(
-            self, path, optimize: bool = True, duration: float = None, fps: int = 25
+            self, path, optimize: bool = True, duration: float = None, fps: float = 25
     ) -> None:
         """
         :param duration: ms duration between frames
         """
         if len(self.pierogis) > 1:
             ims = [np.asarray(pierogi.image) for pierogi in self.pierogis]
-            if duration is not None and os.path.splitext(path) == 'gif':
-                imageio.mimwrite(
-                    path,
-                    ims=ims,
-                    duration=duration,
-                    fps=fps
-                )
-            else:
-                imageio.mimwrite(
-                    path,
-                    ims=ims,
-                    fps=fps
-                )
+            if duration is not None:
+                fps = 1000 / duration
+
+            imageio.mimwrite(
+                path,
+                ims=ims,
+                fps=fps
+            )
 
             if optimize and os.path.splitext(path)[1] == ".gif":
                 try:
@@ -140,3 +142,25 @@ class Dish(Ingredient):
 
         else:
             raise Exception("Dish has no pierogis")
+
+    def save_frames(
+            self,
+            frames_dir
+    ) -> None:
+        """
+        :param duration: ms duration between frames
+        """
+        digits = math.floor(math.log(self.frames, 10)) + 1
+        i = 1
+
+        for pierogi in self.pierogis:
+            if pierogi.file is None:
+                filename = str(i).zfill(digits) + '.png'
+            else:
+                filename = os.path.basename(pierogi.file)
+
+            frame_filename = os.path.join(frames_dir, filename)
+
+            pierogi.save(frame_filename)
+
+            i += 1

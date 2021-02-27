@@ -1,7 +1,6 @@
 import os
 from typing import Dict, List
 
-from .menu import menu
 from .ticket import Ticket
 from ..ingredients import (
     Ingredient, Dish, Pierogi, Recipe
@@ -15,8 +14,6 @@ class Chef:
     implements parsing into a standard representation
     and cooking a parsed representation
     """
-
-    menu = menu
 
     def create_pierogi_objects(self, pierogi_descs: dict, file_links: dict):
         pierogi_objects = {}
@@ -65,7 +62,8 @@ class Chef:
             self,
             ingredients: dict,
             ingredient_descs: dict,
-            ingredient_name
+            ingredient_name: str,
+            menu: dict
     ):
         """
         look to see if an ingredient object has already been created
@@ -79,19 +77,19 @@ class Chef:
             # search kwargs for keys that are type names
             # swap the value of that kwarg (reference key)
             # for the created ingredient obj
-            for ingredient_type_name in self.menu.keys():
+            for ingredient_type_name in menu.keys():
                 ingredient_name = ingredient_desc.kwargs.get(
                     ingredient_type_name
                 )
 
                 if ingredient_name is not None:
                     ingredient = self.get_or_create_ingredient(
-                        ingredients, ingredient_descs, ingredient_name
+                        ingredients, ingredient_descs, ingredient_name, menu
                     )
                     ingredient_desc.kwargs[ingredient_type_name] = ingredient
 
             # now create an ingredient as specified in the description
-            ingredient = ingredient_desc.create(self.menu)
+            ingredient = ingredient_desc.create(menu)
 
         return ingredient
 

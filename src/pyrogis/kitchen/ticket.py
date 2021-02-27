@@ -84,7 +84,7 @@ class Ticket:
             ingredients: Dict[str, IngredientDesc] = None,
             recipe: List[str] = None,
             base: str = None,
-            seasoning_links: Dict[str, dict] = None
+            seasoning_links: Dict[str, str] = None
     ):
         """
         create a Ticket
@@ -107,40 +107,40 @@ class Ticket:
         self.base = base
         self.seasoning_links = seasoning_links
 
-    def add_file(self, path: str):
+    def add_file(self, path: str) -> str:
         """
         add a path to files
 
         :param path: the path to create a file link for
         """
-        file_uuid = str(uuid.uuid4())
+        file_uuid = uuid.uuid4().hex
         self.files[file_uuid] = path
 
         # this uuid can be used to reference this file
         return file_uuid
 
-    def add_pierogi(self, path):
-        pierogi_key = str(uuid.uuid4())
+    def add_pierogi(self, pierogi: Pierogi) -> str:
+        pierogi_key = uuid.uuid4().hex
 
-        files_key = self.add_file(path)
+        files_key = self.add_file(pierogi.file)
 
         self.pierogis[pierogi_key] = PierogiDesc(files_key=files_key)
 
         return pierogi_key
 
-    def add_ingredient_desc(self, ingredient_desc: IngredientDesc):
+    def add_ingredient_desc(self, ingredient_desc: IngredientDesc) -> str:
         """
         add an IngredientDesc to ingredients
 
         :param ingredient_desc: the IngredientDesc to add
         """
-        ingredient_key = str(uuid.uuid4())
+        ingredient_key = uuid.uuid4().hex
 
         self.ingredients[ingredient_key] = ingredient_desc
 
         return ingredient_key
 
-    def extend_recipe(self, new_instructions: list):
+    def extend_recipe(self, new_instructions: List[str]) -> None:
         """
         add a new list of ingredient uuids to the recipe_order
 
@@ -148,7 +148,7 @@ class Ticket:
         """
         self.recipe.extend(new_instructions)
 
-    def add_seasoning_link(self, seasoning_key, ingredient_key):
+    def add_seasoning_link(self, seasoning_key: str, ingredient_key: str) -> None:
         """
 
         """

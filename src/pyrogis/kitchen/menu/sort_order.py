@@ -2,7 +2,7 @@ from .menu_item import MenuItem
 from .rotate_order import RotateOrder
 from .threshold_order import ThresholdOrder
 from ..ticket import Ticket, IngredientDesc
-from ...ingredients import Sort
+from ...ingredients import Pierogi, Sort
 
 
 class SortOrder(MenuItem):
@@ -13,15 +13,15 @@ class SortOrder(MenuItem):
     def generate_ticket(
             cls,
             ticket: Ticket,
-            path: str = None,
+            pierogi: Pierogi = None,
             target_pierogi_uuid=None,
             **kwargs
     ):
         """
         add the description of a sort from this path to the dish
         """
-        if path is not None:
-            target_pierogi_uuid = ticket.add_pierogi(path)
+        if pierogi is not None:
+            target_pierogi_uuid = ticket.add_pierogi(pierogi)
             ticket.base = target_pierogi_uuid
 
         turns = kwargs.pop('turns')

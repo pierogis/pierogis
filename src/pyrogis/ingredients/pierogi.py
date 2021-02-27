@@ -1,7 +1,6 @@
 """
 define an image wrapper ingredient
 """
-import os
 
 import imageio
 import numpy as np
@@ -65,6 +64,8 @@ class Pierogi(Ingredient):
         :param file: file path to load from
         """
 
+        self.file = None
+
         if pixels is None:
             if image is not None:
                 # rotate the image array on receipt so that
@@ -92,7 +93,7 @@ class Pierogi(Ingredient):
         """
         self.image.show()
 
-    def save(self, path: str, optimize: bool =False) -> None:
+    def save(self, path: str, optimize: bool = False) -> None:
         """
         save the image to the given path
         """
@@ -104,6 +105,7 @@ class Pierogi(Ingredient):
         #     )
 
         self.image.save(output_filename, optimize=optimize)
+        self.file = output_filename
 
     def resize(self, width: int, height: int, resample: int = RESAMPLE):
         """
