@@ -1,8 +1,8 @@
 import os
 from typing import Dict, List
 
-from .ticket import Ticket, PierogiDesc, IngredientDesc
 from .menu import MenuItem
+from .ticket import Ticket, PierogiDesc, IngredientDesc
 from ..ingredients import (
     Ingredient, Dish, Pierogi, Recipe
 )
@@ -142,50 +142,48 @@ class Chef:
         return recipe
 
     @classmethod
-    def cook_tickets(cls, order_name: str, cooked_dir, tickets: List[Ticket], menu: Dict) -> None:
+    def cook_ticket(cls, order_name: str, cooked_dir, ticket: Ticket, menu: Dict) -> None:
         """
         cook a dish from a series of descriptive dicts
         """
+        pierogi_descs = ticket.pierogis
+        ingredient_descs = ticket.ingredients
+        files = ticket.files
+        recipe = ticket.recipe
+        base = ticket.base
+        seasoning_links = ticket.seasoning_links
 
-        for ticket in tickets:
-            pierogi_descs = ticket.pierogis
-            ingredient_descs = ticket.ingredients
-            files = ticket.files
-            recipe = ticket.recipe
-            base = ticket.base
-            seasoning_links = ticket.seasoning_links
+        pierogis = cls.create_pierogi_objects(
+            pierogi_descs,
+            files
+        )
 
-            pierogis = cls.create_pierogi_objects(
-                pierogi_descs,
-                files
-            )
+        ingredients = cls.create_ingredient_objects(
+            ingredient_descs,
+            pierogis,
+            menu
+        )
 
-            ingredients = cls.create_ingredient_objects(
-                ingredient_descs,
-                pierogis,
-                menu
-            )
+        cls.apply_seasonings(
+            ingredients,
+            seasoning_links
+        )
 
-            cls.apply_seasonings(
-                ingredients,
-                seasoning_links
-            )
+        recipe_object = cls.create_recipe_object(
+            ingredients,
+            recipe
+        )
 
-            recipe_object = cls.create_recipe_object(
-                ingredients,
-                recipe
-            )
+        dish = Dish(
+            pierogis=[pierogis[base]],
+            recipe=recipe_object
+        )
 
-            dish = Dish(
-                pierogis=[pierogis[base]],
-                recipe=recipe_object
-            )
+        order_dir = os.path.join(cooked_dir, order_name)
+        if not os.path.isdir(order_dir):
+            os.makedirs(order_dir)
 
-            order_dir = os.path.join(cooked_dir, order_name)
-            if not os.path.isdir(order_dir):
-                os.makedirs(order_dir)
+        output_path = os.path.join(order_dir, os.path.basename(pierogis[base].file))
 
-            output_path = os.path.join(order_dir, os.path.basename(pierogis[base].file))
-
-            cooked_dish = dish.serve()
-            cooked_dish.save(output_path)
+        cooked_dish = dish.serve()
+        cooked_dish.save(output_path)
