@@ -5,7 +5,7 @@ from pyrogis import (
     Quantize, Recipe, Sort, Threshold
 )
 
-pierogi = Pierogi(path='gnome.jpg')
+pierogi = Pierogi(file='gnome.jpg')
 
 
 def threshold_example(self):
@@ -21,7 +21,7 @@ def threshold_example(self):
         recipe=threshold_recipe
     )
 
-    threshold_dish.serve()
+    cooked_dish = threshold_dish.serve()
 
 
 def swap_example(self):
@@ -37,7 +37,7 @@ def swap_example(self):
         recipe=swap_recipe
     )
 
-    swap_dish.serve()
+    cooked_dish = swap_dish.serve()
 
 
 def quantize_example(self):
@@ -60,7 +60,7 @@ def quantize_example(self):
         recipe=quantize_recipe
     )
 
-    quantize_dish.serve()
+    cooked_dish = quantize_dish.serve()
 
 
 def sort_example(self):
@@ -80,5 +80,4 @@ def sort_example(self):
         recipe=sort_recipe
     )
 
-    sort_dish.serve()
-    sort_dish.show()
+    cooked_dish = sort_dish.serve()

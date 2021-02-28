@@ -40,7 +40,7 @@ def main(args=None, order_name = None, output_filename=None):
 
         dish = Dish.from_path(order_dir)
 
-        server.togo(dish, output_filename, fps, optimize)
+        server.togo(order_name, dish, output_filename, fps, optimize)
 
 
 if __name__ == "__main__":

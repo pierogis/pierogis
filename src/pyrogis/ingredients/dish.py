@@ -79,13 +79,13 @@ class Dish(Ingredient):
                 pierogis.append(Pierogi(file=file_path))
 
             except UnidentifiedImageError:
-                print("{} is not an image".format(path))
+                print("{} is not an image".format(file))
 
             except ValueError:
-                print("{} is not an image".format(path))
+                print("{} is not an image".format(file))
 
             except IsADirectoryError:
-                print("{} is a directory".format(path))
+                print("{} is a directory".format(file))
 
         return cls(pierogis=pierogis)
 

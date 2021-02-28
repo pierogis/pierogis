@@ -1,7 +1,8 @@
 import os
 from typing import Dict, List
 
-from .ticket import Ticket
+from .ticket import Ticket, PierogiDesc, IngredientDesc
+from .menu import MenuItem
 from ..ingredients import (
     Ingredient, Dish, Pierogi, Recipe
 )
@@ -15,21 +16,32 @@ class Chef:
     and cooking a parsed representation
     """
 
-    def create_pierogi_objects(self, pierogi_descs: dict, file_links: dict):
+    @classmethod
+    def create_pierogi_objects(
+            cls,
+            pierogi_descs: Dict[str, PierogiDesc],
+            files: Dict[str, str]
+    ) -> Dict[str, Pierogi]:
+        """
+        exchange a set of PierogiDesc keyed by a name
+        with Pierogi loaded from file links
+        """
         pierogi_objects = {}
 
         for pierogi_key, pierogi_desc in pierogi_descs.items():
-            file = file_links[pierogi_desc.files_key]
+            file = files[pierogi_desc.files_key]
             pierogi = Pierogi(file=file)
 
             pierogi_objects[pierogi_key] = pierogi
 
         return pierogi_objects
 
+    @classmethod
     def create_ingredient_objects(
-            self,
-            ingredient_descs: dict,
-            pierogis: dict
+            cls,
+            ingredient_descs: Dict[str, IngredientDesc],
+            pierogis: Dict[str, Pierogi],
+            menu: Dict[str, MenuItem]
     ):
         """
         create a dict of uuid->Ingredient
@@ -37,8 +49,7 @@ class Chef:
 
         :param ingredient_descs: map of uuid keys to inner dict
         with type, args, and kwargs keys
-        :param file_links: map of uuid keys to file paths,
-        usually for Pierogi
+        :param pierogis: map of uuid keys created Pierogi
         """
         ingredients: Dict[str, Ingredient] = {}
 
@@ -50,16 +61,17 @@ class Chef:
                 pierogi = pierogis[pierogi_name]
                 ingredient_desc.kwargs['pierogi'] = pierogi
 
-            ingredient = self.get_or_create_ingredient(
-                ingredients, ingredient_descs, ingredient_name
+            ingredient = Chef.get_or_create_ingredient(
+                ingredients, ingredient_descs, ingredient_name, menu
             )
 
             ingredients[ingredient_name] = ingredient
 
         return ingredients
 
+    @classmethod
     def get_or_create_ingredient(
-            self,
+            cls,
             ingredients: dict,
             ingredient_descs: dict,
             ingredient_name: str,
@@ -83,7 +95,7 @@ class Chef:
                 )
 
                 if ingredient_name is not None:
-                    ingredient = self.get_or_create_ingredient(
+                    ingredient = cls.get_or_create_ingredient(
                         ingredients, ingredient_descs, ingredient_name, menu
                     )
                     ingredient_desc.kwargs[ingredient_type_name] = ingredient
@@ -93,15 +105,17 @@ class Chef:
 
         return ingredient
 
-    def apply_seasonings(self, ingredients, seasoning_links):
+    @classmethod
+    def apply_seasonings(cls, ingredients, seasoning_links):
         for seasoning, recipient in seasoning_links.items():
             seasoning = ingredients[seasoning]
             recipient = ingredients[recipient]
 
             recipient.season(seasoning)
 
+    @classmethod
     def create_recipe_object(
-            self,
+            cls,
             ingredients: Dict[str, Ingredient],
             recipe_order: List[str]
     ):
@@ -127,11 +141,11 @@ class Chef:
 
         return recipe
 
-    def cook_tickets(self, order_name, tickets: List[Ticket]) -> None:
+    @classmethod
+    def cook_tickets(cls, order_name: str, cooked_dir, tickets: List[Ticket], menu: Dict) -> None:
         """
         cook a dish from a series of descriptive dicts
         """
-        cooked_dishes = []
 
         for ticket in tickets:
             pierogi_descs = ticket.pierogis
@@ -141,22 +155,23 @@ class Chef:
             base = ticket.base
             seasoning_links = ticket.seasoning_links
 
-            pierogis = self.create_pierogi_objects(
+            pierogis = cls.create_pierogi_objects(
                 pierogi_descs,
                 files
             )
 
-            ingredients = self.create_ingredient_objects(
+            ingredients = cls.create_ingredient_objects(
                 ingredient_descs,
-                pierogis
+                pierogis,
+                menu
             )
 
-            self.apply_seasonings(
+            cls.apply_seasonings(
                 ingredients,
                 seasoning_links
             )
 
-            recipe_object = self.create_recipe_object(
+            recipe_object = cls.create_recipe_object(
                 ingredients,
                 recipe
             )
@@ -166,7 +181,11 @@ class Chef:
                 recipe=recipe_object
             )
 
-            output_path = os.path.join('cooked', order_name, os.path.basename(pierogis[base].file))
+            order_dir = os.path.join(cooked_dir, order_name)
+            if not os.path.isdir(order_dir):
+                os.makedirs(order_dir)
+
+            output_path = os.path.join(order_dir, os.path.basename(pierogis[base].file))
 
             cooked_dish = dish.serve()
             cooked_dish.save(output_path)

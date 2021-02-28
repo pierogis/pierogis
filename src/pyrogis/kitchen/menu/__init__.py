@@ -1,3 +1,4 @@
+from .menu_item import MenuItem
 from .custom_order import CustomOrder
 from .quantize_order import QuantizeOrder
 from .sort_order import SortOrder

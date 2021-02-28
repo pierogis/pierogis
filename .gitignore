@@ -5,6 +5,7 @@
 /build/
 /.eggs/
 /cooked*
+/tests/cooked*
 
 # venv
 venv
@@ -16,4 +17,3 @@ venv
 # rust
 /target
 /build
-/src/pymodule.rs

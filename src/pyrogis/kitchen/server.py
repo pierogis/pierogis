@@ -47,12 +47,13 @@ class Server:
         togo_parser = argparse.ArgumentParser(add_help=False)
         togo_parser.add_argument(
             '-o', '--output',
+            dest='output_filename',
             help="path to save resulting image"
         )
         togo_parser.add_argument(
-            '--duration',
+            '--frame-duration',
             type=int,
-            help="duration in ms"
+            help="frame duration in ms"
         )
         togo_parser.add_argument(
             '--fps',
@@ -91,12 +92,12 @@ class Server:
             if args[0] == 'togo':
                 parser = self._create_togo_parser()
 
-            self.togo(dish, **vars(parser.parse_args(unknown)))
+            self.togo(order_name, dish, **vars(parser.parse_args(unknown)))
             return []
+        else:
+            tickets = self.write_tickets(order_name, dish, parsed_vars)
 
-        tickets = self.write_tickets(order_name, dish, parsed_vars)
-
-        return tickets
+            return tickets
 
     def _write_dish_tickets(self, dish: Dish, parsed_vars: dict) -> List[Ticket]:
         generate_ticket = parsed_vars.pop('generate_ticket')
@@ -105,7 +106,7 @@ class Server:
 
         for pierogi in dish.pierogis:
             ticket = Ticket()
-            ticket = generate_ticket(ticket, pierogi, parsed_vars)
+            ticket = generate_ticket(ticket, pierogi, parsed_vars.copy())
 
             tickets.append(ticket)
 
@@ -142,12 +143,26 @@ class Server:
         paths = os.listdir(cooked_dir)
         return len(paths)
 
-    def togo(self, dish: Dish, output_filename: str, fps: float, optimize) -> str:
+    def togo(self,
+             order_name: str,
+             dish: Dish,
+             output_filename: str,
+             fps: float,
+             optimize: bool,
+             frame_duration: float = None
+             ) -> str:
         """
 
         """
+        if frame_duration is not None:
+            fps = 1000 / frame_duration
+
         if not os.path.isdir(self.cooked_dir):
             os.makedirs(self.cooked_dir)
+
+        if output_filename is None:
+            output_filename = order_name + '.gif'
+
         output_path = os.path.join(self.cooked_dir, output_filename)
 
         dish.save(output_path, optimize, fps=fps)

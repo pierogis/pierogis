@@ -2,7 +2,6 @@
 threshold ingredient(s)
 """
 import numpy as np
-from pierogis_rs import algorithms
 
 from .seasoning import Seasoning
 
@@ -68,6 +67,8 @@ class Threshold(Seasoning):
         parallel computation in rust is 10x speedup
         """
         cooked_pixels = pixels.copy()
+
+        from pierogis_rs import algorithms
 
         # cook using the rust function
         cooked_pixels = algorithms.threshold(
