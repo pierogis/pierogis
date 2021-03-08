@@ -66,20 +66,25 @@ class Pierogi(Ingredient):
 
         self.file = None
 
-        if pixels is None:
-            if image is not None:
-                # rotate the image array on receipt so that
-                # array dimensions are (width, height, 3)
-                pixels = np.rot90(np.array(image.convert('RGB')), axes=(1, 0))
-            elif file is not None:
-                self.file = file
-                pixels = np.rot90(np.array(imageio.imread(file)), axes=(1, 0))
-            elif shape is not None:
-                pixels = np.full((*shape, 3), self._default_pixel)
-            else:
-                raise Exception("one of image, file, or shape must be provided")
+        if pixels is not None:
+            self._pixels_loader = lambda: pixels
+        elif image is not None:
+            # rotate the image array on receipt so that
+            # array dimensions are (width, height, 3)
+            self._pixels_loader = lambda: np.rot90(np.array(image.convert('RGB')), axes=(1, 0))
+        elif file is not None:
+            self._pixels_loader = lambda: np.rot90(np.array(imageio.imread(file)), axes=(1, 0))
+        elif shape is not None:
+            self._pixels_loader = lambda: np.full((*shape, 3), self._default_pixel)
+        else:
+            raise Exception("one of pixels, image, file, or shape must be provided")
 
-        self.pixels = pixels
+    @property
+    def pixels(self) -> np.ndarray:
+        if self._pixels is None:
+            self._pixels = self._pixels_loader()
+
+        return self._pixels
 
     def cook(self, pixels: np.ndarray) -> np.ndarray:
         """

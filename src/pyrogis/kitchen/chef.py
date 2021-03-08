@@ -142,7 +142,7 @@ class Chef:
         return recipe
 
     @classmethod
-    def cook_ticket(cls, order_name: str, cooked_dir, ticket: Ticket, menu: Dict) -> None:
+    def assemble_ingredients(cls, ticket: Ticket, menu: Dict) -> Dish:
         """
         cook a dish from a series of descriptive dicts
         """
@@ -174,16 +174,17 @@ class Chef:
             recipe
         )
 
-        dish = Dish(
+        return Dish(
             pierogis=[pierogis[base]],
             recipe=recipe_object
         )
 
+    def cook_dish(self, order_name, cooked_dir, dish) -> None:
         order_dir = os.path.join(cooked_dir, order_name)
         if not os.path.isdir(order_dir):
             os.makedirs(order_dir)
 
-        output_path = os.path.join(order_dir, os.path.basename(pierogis[base].file))
+        output_path = os.path.join(order_dir, os.path.basename(dish.pierogis[0].file))
 
         cooked_dish = dish.serve()
         cooked_dish.save(output_path)

@@ -89,8 +89,8 @@ class Dish(Ingredient):
 
         return cls(pierogis=pierogis)
 
-    def cook(self, pixels: np.ndarray) -> np.ndarray:
-        return self.recipe(0, 0).cook(self.pierogis[0].pixels)
+    def cook(self, pixels: np.ndarray, i: int = 0) -> np.ndarray:
+        return self.recipe(0, 0).cook(self.pierogis[i].pixels)
 
     def serve(self) -> 'Dish':
         """
@@ -148,7 +148,7 @@ class Dish(Ingredient):
             frames_dir
     ) -> None:
         """
-        :param duration: ms duration between frames
+        :param frames_dir: directory to save frames into
         """
         digits = math.floor(math.log(self.frames, 10)) + 1
         i = 1

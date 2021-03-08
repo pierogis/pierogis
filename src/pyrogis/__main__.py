@@ -3,7 +3,7 @@ import sys
 from .kitchen import Chef, Server, Kitchen
 
 
-def main(args=None, order_name=None, output_filename=None):
+def main(args=None, order_name=None):
     """cli program"""
     if args is None:
         args = sys.argv[1:]

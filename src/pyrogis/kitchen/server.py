@@ -4,11 +4,11 @@ parsing
 import argparse
 import math
 import os
+import time
 from typing import List
 
-from . import Kitchen
+from .kitchen import Kitchen
 from .ticket import Ticket
-from .. import Pierogi
 from ..ingredients import Dish
 
 
@@ -93,27 +93,21 @@ class Server:
 
         # if plate is the order, just assemble the plate from files in path
         if parsed_vars['order'] == 'togo':
-            if args[0] == 'togo':
-                parser = self._create_togo_parser()
-
-            self.togo(order_name, dish, **vars(parser.parse_args(unknown)))
+            self.togo(order_name, dish, unknown)
         else:
             for ticket in self.write_tickets(order_name, dish, parsed_vars):
                 kitchen.cook_ticket(order_name, self.cooked_dir, ticket)
 
-    def _write_ticket(self, pierogi: Pierogi, parsed_vars: dict) -> Ticket:
-        generate_ticket = parsed_vars.pop('generate_ticket')
+            while not self.check_cooked(order_name):
+                time.sleep(1)
 
-        ticket = Ticket()
-        ticket = generate_ticket(ticket, pierogi, **parsed_vars.copy())
-
-        return ticket
+            self.togo(order_name, dish)
 
     def write_tickets(self, order_name: str, dish: Dish, parsed_vars) -> List[Ticket]:
         """
         create tickets from a list of pierogis and parsed vars
         """
-        self.remove_order_dir(order_name)
+        self.remove_order_dirs(order_name)
 
         cooked_order_dir = os.path.join(self.cooked_dir, order_name)
         raw_order_dir = os.path.join(self.raw_dir, order_name)
@@ -125,6 +119,7 @@ class Server:
         i = 1
 
         recipe_path = os.path.join(cooked_order_dir, 'recipe.json')
+        generate_ticket = parsed_vars.pop('generate_ticket')
 
         for pierogi in dish.pierogis:
             if pierogi.file is None:
@@ -136,20 +131,27 @@ class Server:
 
             pierogi.save(frame_filename)
 
-            yield self._write_ticket(pierogi, parsed_vars.copy())
+            ticket = Ticket()
+            ticket = generate_ticket(ticket, pierogi, **parsed_vars.copy())
+
+            yield ticket
 
             i += 1
 
     @classmethod
-    def remove_order_dir(cls, order_name: str, cooked: bool = True):
-        if cooked:
-            order_dir = os.path.join(cls.cooked_dir, order_name)
-        else:
-            order_dir = os.path.join(cls.raw_dir, order_name)
-        if os.path.isdir(order_dir):
-            for file in os.listdir(order_dir):
-                os.remove(os.path.join(order_dir, file))
-            os.removedirs(order_dir)
+    def remove_order_dirs(cls, order_name: str):
+        cooked_dir = os.path.join(cls.cooked_dir, order_name)
+        raw_dir = os.path.join(cls.raw_dir, order_name)
+
+        if os.path.isdir(cooked_dir):
+            for file in os.listdir(cooked_dir):
+                os.remove(os.path.join(cooked_dir, file))
+            os.removedirs(cooked_dir)
+
+        if os.path.isdir(raw_dir):
+            for file in os.listdir(raw_dir):
+                os.remove(os.path.join(raw_dir, file))
+            os.removedirs(raw_dir)
 
     def check_cooked(self, order_name: str) -> int:
         cooked_order_dir = os.path.join(self.cooked_dir, str(order_name))
@@ -160,17 +162,33 @@ class Server:
         print("{} tickets cooked of {}".format(cooked_tickets, submitted_tickets), end='\r')
         return cooked_tickets == submitted_tickets
 
-    def togo(self,
-             order_name: str,
-             dish: Dish,
-             output_filename: str,
-             fps: float,
-             optimize: bool,
-             frame_duration: float = None
-             ) -> str:
+    def togo(
+            self,
+            order_name: str,
+            dish: Dish,
+            args: List[str] = None,
+            output_filename=None,
+            fps=None,
+            optimize=None,
+            frame_duration=None,
+    ) -> str:
         """
 
         """
+        if args is not None:
+            parser = self._create_togo_parser()
+
+            parsed_vars = vars(parser.parse_args(args))
+
+            output_filename = parsed_vars.pop('output_filename')
+            fps = parsed_vars.pop('fps')
+            optimize = parsed_vars.pop('optimize')
+            frame_duration = parsed_vars.pop('frame_duration')
+
+        else:
+            # prompt for vars
+            pass
+
         if output_filename is None:
             if dish.frames == 1:
                 output_filename = order_name + '.png'
@@ -180,24 +198,3 @@ class Server:
         dish.save(output_filename, optimize, duration=frame_duration, fps=fps)
 
         return output_filename
-
-    def deliver(self, order_name):
-        # waits for the dishes to all be cooked
-        while not self.check_cooked(order_name):
-            time.sleep(1)
-
-
-
-        if output_filename is None:
-            output_filename = 'sort.png'
-
-        # all cooked
-        frame_duration = 15
-        fps = None
-        optimize = True
-        if frame_duration is not None:
-            fps = 1000 / frame_duration
-
-        dish = Dish.from_path(order_dir)
-
-        server.togo(order_name, dish, output_filename, fps, optimize)
