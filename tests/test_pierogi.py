@@ -16,15 +16,15 @@ def file(array: np.ndarray):
     image = Image.fromarray(array)
     output = image.tobytes()
 
-    return 'demo/gnome_small.jpg'
+    return 'resources/gnome.jpg'
 
 
-def test_prep_1(file: str):
+def test_from_pil_image(file: str):
     """
     test that a Pierogi can be created from an Image
     """
     image = Image.open(file)
-    pierogi = Pierogi(image=image)
+    pierogi = Pierogi.from_pil_image(image=image)
 
     assert np.all(pierogi.pixels[0, 0] == np.asarray([137, 139, 115]))
     assert np.all(pierogi.pixels[0, -1] == np.asarray([59, 59, 67]))
@@ -32,12 +32,12 @@ def test_prep_1(file: str):
     assert np.all(pierogi.pixels[-1, -1] == np.asarray([90, 81, 66]))
 
 
-def test_prep_2(file: str):
+def test_from_path(file: str):
     """
     test that a Pierogi can be created from a file
     """
 
-    pierogi = Pierogi(file=file)
+    pierogi = Pierogi.from_path(path=file)
 
     assert np.all(pierogi.pixels[0, 0] == np.asarray([137, 139, 115]))
     assert np.all(pierogi.pixels[0, -1] == np.asarray([59, 59, 67]))
@@ -45,7 +45,7 @@ def test_prep_2(file: str):
     assert np.all(pierogi.pixels[-1, -1] == np.asarray([90, 81, 66]))
 
 
-def test_resize_1(array: np.ndarray):
+def test_resize(array: np.ndarray):
     """
     test resize method
     """
@@ -67,7 +67,7 @@ def test_resize_1(array: np.ndarray):
     assert np.all(pierogi.pixels[-1, -1] == array[-1, -1])
 
 
-def test_resize_2(array: np.ndarray):
+def test_resize_resample(array: np.ndarray):
     """
     test resample can be used
     """

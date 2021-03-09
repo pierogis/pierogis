@@ -39,6 +39,16 @@ def image_file():
 
 
 @pytest.fixture
+def cooked_dir():
+    return 'cooked'
+
+
+@pytest.fixture
+def chef(cooked_dir):
+    return Chef(cooked_dir)
+
+
+@pytest.fixture
 def image_files(files_key, image_file) -> Dict[str, str]:
     files = {
         files_key: image_file
@@ -52,11 +62,11 @@ def ingredient_desc(ingredient_key) -> IngredientDesc:
 
 
 @pytest.fixture
-def pierogi_objects(pierogi_key, pierogi_desc, image_files):
+def pierogi_objects(chef, pierogi_key, pierogi_desc, image_files):
     pierogi_descs = {
         pierogi_key: pierogi_desc
     }
-    return Chef.create_pierogi_objects(pierogi_descs, image_files)
+    return chef.create_pierogi_objects(pierogi_descs, image_files)
 
 
 @pytest.fixture
@@ -98,20 +108,22 @@ def test_create_pierogi_objects(pierogi_objects):
     assert len(pierogi_objects.values()) == 1
 
 
-def test_create_ingredient_objects(ingredient_desc, pierogi_objects):
+def test_create_ingredient_objects(chef, ingredient_desc, pierogi_objects):
     ingredient_descs = {
         ingredient_key: ingredient_desc
     }
-    ingredient_objects = Chef.create_ingredient_objects(ingredient_descs, pierogi_objects, menu)
+    ingredient_objects = chef.create_ingredient_objects(
+        ingredient_descs, pierogi_objects, menu
+    )
 
     assert len(ingredient_objects.values()) == 1
 
 
-def test_get_ingredient_get(ingredient_desc, ingredient_key):
+def test_get_ingredient_get(chef, ingredient_desc, ingredient_key):
     ingredients = {
         ingredient_key: menu[ingredient_desc.type_name].type()
     }
-    ingredient = Chef.get_ingredient(
+    ingredient = chef.get_ingredient(
         ingredients,
         {ingredient_key: ingredient_desc},
         ingredient_key,
@@ -121,9 +133,9 @@ def test_get_ingredient_get(ingredient_desc, ingredient_key):
     assert ingredients[ingredient_key] == ingredient
 
 
-def test_get_ingredient_create(ingredient_desc, ingredient_key):
+def test_get_ingredient_create(chef, ingredient_desc, ingredient_key):
     ingredients = {}
-    ingredient = Chef.get_ingredient(
+    ingredient = chef.get_ingredient(
         ingredients,
         {ingredient_key: ingredient_desc},
         ingredient_key,
@@ -135,17 +147,18 @@ def test_get_ingredient_create(ingredient_desc, ingredient_key):
     assert order_type == type(ingredient)
 
 
-def test_assemble_dish(ticket):
+def test_assemble_dish(chef, ticket):
     order_name = 'test_assemble_dish'
-    dish = Chef.assemble_ticket(ticket, menu)
+    dish = chef.assemble_ticket(ticket, menu)
 
 
-def test_cook_dish_image(image_dish):
+@pytest.mark.asyncio
+async def test_cook_dish_image(chef, image_dish):
     order_name = 'test_cook_dish'
 
     order_dir = os.path.join('cooked', order_name)
     output_filename = 'cooked.png'
-    Chef.cook_dish(order_name, 'cooked', output_filename, image_dish)
+    await chef.cook_dish(order_name, output_filename, image_dish)
 
     output_path = os.path.join(order_dir, output_filename)
 
@@ -154,16 +167,6 @@ def test_cook_dish_image(image_dish):
 
     os.remove(output_path)
     os.removedirs(order_dir)
-
-
-@pytest.fixture
-def cooked_dir():
-    return 'cooked'
-
-
-@pytest.fixture
-def chef(cooked_dir):
-    return Chef(cooked_dir)
 
 
 @pytest.mark.asyncio

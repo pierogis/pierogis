@@ -145,7 +145,7 @@ class Dish(Ingredient):
             def loader():
                 return cls._file_loader(path)
         else:
-            raise Exception("{} is not an image")
+            raise Exception("{} is not a valid path".format(path))
 
         return cls(loader=loader)
 

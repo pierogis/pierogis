@@ -61,7 +61,7 @@ class Chef:
                 pierogi = pierogis[pierogi_name]
                 ingredient_desc.kwargs['pierogi'] = pierogi
 
-            ingredient = Chef.get_ingredient(
+            ingredient = self.get_ingredient(
                 ingredients, ingredient_descs, ingredient_name, menu
             )
 

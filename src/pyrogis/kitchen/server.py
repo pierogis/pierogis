@@ -93,7 +93,7 @@ class Server:
 
         dish = Dish.from_path(path=input_path)
 
-        # if plate is the order, just assemble the plate from files in path
+        # if the order is just togo, don't need the kitchen
         if parsed_vars['order'] == 'togo':
             self.togo(order_name, dish, unknown)
         else:
