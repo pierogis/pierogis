@@ -68,6 +68,7 @@ class Pierogi(Ingredient):
         """
 
         if pixels is not None:
+            self._pixels = pixels
             self._loader = lambda: pixels
 
         elif loader is not None:
@@ -170,7 +171,7 @@ class Pierogi(Ingredient):
         >    If omitted, or if the image has mode “1” or “P”, it is set PIL.Image.NEAREST."
         """
 
-        self.pixels = np.array(
+        self._pixels = np.array(
             Image.fromarray(
                 self.pixels
             ).resize(

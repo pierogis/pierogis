@@ -1,11 +1,10 @@
 import os
-from typing import List, Dict
+from typing import Dict
 
 import pytest
 
 from pyrogis import Dish
 from pyrogis.kitchen import Chef, menu
-from pyrogis.kitchen.menu import ResizeOrder
 from pyrogis.kitchen.ticket import Ticket, PierogiDesc, IngredientDesc
 
 
@@ -145,25 +144,39 @@ def test_cook_dish_image(image_dish):
     order_name = 'test_cook_dish'
 
     order_dir = os.path.join('cooked', order_name)
-    output_filename = os.path.join(order_dir, 'cooked')
+    output_filename = 'cooked.png'
     Chef.cook_dish(order_name, 'cooked', output_filename, image_dish)
 
-    assert os.path.isdir(order_dir)
-    assert os.path.isfile(output_filename)
+    output_path = os.path.join(order_dir, output_filename)
 
-    os.remove(output_filename)
+    assert os.path.isdir(order_dir)
+    assert os.path.isfile(output_path)
+
+    os.remove(output_path)
     os.removedirs(order_dir)
 
 
-def test_cook_dish_animation(animation_dish):
+@pytest.fixture
+def cooked_dir():
+    return 'cooked'
+
+
+@pytest.fixture
+def chef(cooked_dir):
+    return Chef(cooked_dir)
+
+
+@pytest.mark.asyncio
+async def test_cook_dish_animation(chef, cooked_dir, animation_dish):
     order_name = 'test_cook_dish'
 
-    order_dir = os.path.join('cooked', order_name)
-    output_filename = os.path.join(order_dir, os.path.basename(image_file))
-    Chef.cook_dish(order_name, 'cooked', output_filename, animation_dish)
+    output_filename = 'cooked.gif'
+    await chef.cook_dish(order_name, output_filename, animation_dish)
 
-    assert os.path.isdir(order_dir)
-    assert os.path.isfile(output_filename)
+    order_dir = os.path.join(cooked_dir, order_name)
+    output_path = os.path.join(order_dir, output_filename)
 
-    os.remove(output_filename)
+    assert os.path.isfile(output_path)
+
+    os.remove(output_path)
     os.removedirs(order_dir)

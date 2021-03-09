@@ -24,6 +24,8 @@ class Dish(Ingredient):
     - directory
     """
 
+    _pierogis: List[Pierogi] = None
+
     @property
     def frames(self):
         return len(self.pierogis)
@@ -56,16 +58,22 @@ class Dish(Ingredient):
 
     @property
     def pierogis(self) -> List[Pierogi]:
-        return self._loader()
+        if self._pierogis is None:
+            self._pierogis = self._loader()
+
+        return self._pierogis
 
     @classmethod
     def _file_loader(cls, file: str) -> List[Pierogi]:
-
-        # first try to load as video/animation
         reader = imageio.get_reader(file, 'ffmpeg')
         frames = reader.get_length()
+
+        # first try to load as video/animation
         if math.isinf(frames):
-             pierogis = list(cls._stream_loader(reader.iter_data()))
+            pierogis = []
+
+            for pierogi in cls._stream_loader(reader, lazy=True):
+                pierogis.append(pierogi)
 
         else:
             pierogis = []
@@ -78,11 +86,21 @@ class Dish(Ingredient):
         return pierogis
 
     @classmethod
-    def _stream_loader(cls, stream):
-        for frame in stream:
-            def loader():
-                return np.rot90(np.array(frame), axes=(1, 0))
-            yield Pierogi(loader=loader)
+    def _stream_loader(cls, stream, lazy: bool = True):
+
+        if lazy:
+            for frame_index in range(stream.count_frames()):
+                path = stream.request.filename
+                pierogi = Pierogi.from_path(path=path, frame_index=frame_index)
+                yield pierogi
+
+        else:
+            for frame in stream:
+                def loader():
+                    np.rot90()
+
+                pierogi = Pierogi(loader=loader)
+                yield pierogi
 
     @classmethod
     def _dir_loader(cls, dir: str) -> List[Pierogi]:
@@ -143,6 +161,7 @@ class Dish(Ingredient):
 
         for frame in range(self.frames):
             pierogi = self.pierogis[frame]
+            a = np.average(pierogi.pixels)
             # cook with these pixels as first input
             recipe = self.recipe(frame + 1, self.frames)
             cooked_pixels = recipe.cook(pierogi.pixels)
