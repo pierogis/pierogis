@@ -16,5 +16,5 @@ class Kitchen:
         # waiter takes orders to produce DishDescription
         # chef cooks these dish descriptions (returning Dish)
         # waiter takes these dishes and saves them and plates them
-        dish = self.chef_type.assemble_ingredients(ticket, menu)
+        dish = self.chef_type.assemble_ticket(ticket, menu)
         self.executor.submit(self.chef_type.cook_dish, order_name, cooked_dir, dish)

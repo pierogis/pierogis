@@ -268,20 +268,17 @@ import pyrogis
 The created files can be found in this repository in the `docs` folder
 
 <a name="acknowledgements"></a>
-
 ## acknowledgements
 
 The original python [pixelsort](https://github.com/satyarth/pixelsort) package inspired this package. While the
 underlying [algorithm](https://github.com/kimasendorf/ASDFPixelSort) of that package and of `sort` in this one is
-supposed to be functionally the same, details of the implementation may differ, and it makes up just part of this
-package.
+supposed to be functionally the same, details of the implementation may differ.
 
-The quantizing algorithm used in this package is implemented by [`rscolorq`](https://github.com/okaneco/rscolorq), which
+The quantizing algorithm used in this package is done with [`rscolorq`](https://github.com/okaneco/rscolorq), which
 is a port of [`scolorq`](http://people.eecs.berkeley.edu/~dcoetzee/downloads/scolorq/), itself an implementation of
 Spatial Color Quantization.
 
 <a name="issues-and-contributing"></a>
-
 ## issues and contributing
 
 When you encounter an error, there are some guidelines that will make it easier to help you:
@@ -290,12 +287,12 @@ When you encounter an error, there are some guidelines that will make it easier 
   Use `pip uninstall pyrogis` then `pip install pyrogis --no-cache-dir` to reinstall.
 - Provide the version of `pyrogis` that you are using in issues to rule that out.
   `pip list` -> pyrogis \_.\_.\_
-- Provide the traceback or error message if you can.
-- Provide your os and any other specific information relevant to how you are trying to use the package.
+- Provide the traceback or error message if relevant.
+- Provide your os and any other specific information about how you are trying to use the package.
 - Provide the code or the cli command that triggered the error.
-- If the problem is visual: that can be more difficult to debug. Try to use an image hosting site if you want to share
-  what you are seeing in an issue.
-- If you are getting different behavior than you expect: that could be an error or a feature too.
+- If the problem is visual: that can be more difficult to debug. Share a link to an image hosting site if you want to
+  share what you are seeing in an issue.
+- If you are getting different behavior than you expect: that could be an error or a feature.
 - If your problem is with installation: try conda, preinstall `numpy` and `pillow`, install the rust toolchain, and
   start praying. There will be a website with a visual editor for this software so stay tuned.
 

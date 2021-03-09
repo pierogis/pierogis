@@ -6,13 +6,20 @@ from ..ingredients import Pierogi
 
 
 class PierogiDesc:
-    def __init__(self, files_key):
-        self.files_key = files_key
+    def __init__(self, files_key: str, frame_index: int = 0):
+        """
 
-    def create(self, files):
+        """
+        self.files_key = files_key
+        self.frame_index = frame_index
+
+    def create(self, files) -> Pierogi:
+        """
+
+        """
         file = files[self.files_key]
 
-        return Pierogi(file=file)
+        return Pierogi.from_path(path=file, frame_index=self.frame_index)
 
 
 class IngredientDesc:
@@ -119,12 +126,14 @@ class Ticket:
         # this uuid can be used to reference this file
         return file_uuid
 
-    def add_pierogi(self, pierogi: Pierogi) -> str:
+    def add_pierogi(self, path, frame_index) -> str:
         pierogi_key = uuid.uuid4().hex
 
-        files_key = self.add_file(pierogi.file)
+        files_key = self.add_file(path)
 
-        self.pierogis[pierogi_key] = PierogiDesc(files_key=files_key)
+        self.pierogis[pierogi_key] = PierogiDesc(
+            files_key=files_key, frame_index=frame_index
+        )
 
         return pierogi_key
 

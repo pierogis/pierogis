@@ -13,16 +13,18 @@ class SortOrder(MenuItem):
     def generate_ticket(
             cls,
             ticket: Ticket,
-            pierogi: Pierogi = None,
-            target_pierogi_uuid=None,
+            path: str = None,
+            frame_index: int = 0,
+            target_pierogi_uuid: str = None,
             **kwargs
     ):
         """
         add the description of a sort from this path to the dish
         """
-        if pierogi is not None:
-            target_pierogi_uuid = ticket.add_pierogi(pierogi)
-            ticket.base = target_pierogi_uuid
+
+        ticket = super().generate_ticket(
+            ticket, path, frame_index, target_pierogi_uuid, **kwargs
+        )
 
         turns = kwargs.pop('turns')
         clockwise = kwargs.pop('clockwise')

@@ -1,6 +1,7 @@
 import math
 import os
-from typing import List
+import threading
+from typing import List, Callable
 
 import imageio as imageio
 import numpy as np
@@ -14,6 +15,13 @@ from .recipe import Recipe
 class Dish(Ingredient):
     """
     crop and cook an entire recipe for all pixels
+
+    create a Dish from:
+    - single Pierogi
+    - list of Pierogis
+    - image file
+    - video file
+    - directory
     """
 
     @property
@@ -22,7 +30,8 @@ class Dish(Ingredient):
 
     def prep(
             self,
-            pierogis: List[Pierogi],
+            pierogis: List[Pierogi] = None,
+            loader: Callable[[], List[Pierogi]] = None,
             recipe=None,
             **kwargs
     ):
@@ -36,58 +45,91 @@ class Dish(Ingredient):
         :param pierogis: a list of Pierogi to cook
         """
 
-        self.pierogis = pierogis
+        if pierogis is not None:
+            loader = lambda: pierogis
+
+        self._loader = loader
 
         if recipe is None:
-            Recipe()
+            recipe = Recipe()
         self.recipe = recipe
 
-    @classmethod
-    def _from_file(cls, file: str) -> 'Dish':
-        pierogis = []
+    @property
+    def pierogis(self) -> List[Pierogi]:
+        return self._loader()
 
-        try:
-            # first try to load as video/animation
-            images = imageio.mimread(file, memtest=False)
-            for image in images:
+    @classmethod
+    def _file_loader(cls, file: str) -> List[Pierogi]:
+
+        # first try to load as video/animation
+        reader = imageio.get_reader(file, 'ffmpeg')
+        frames = reader.get_length()
+        if math.isinf(frames):
+             pierogis = list(cls._stream_loader(reader.iter_data()))
+
+        else:
+            pierogis = []
+
+            for frame_index in frames:
                 pierogis.append(
-                    Pierogi(pixels=np.rot90(
-                        np.asarray(image), axes=(1, 0)
-                    ))
+                    Pierogi.from_path(file, frame_index)
                 )
 
-        except ValueError:
-            # then load as a single image
-            pierogis = [Pierogi(file=file)]
+        return pierogis
 
-        return cls(pierogis=pierogis)
+    @classmethod
+    def _stream_loader(cls, stream):
+        for frame in stream:
+            def loader():
+                return np.rot90(np.array(frame), axes=(1, 0))
+            yield Pierogi(loader=loader)
+
+    @classmethod
+    def _dir_loader(cls, dir: str) -> List[Pierogi]:
+        pierogis = []
+
+        files = sorted(os.listdir(dir))
+
+        for file in files:
+            file_path = os.path.join(dir, file)
+
+            if not os.path.isfile(file_path):
+                continue
+
+            def target():
+                pierogi = cls._file_loader(file_path)[0]
+                pierogi.load()
+                pierogis.append(pierogi)
+
+            try:
+                threading.Thread(target=target)
+
+            except UnidentifiedImageError:
+                # print("{} is not an image".format(file))
+                continue
+
+            except ValueError:
+                # print("{} is not an image".format(file))
+                continue
+
+            except IsADirectoryError:
+                # print("{} is a directory".format(file))
+                continue
+
+        return pierogis
 
     @classmethod
     def from_path(cls, path: str) -> 'Dish':
-        pierogis = []
+        if os.path.isdir(path):
+            def loader():
+                return cls._dir_loader(path)
+        elif os.path.isfile(path):
+            def loader():
+                return cls._file_loader(path)
+        else:
+            raise Exception("{} is not an image")
 
-        if os.path.isfile(path):
-            return cls._from_file(path)
-
-        files = sorted(os.listdir(path))
-
-        for file in files:
-            file_path = os.path.join(path, file)
-            if not os.path.isfile(file_path):
-                continue
-            try:
-                pierogis.append(Pierogi(file=file_path))
-
-            except UnidentifiedImageError:
-                print("{} is not an image".format(file))
-
-            except ValueError:
-                print("{} is not an image".format(file))
-
-            except IsADirectoryError:
-                print("{} is a directory".format(file))
-
-        return cls(pierogis=pierogis)
+        return cls(loader=loader)
 
     def cook(self, pixels: np.ndarray, i: int = 0) -> np.ndarray:
         return self.recipe(0, 0).cook(self.pierogis[i].pixels)
@@ -114,7 +156,11 @@ class Dish(Ingredient):
         return Dish(pierogis=cooked_pierogis)
 
     def save(
-            self, path, optimize: bool = True, duration: float = None, fps: float = 25
+            self,
+            path,
+            optimize: bool = True,
+            duration: float = None,
+            fps: float = 25
     ) -> None:
         """
         :param duration: ms duration between frames
@@ -145,22 +191,23 @@ class Dish(Ingredient):
 
     def save_frames(
             self,
-            frames_dir
+            frames_dir,
+            prefix: str = None
     ) -> None:
         """
         :param frames_dir: directory to save frames into
+        :param prefix: add to beginning of each filename separated by '-'
         """
         digits = math.floor(math.log(self.frames, 10)) + 1
         i = 1
 
         for pierogi in self.pierogis:
-            if pierogi.file is None:
-                filename = str(i).zfill(digits) + '.png'
-            else:
-                filename = os.path.basename(pierogi.file)
+            frame_filename = str(i).zfill(digits) + '.png'
+            if prefix is not None:
+                frame_filename = os.path.join(prefix, '-' + frame_filename)
 
-            frame_filename = os.path.join(frames_dir, filename)
+            frame_path = os.path.join(frames_dir, frame_filename)
 
-            pierogi.save(frame_filename)
+            pierogi.save(frame_path)
 
             i += 1

@@ -6,7 +6,7 @@ from ..ticket import Ticket
 from ...ingredients import Pierogi
 
 
-class CustomOrder(MenuItem):
+class RecipeOrder(MenuItem):
     @staticmethod
     def read_recipe(
             ticket: Ticket,
@@ -51,9 +51,9 @@ class CustomOrder(MenuItem):
 
                 # this corresponds to one of the menu item's parser's
                 # it links to a method on this class
-                extend_ticket = parsed_vars.pop('extend_ticket')
+                generate_ticket = parsed_vars.pop('generate_ticket')
 
-                ticket = extend_ticket(
+                ticket = generate_ticket(
                     ticket, target_pierogi_uuid=target_pierogi_uuid, **parsed_vars
                 )
 
@@ -63,16 +63,17 @@ class CustomOrder(MenuItem):
     def generate_ticket(
             cls,
             ticket: Ticket,
-            pierogi: Pierogi = None,
-            target_pierogi_uuid=None,
+            path: str = None,
+            frame_index: int = 0,
+            target_pierogi_uuid: str = None,
             **kwargs
-    ):
+    ) -> Ticket:
         """
         add to dish_desc using a recipe specified in a string or a file
         """
-        if pierogi is not None:
-            target_pierogi_uuid = ticket.add_pierogi(pierogi)
-            ticket.base = target_pierogi_uuid
+        ticket = super().generate_ticket(
+            ticket, path, frame_index, target_pierogi_uuid, **kwargs
+        )
 
         # recipe can be provided as a string
         recipe = kwargs.pop('recipe')

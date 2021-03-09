@@ -12,25 +12,28 @@ class MenuItem(ABC):
     def generate_ticket(
             cls,
             ticket: Ticket,
-            pierogi: Pierogi = None,
-            target_pierogi_uuid=None,
+            path: str = None,
+            frame_index: int = 0,
+            target_pierogi_uuid: str = None,
             **kwargs
-    ):
+    ) -> Ticket:
         """
         add a description of a quantize recipe
         """
-        if pierogi is not None:
-            target_pierogi_uuid = ticket.add_pierogi(pierogi)
+
+        if path is not None:
+            target_pierogi_uuid = ticket.add_pierogi(path, frame_index)
             ticket.base = target_pierogi_uuid
 
-        ingredient_desc = IngredientDesc(
-            type_name=cls.type_name,
-            kwargs=kwargs
-        )
+        if cls.type_name is not None:
+            ingredient_desc = IngredientDesc(
+                type_name=cls.type_name,
+                kwargs=kwargs
+            )
 
-        ingredient_uuid = ticket.add_ingredient_desc(ingredient_desc)
+            ingredient_uuid = ticket.add_ingredient_desc(ingredient_desc)
 
-        ticket.extend_recipe([ingredient_uuid])
+            ticket.extend_recipe([ingredient_uuid])
 
         return ticket
 
