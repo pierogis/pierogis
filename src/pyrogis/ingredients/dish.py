@@ -120,7 +120,8 @@ class Dish(Ingredient):
                 pierogis.append(pierogi)
 
             try:
-                threading.Thread(target=target)
+                thread = threading.Thread(target=target)
+                thread.run()
 
             except UnidentifiedImageError:
                 # print("{} is not an image".format(file))
