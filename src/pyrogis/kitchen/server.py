@@ -2,6 +2,7 @@
 parsing
 """
 import argparse
+import asyncio
 import math
 import os
 import time
@@ -97,16 +98,25 @@ class Server:
         if parsed_vars['order'] == 'togo':
             self.togo(order_name, dish, unknown)
         else:
-            for ticket in self.write_tickets(order_name, dish, parsed_vars):
+            self.order_tickets[order_name] = []
+
+            for ticket in self.write_tickets(order_name, dish, input_path, parsed_vars):
                 self.order_tickets[order_name].append(ticket)
-                kitchen.cook_ticket(order_name, self.cooked_dir, ticket)
+                filename = os.path.basename(
+                    ticket.files[ticket.pierogis[ticket.base].files_key]
+                )
+                loop = asyncio.get_event_loop()
+                loop.run_until_complete(kitchen.cook_ticket(order_name, filename, ticket))
+
 
             while not self.check_cooked(order_name):
                 time.sleep(1)
 
             self.togo(order_name, dish)
 
-    def write_tickets(self, order_name: str, dish: Dish, parsed_vars) -> Generator[Ticket, None, None]:
+    def write_tickets(
+            self, order_name: str, dish: Dish, input_path, parsed_vars
+    ) -> Generator[Ticket, None, None]:
         """
         create tickets from a list of pierogis and parsed vars
         """
@@ -118,9 +128,9 @@ class Server:
 
         generate_ticket = parsed_vars.pop('generate_ticket')
 
-        for pierogi in dish.pierogis:
+        for frame_index in range(len(dish.pierogis)):
             ticket = Ticket()
-            ticket = generate_ticket(ticket, pierogi, **parsed_vars.copy())
+            ticket = generate_ticket(ticket, input_path, frame_index, **parsed_vars.copy())
 
             yield ticket
 

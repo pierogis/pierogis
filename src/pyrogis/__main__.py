@@ -12,7 +12,7 @@ def main(args=None, order_name=None):
     if order_name is None:
         order_name = 'sort'
 
-    kitchen = Kitchen(Chef)
+    kitchen = Kitchen(Chef())
     server.take_orders(order_name, args, kitchen)
 
 
