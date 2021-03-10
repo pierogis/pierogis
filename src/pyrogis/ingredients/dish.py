@@ -25,10 +25,13 @@ class Dish(Ingredient):
     """
 
     _pierogis: List[Pierogi] = None
+    _frames: int = None
 
     @property
     def frames(self):
-        return len(self.pierogis)
+        if self._frames is None:
+            self._frames = len(self.pierogis)
+        return self._frames
 
     def prep(
             self,
@@ -224,7 +227,7 @@ class Dish(Ingredient):
         for pierogi in self.pierogis:
             frame_filename = str(i).zfill(digits) + '.png'
             if prefix is not None:
-                frame_filename = os.path.join(prefix, '-' + frame_filename)
+                frame_filename = prefix + '-' + frame_filename
 
             frame_path = os.path.join(frames_dir, frame_filename)
 

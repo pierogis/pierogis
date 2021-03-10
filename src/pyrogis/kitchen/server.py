@@ -3,9 +3,11 @@ parsing
 """
 import argparse
 import asyncio
+import concurrent.futures
 import math
 import os
 import time
+from multiprocessing import Pool, Process
 from typing import List, Dict, Generator
 
 from .kitchen import Kitchen
@@ -96,23 +98,20 @@ class Server:
 
         # if the order is just togo, don't need the kitchen
         if parsed_vars['order'] == 'togo':
-            self.togo(order_name, dish, unknown)
+            self.togo(dish, order_name, unknown)
         else:
             self.order_tickets[order_name] = []
 
             for ticket in self.write_tickets(order_name, dish, input_path, parsed_vars):
                 self.order_tickets[order_name].append(ticket)
-                filename = os.path.basename(
+                prefix = os.path.splitext(os.path.basename(
                     ticket.files[ticket.pierogis[ticket.base].files_key]
-                )
-                loop = asyncio.get_event_loop()
-                loop.run_until_complete(kitchen.cook_ticket(order_name, filename, ticket))
+                ))[0]
 
+                Process(target=kitchen.cook_ticket, args=(order_name, prefix, ticket)).start()
 
-            while not self.check_cooked(order_name):
-                time.sleep(1)
-
-            self.togo(order_name, dish)
+            # with concurrent.futures.ProcessPoolExecutor() as executor:
+            #     executor.map(cook_ticket, tickets)
 
     def write_tickets(
             self, order_name: str, dish: Dish, input_path, parsed_vars
@@ -155,19 +154,18 @@ class Server:
         else:
             submitted_tickets = 0
 
-
         print("{} tickets cooked of {}".format(cooked_tickets, submitted_tickets), end='\r')
         return cooked_tickets == submitted_tickets
 
     def togo(
             self,
-            order_name: str,
             dish: Dish,
+            order_name: str = None,
             args: List[str] = None,
-            output_filename=None,
-            fps=None,
-            optimize=None,
-            frame_duration=None,
+            output_filename: str = None,
+            fps: float = None,
+            optimize: bool = None,
+            frame_duration: int = None,
     ) -> str:
         """
 

@@ -175,10 +175,10 @@ class Chef:
             recipe=recipe_object
         )
 
-    async def cook_dish(
+    def cook_dish(
             self,
             order_name: str,
-            filename: str,
+            prefix: str,
             dish: Dish
     ) -> None:
         """
@@ -188,7 +188,5 @@ class Chef:
         if not os.path.isdir(order_dir):
             os.makedirs(order_dir)
 
-        output_path = os.path.join(order_dir, filename)
-
         cooked_dish = dish.serve()
-        cooked_dish.save(output_path)
+        cooked_dish.save_frames(order_dir, prefix)
