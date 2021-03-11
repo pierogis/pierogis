@@ -23,6 +23,7 @@ setup(
         'imageio-ffmpeg>=0.4.3',
         'pygifsicle>=1.0.2'
     ],
+    setup_requires=['setuptools_scm'],
     rust_extensions=[
         RustExtension("pierogis_rs", binding=Binding.PyO3)
     ],
