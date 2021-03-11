@@ -13,7 +13,7 @@ def main(args=None):
 
     kitchen = Kitchen(Chef())
 
-    order_name = input("What is the name for this order?")
+    order_name = input("What is the name for this order?\n")
 
     server.take_order(args, kitchen, order_name)
 

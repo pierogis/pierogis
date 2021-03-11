@@ -1,18 +1,15 @@
 use ndarray::parallel::prelude::*;
 use numpy::{Ix1, Ix2, Ix3, PyArray, PyReadonlyArray, ToPyArray};
-use pyo3::{IntoPy, Py, PyAny, PyResult, Python};
+use pyo3::{PyResult, Python};
 use pyo3::prelude::{pymodule, PyModule};
-use pyo3::types::{IntoPyDict, PyList};
 use rayon::prelude::*;
 
 use crate::quantize;
-use crate::kitchen::Kitchen;
 
 #[pymodule]
 fn pierogis_rs(py: Python<'_>, m: &PyModule) -> PyResult<()> {
     let module = PyModule::new(py, "algorithms")?;
     m.add_submodule(module)?;
-    m.add_class::<Kitchen>()?;
 
     /// quantize(py_array, palette_size, /)
     /// --

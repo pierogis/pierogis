@@ -102,6 +102,7 @@ pub fn cook(
     imgbuf
 }
 
+
 // NOTES on spatial quantization
 
 // COLOR PERCEPTION
