@@ -106,10 +106,14 @@ class Dish(Ingredient):
                 yield pierogi
 
     @classmethod
-    def _dir_loader(cls, dir: str) -> List[Pierogi]:
+    def _dir_loader(cls, dir: str, order_name: str = None) -> List[Pierogi]:
         pierogis = []
 
-        files = sorted(os.listdir(dir))
+        if order_name is None:
+            files = sorted(os.listdir(dir))
+
+        else:
+            files = sorted([filename for filename in os.listdir(dir) if filename.startswith(order_name)])
 
         for file in files:
             file_path = os.path.join(dir, file)
@@ -141,10 +145,10 @@ class Dish(Ingredient):
         return pierogis
 
     @classmethod
-    def from_path(cls, path: str) -> 'Dish':
+    def from_path(cls, path: str, order_name: str = None) -> 'Dish':
         if os.path.isdir(path):
             def loader():
-                return cls._dir_loader(path)
+                return cls._dir_loader(path, order_name)
         elif os.path.isfile(path):
             def loader():
                 return cls._file_loader(path)
@@ -180,7 +184,7 @@ class Dish(Ingredient):
 
     def save(
             self,
-            path,
+            path: str,
             optimize: bool = True,
             duration: float = None,
             fps: float = 25
@@ -216,7 +220,7 @@ class Dish(Ingredient):
             self,
             frames_dir,
             prefix: str = None
-    ) -> None:
+    ) -> List[str]:
         """
         :param frames_dir: directory to save frames into
         :param prefix: add to beginning of each filename separated by '-'
@@ -224,13 +228,18 @@ class Dish(Ingredient):
         digits = math.floor(math.log(self.frames, 10)) + 1
         i = 1
 
+        output_filenames = []
+
         for pierogi in self.pierogis:
             frame_filename = str(i).zfill(digits) + '.png'
             if prefix is not None:
                 frame_filename = prefix + '-' + frame_filename
 
             frame_path = os.path.join(frames_dir, frame_filename)
+            threading.Thread(target=pierogi.save, args=(frame_path,)).start()
 
-            pierogi.save(frame_path)
+            output_filenames.append(frame_path)
 
             i += 1
+
+        return output_filenames

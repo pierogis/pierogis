@@ -1,4 +1,5 @@
 import os
+from threading import Thread
 from typing import Dict, List
 
 from .menu import MenuItem
@@ -15,9 +16,6 @@ class Chef:
     implements parsing into a standard representation
     and cooking a parsed representation
     """
-
-    def __init__(self, cooked_dir: str = 'cooked'):
-        self.cooked_dir = cooked_dir
 
     def create_pierogi_objects(
             self,
@@ -177,16 +175,9 @@ class Chef:
 
     def cook_dish(
             self,
-            order_name: str,
-            prefix: str,
             dish: Dish
-    ) -> None:
+    ) -> Dish:
         """
 
         """
-        order_dir = os.path.join(self.cooked_dir, order_name)
-        if not os.path.isdir(order_dir):
-            os.makedirs(order_dir)
-
-        cooked_dish = dish.serve()
-        cooked_dish.save_frames(order_dir, prefix)
+        return dish.serve()

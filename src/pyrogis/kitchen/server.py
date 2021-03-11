@@ -2,12 +2,8 @@
 parsing
 """
 import argparse
-import asyncio
-import concurrent.futures
-import math
 import os
-import time
-from multiprocessing import Pool, Process
+import uuid
 from typing import List, Dict, Generator
 
 from .kitchen import Kitchen
@@ -79,7 +75,7 @@ class Server:
 
         return togo_parser
 
-    def take_orders(self, order_name: str, args: List[str], kitchen: Kitchen) -> None:
+    def take_order(self, args: List[str], kitchen: Kitchen, order_name: str = None) -> List[str]:
         """
         use a chef to parse list of strings into Tickets
         """
@@ -96,35 +92,49 @@ class Server:
 
         dish = Dish.from_path(path=input_path)
 
+        if order_name is None:
+            order_name = uuid.uuid4().hex
+
+        output_filenames = []
+
         # if the order is just togo, don't need the kitchen
         if parsed_vars['order'] == 'togo':
-            self.togo(dish, order_name, unknown)
+            self.order_tickets[order_name] = [Ticket() for i in range(dish.frames)]
+            output_filenames = dish.save_frames(self.cooked_dir, order_name)
         else:
+            frames = dish.frames
+
             self.order_tickets[order_name] = []
 
-            for ticket in self.write_tickets(order_name, dish, input_path, parsed_vars):
+            for ticket in self.write_tickets(dish, input_path, parsed_vars):
                 self.order_tickets[order_name].append(ticket)
-                prefix = os.path.splitext(os.path.basename(
-                    ticket.files[ticket.pierogis[ticket.base].files_key]
-                ))[0]
 
-                Process(target=kitchen.cook_ticket, args=(order_name, prefix, ticket)).start()
+                if not os.path.isdir(self.cooked_dir):
+                    os.makedirs(self.cooked_dir)
 
-            # with concurrent.futures.ProcessPoolExecutor() as executor:
-            #     executor.map(cook_ticket, tickets)
+                if frames > 1:
+                    i = 1
+                    while True:
+                        output_filename = os.path.join(self.cooked_dir, order_name + '-' + str(i) + '.png')
+
+                        if os.path.isfile(output_filename):
+                            break
+
+                        i += 1
+                else:
+                    output_filename = os.path.join(self.cooked_dir, order_name + '.png')
+
+                kitchen.queue_ticket(output_filename, ticket)
+                output_filenames.append(output_filename)
+
+        return output_filenames
 
     def write_tickets(
-            self, order_name: str, dish: Dish, input_path, parsed_vars
+            self, dish: Dish, input_path, parsed_vars
     ) -> Generator[Ticket, None, None]:
         """
         create tickets from a list of pierogis and parsed vars
         """
-        self.remove_order_dir(order_name)
-
-        cooked_order_dir = os.path.join(self.cooked_dir, order_name)
-
-        os.makedirs(cooked_order_dir)
-
         generate_ticket = parsed_vars.pop('generate_ticket')
 
         for frame_index in range(len(dish.pierogis)):
@@ -133,20 +143,14 @@ class Server:
 
             yield ticket
 
-    def remove_order_dir(self, order_name: str):
-        cooked_dir = os.path.join(self.cooked_dir, order_name)
-
-        if os.path.isdir(cooked_dir):
-            for file in os.listdir(cooked_dir):
-                os.remove(os.path.join(cooked_dir, file))
-            os.removedirs(cooked_dir)
-
-    def check_cooked(self, order_name: str) -> int:
-        cooked_order_dir = os.path.join(self.cooked_dir, str(order_name))
-        if os.path.isdir(cooked_order_dir):
-            cooked_tickets = len(os.listdir(cooked_order_dir))
-        else:
-            cooked_tickets = 0
+    def check_order(self, order_name) -> int:
+        cooked_tickets = len(
+            [
+                filename for filename
+                in os.listdir(self.cooked_dir)
+                if filename.startswith(order_name)
+            ]
+        )
 
         order_tickets = self.order_tickets.get(order_name)
         if order_tickets is not None:
@@ -159,7 +163,7 @@ class Server:
 
     def togo(
             self,
-            dish: Dish,
+            input_path: str = None,
             order_name: str = None,
             args: List[str] = None,
             output_filename: str = None,
@@ -170,10 +174,15 @@ class Server:
         """
 
         """
+        if input_path is None:
+            input_path = self.cooked_dir
+
+        dish = Dish.from_path(input_path, order_name)
+
         if args is not None:
             parser = self._create_togo_parser()
 
-            parsed_vars = vars(parser.parse_args(args))
+            parsed_vars = vars(parser.parse_known_args(args)[0])
 
             output_filename = parsed_vars.pop('output_filename')
             fps = parsed_vars.pop('fps')

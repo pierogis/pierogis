@@ -52,6 +52,7 @@ class Ticket:
     describe a dish using a json style object
 
     {
+        "order_name": "order_uuid"
         "pierogis": {
             "pierogi_uuid": {               << PierogiDesc
                 "files_key": "file_uuid"

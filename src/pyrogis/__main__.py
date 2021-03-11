@@ -4,23 +4,26 @@ import time
 from .kitchen import Chef, Server, Kitchen
 
 
-def main(args=None, order_name=None):
+def main(args=None):
     """cli program"""
     if args is None:
         args = sys.argv[1:]
 
     server = Server()
-    if order_name is None:
-        order_name = 'sort'
 
     kitchen = Kitchen(Chef())
-    server.take_orders(order_name, args, kitchen)
 
-    while not server.check_cooked(order_name):
+    order_name = input("What is the name for this order?")
+
+    server.take_order(args, kitchen, order_name)
+
+    while len(server.order_tickets) > 0:
+        for order_name in server.order_tickets.keys():
+            if server.check_order(order_name):
+                server.order_tickets.pop(order_name)
+                server.togo(order_name)
+
         time.sleep(1)
-
-
-    # server.togo(dish, order_name)
 
 
 if __name__ == "__main__":

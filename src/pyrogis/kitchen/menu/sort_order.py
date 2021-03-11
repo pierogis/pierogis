@@ -22,10 +22,6 @@ class SortOrder(MenuItem):
         add the description of a sort from this path to the dish
         """
 
-        ticket = super().generate_ticket(
-            ticket, path, frame_index, target_pierogi_uuid, **kwargs
-        )
-
         turns = kwargs.pop('turns')
         clockwise = kwargs.pop('clockwise')
 
@@ -43,16 +39,6 @@ class SortOrder(MenuItem):
         lower_threshold = kwargs.pop('lower_threshold')
         upper_threshold = kwargs.pop('upper_threshold')
 
-        # create the sort description
-        sort_desc = IngredientDesc(
-            type_name='sort',
-            kwargs={
-                'rotate': rotate_uuid,
-                **kwargs
-            }
-        )
-        sort_uuid = ticket.add_ingredient_desc(sort_desc)
-
         # create threshold desc
         threshold_desc = IngredientDesc(
             type_name='threshold',
@@ -64,11 +50,22 @@ class SortOrder(MenuItem):
         )
         # add seasoning link for threshold to season sort
         season_uuid = ticket.add_ingredient_desc(threshold_desc)
+
+        kwargs['rotate'] = rotate_uuid
+
+        ticket = super().generate_ticket(
+            ticket, path, frame_index, target_pierogi_uuid, **kwargs
+        )
+
+        sort_uuid = ticket.recipe[-1]
+
         ticket.add_seasoning_link(season_uuid, sort_uuid)
 
-        ticket.extend_recipe([sort_uuid])
-
         return ticket
+
+    # put everything in cooked
+    # if input dish was many, tell chef/kitchen to append a frame number
+    #
 
     @classmethod
     def add_parser_arguments(cls, parser):
