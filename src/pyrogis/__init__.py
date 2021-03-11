@@ -180,8 +180,6 @@ from .ingredients import Sort
 from .ingredients import SpatialQuantize
 from .ingredients import Threshold
 
-__version__ = '0.2.0'
-
 __all__ = [
     'Pierogi',
     'Dish',
