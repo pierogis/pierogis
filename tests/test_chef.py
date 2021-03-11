@@ -45,7 +45,7 @@ def cooked_dir():
 
 @pytest.fixture
 def chef(cooked_dir):
-    return Chef(cooked_dir)
+    return Chef()
 
 
 @pytest.fixture
@@ -151,35 +151,16 @@ def test_assemble_dish(chef, ticket):
     order_name = 'test_assemble_dish'
     dish = chef.assemble_ticket(ticket, menu)
 
-
-@pytest.mark.asyncio
-async def test_cook_dish_image(chef, image_dish):
-    order_name = 'test_cook_dish'
-
-    order_dir = os.path.join('cooked', order_name)
-    output_filename = 'cooked.png'
-    await chef.cook_dish(order_name, output_filename, image_dish)
-
-    output_path = os.path.join(order_dir, output_filename)
-
-    assert os.path.isdir(order_dir)
-    assert os.path.isfile(output_path)
-
-    os.remove(output_path)
-    os.removedirs(order_dir)
+    assert dish
 
 
-@pytest.mark.asyncio
-async def test_cook_dish_animation(chef, cooked_dir, animation_dish):
-    order_name = 'test_cook_dish'
+def test_cook_dish_image(chef, image_dish):
+    dish = chef.cook_dish(image_dish)
 
-    output_filename = 'cooked.gif'
-    await chef.cook_dish(order_name, output_filename, animation_dish)
+    assert dish
 
-    order_dir = os.path.join(cooked_dir, order_name)
-    output_path = os.path.join(order_dir, output_filename)
 
-    assert os.path.isfile(output_path)
+def test_cook_dish_animation(chef, cooked_dir, animation_dish):
+    dish = chef.cook_dish(animation_dish)
 
-    os.remove(output_path)
-    os.removedirs(order_dir)
+    assert dish

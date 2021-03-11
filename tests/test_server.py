@@ -70,30 +70,23 @@ def kitchen():
 
 
 def test_write_tickets_image(server: Server, image_file, image_dish: Dish, parsed_vars):
-    order_name = 'test_server_write_tickets_image'
-
-    tickets = list(server.write_tickets(order_name, image_dish, image_file, parsed_vars))
+    tickets = list(server.write_tickets(image_dish, image_file, parsed_vars))
 
     assert len(tickets) == 1
 
 
 def test_write_tickets_animation(server, animation_file, animation_dish, parsed_vars):
-    order_name = 'test_server_write_tickets_animation'
-
     tickets = list(server.write_tickets(animation_dish, animation_file, parsed_vars))
 
     assert len(tickets) > 1
 
 
 def test_togo_gif(server):
-    order_name = 'test_togo_gif'
-    input_path = 'resources/octo.mp4'
+    input_path = 'resources/octo.gif'
     output_filename = 'output.gif'
     optimize = True
-    dish = Dish.from_path(path=input_path)
     output_path = server.togo(
-        dish,
-        order_name,
+        input_path=input_path,
         output_filename=output_filename,
         fps=25,
         optimize=optimize
@@ -105,14 +98,11 @@ def test_togo_gif(server):
 
 
 def test_togo_mp4(server):
-    order_name = 'test_togo_gif'
     input_path = 'resources/octo.mp4'
     output_filename = 'output.mp4'
     optimize = True
-    dish = Dish.from_path(path=input_path)
     output_path = server.togo(
-        dish,
-        order_name,
+        input_path=input_path,
         output_filename=output_filename,
         fps=25,
         optimize=optimize
@@ -124,13 +114,11 @@ def test_togo_mp4(server):
 
 
 def test_togo_dir(server):
-    order_name = 'test_togo_dir'
     input_path = 'resources/frames'
     output_filename = 'output.mp4'
     optimize = True
     output_path = server.togo(
         input_path=input_path,
-        order_name=order_name,
         output_filename=output_filename,
         fps=25,
         optimize=optimize
@@ -152,7 +140,7 @@ def test_check_cooked(server):
 def take_order(server, kitchen, args, order_name):
     output_filenames = server.take_order(args, kitchen, order_name)
 
-    time.sleep(2)
+    time.sleep(1)
 
     for output_filename in output_filenames:
         assert os.path.isfile(output_filename)
@@ -269,23 +257,23 @@ def test_take_order_chef_txt(server, kitchen):
 
     order_name = 'chef'
 
-    take_order(args, order_name)
+    take_order(server, kitchen, args, order_name)
 
 
-def test_take_order_plate():
+def test_take_order_togo(server, kitchen):
     args = ["togo", "resources/frames"]
 
     order_name = 'togo'
 
-    take_order(args, order_name)
+    take_order(server, kitchen, args, order_name)
 
 
-def test_take_order_plate_options():
-    args = ["togo", "resources", "--fps", "25", "--duration", "20", "--no-optimize"]
+def test_take_order_togo_options(server, kitchen):
+    args = ["togo", "resources/frames", "--fps", "25", "--duration", "20", "--no-optimize"]
 
     order_name = 'togo'
 
-    take_order(args, order_name)
+    take_order(server, kitchen, args, order_name)
 
 
 # def test_take_order_image_with_output():
@@ -296,14 +284,14 @@ def test_take_order_plate_options():
 #     take_order(args, order_name)
 
 
-def test_take_order_animation():
+def test_take_order_animation(server, kitchen):
     """
     test making an animation order
     """
     args = ["resize", "resources/octo.mp4"]
     order_name = 'resize'
 
-    take_order(args, order_name)
+    take_order(server, kitchen, args, order_name)
 
 # def test_take_order_animation_with_output_gif():
 #     """

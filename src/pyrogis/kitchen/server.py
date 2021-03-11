@@ -106,6 +106,7 @@ class Server:
 
             self.order_tickets[order_name] = []
 
+            frame_index = 1
             for ticket in self.write_tickets(dish, input_path, parsed_vars):
                 self.order_tickets[order_name].append(ticket)
 
@@ -113,14 +114,12 @@ class Server:
                     os.makedirs(self.cooked_dir)
 
                 if frames > 1:
-                    i = 1
-                    while True:
-                        output_filename = os.path.join(self.cooked_dir, order_name + '-' + str(i) + '.png')
+                    output_filename = os.path.join(
+                        self.cooked_dir,
+                        order_name + '-' + str(frame_index) + '.png'
+                    )
 
-                        if os.path.isfile(output_filename):
-                            break
-
-                        i += 1
+                    frame_index += 1
                 else:
                     output_filename = os.path.join(self.cooked_dir, order_name + '.png')
 

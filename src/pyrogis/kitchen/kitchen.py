@@ -21,6 +21,5 @@ class Kitchen:
 
         cooked_dish.save(output_filename)
 
-    def queue_ticket(self, output_filename, ticket):
-        self.cook_ticket(output_filename, ticket)
-        # Process(target=self.cook_ticket, args=(output_filename, ticket)).start()
+    def queue_ticket(self, output_filename: str, ticket: Ticket):
+        Process(target=self.cook_ticket, args=(output_filename, ticket)).start()

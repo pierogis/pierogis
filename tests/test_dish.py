@@ -10,7 +10,6 @@ def array():
                        [[130, 130, 130], [60, 60, 60]]]).astype(np.dtype('uint8'))
 
 
-
 @pytest.fixture
 def image_file():
     return 'resources/gnome.jpg'
@@ -43,8 +42,8 @@ def test_dish_from_path_image(image_file):
 
     assert len(dish.pierogis) == 1
 
+
 def test_dish_from_path_animation(animation_file):
     dish = Dish.from_path(path=animation_file)
 
     assert len(dish.pierogis) > 1
-
