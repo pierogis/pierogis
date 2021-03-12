@@ -23,6 +23,7 @@ jobs:
   macos-arm-build:
     runs-on: [ "self-hosted", "macos" ]
     continue-on-error: true
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v1
       - name: build wheels
