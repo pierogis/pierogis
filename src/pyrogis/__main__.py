@@ -20,7 +20,7 @@ def main(args=None):
     for order_name in server.order_names:
         while True:
             if server.check_order(order_name):
-                server.togo(order_name=order_name)
+                server.togo(args=args, order_name=order_name)
                 break
             else:
                 time.sleep(1)

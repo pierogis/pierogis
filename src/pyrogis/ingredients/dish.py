@@ -122,6 +122,7 @@ class Dish(Ingredient):
             if not os.path.isfile(file_path):
                 continue
 
+            # files are loaded just to check if valid and this thread is probably blocking
             def target():
                 pierogi = cls._file_loader(file_path)[0]
                 pierogi.load()

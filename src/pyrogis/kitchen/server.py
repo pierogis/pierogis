@@ -37,6 +37,9 @@ class Server:
             'path',
             default='./',
             help="path to file or directory to use as input")
+        base_parser.add_argument(
+            '--order-name',
+            help="path to file or directory to use as input")
 
         subparsers.add_parser('togo', parents=[base_parser], add_help=False)
 
@@ -93,17 +96,18 @@ class Server:
         # need the path to use as input for some recipes
         # like opening files for ingredients
         input_path = parsed_vars.pop('path')
+        order_name = parsed_vars.pop('order_name')
 
-        dish = Dish.from_path(path=input_path)
+        dish = Dish.from_path(path=input_path, order_name=order_name)
 
-        order_name = os.path.splitext(os.path.basename(input_path))[0]
+        if order_name is None:
+            order_name = os.path.splitext(os.path.basename(input_path))[0]
 
         output_filenames = []
 
         # if the order is just togo, don't need the kitchen
         if parsed_vars['order'] == 'togo':
-            self.order_tickets[order_name] = [Ticket() for i in range(dish.frames)]
-            output_filenames = dish.save_frames(self.cooked_dir, order_name)
+            self.togo(input_path=input_path, order_name=order_name, args=args)
         else:
             frames = dish.frames
 
