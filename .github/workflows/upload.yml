@@ -1,8 +1,6 @@
 name: upload pyrogis
 
 on:
-  push:
-    branches: [ develop ]
   release:
     types: [ created ]
 
@@ -102,14 +100,6 @@ jobs:
       - name: create source distribution
         run: |
           python setup.py sdist
-
-      - name: publish to test pypi
-        if: "startsWith(github.ref, 'refs/heads/develop')"
-        env:
-          PYPI_TOKEN: ${{ secrets.PYPI_TEST_TOKEN }}
-        run: |
-          pip install twine
-          twine upload --repository testpypi dist/* -u __token__ -p "$PYPI_TOKEN"
 
       - name: publish to pypi
         if: "startsWith(github.ref, 'refs/tags')"
