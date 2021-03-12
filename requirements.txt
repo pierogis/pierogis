@@ -1,6 +1,7 @@
 Pillow>=8.0.1
 numpy>=1.19.4
 setuptools-rust>=0.11.6
+setuptools-scm>=3.4
 imageio>=2.9.0
 imageio-ffmpeg>=0.4.3
 pygifsicle>=1.0.2
