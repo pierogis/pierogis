@@ -1,0 +1,77 @@
+name: test pyrogis
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: install rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.platform.rust-target }}
+          profile: minimal
+          default: true
+          components: rustfmt, clippy
+
+      - name: fmt rust
+        uses: actions-rs/cargo@v1
+        continue-on-error: true
+        with:
+          toolchain: stable
+          command: fmt
+          args: --manifest-path ./Cargo.toml -- --check
+
+      - name: clippy rust
+        uses: actions-rs/cargo@v1
+        continue-on-error: true
+        with:
+          command: clippy
+          args: --manifest-path ./Cargo.toml --all-targets --all-features -- -D warnings
+
+      - name: create pyrogis environment
+        run: |
+          python -m venv .env
+          source .env/bin/activate
+          sudo apt-get install -y gifsicle
+          pip install wheel
+          pip install -r requirements.txt
+          pip install .
+
+      - name: flake8 python
+        continue-on-error: true
+        run: |
+          source .env/bin/activate
+          pip install flake8
+          flake8 src/pyrogis
+
+      - name: pylint python
+        continue-on-error: true
+        run: |
+          source .env/bin/activate
+          pip install pylint
+          pylint src/pyrogis
+
+      - name: run mypy
+        continue-on-error: true
+        run: |
+          source .env/bin/activate
+          pip install mypy
+          mypy src/pyrogis
+
+      - name: run tests
+        run: |
+          source .env/bin/activate
+          pip install pytest
+          pytest -s -v tests
