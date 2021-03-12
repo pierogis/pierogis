@@ -1,8 +1,7 @@
-from multiprocessing import Process
-from threading import Thread
+import multiprocessing  as mp
 
-from .ticket import Ticket
 from .menu import menu
+from .ticket import Ticket
 
 
 class Kitchen:
@@ -10,6 +9,8 @@ class Kitchen:
 
     def __init__(self, chef):
         self.chef = chef
+        mp.set_start_method('spawn')
+        self.pool = mp.Pool()
 
     def cook_ticket(self, output_filename: str, ticket: Ticket):
         """
@@ -22,4 +23,15 @@ class Kitchen:
         cooked_dish.save(output_filename)
 
     def queue_ticket(self, output_filename: str, ticket: Ticket):
-        Process(target=self.cook_ticket, args=(output_filename, ticket)).start()
+        self.pool.apply_async(func=self.cook_ticket, args=(output_filename, ticket))
+
+    def close(self):
+        self.pool.close()
+
+    def __getstate__(self):
+        self_dict = self.__dict__.copy()
+        del self_dict['pool']
+        return self_dict
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)

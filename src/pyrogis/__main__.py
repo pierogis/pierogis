@@ -13,17 +13,17 @@ def main(args=None):
 
     kitchen = Kitchen(Chef())
 
-    order_name = input("What is the name for this order?\n")
+    server.take_order(args, kitchen)
 
-    server.take_order(args, kitchen, order_name)
+    kitchen.close()
 
-    while len(server.order_tickets) > 0:
-        for order_name in server.order_tickets.keys():
+    for order_name in server.order_names:
+        while True:
             if server.check_order(order_name):
-                server.order_tickets.pop(order_name)
-                server.togo(order_name)
-
-        time.sleep(1)
+                server.togo(order_name=order_name)
+                break
+            else:
+                time.sleep(1)
 
 
 if __name__ == "__main__":

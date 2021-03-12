@@ -21,7 +21,8 @@ setup(
         'numpy>=1.20.1',
         'imageio>=2.9.0',
         'imageio-ffmpeg>=0.4.3',
-        'pygifsicle>=1.0.2'
+        'pygifsicle>=1.0.2',
+        'natsort>=7.1.1'
     ],
     rust_extensions=[
         RustExtension("pierogis_rs", binding=Binding.PyO3)

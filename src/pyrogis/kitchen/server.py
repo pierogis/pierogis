@@ -2,8 +2,8 @@
 parsing
 """
 import argparse
+import math
 import os
-import uuid
 from typing import List, Dict, Generator
 
 from .kitchen import Kitchen
@@ -13,6 +13,10 @@ from ..ingredients import Dish
 
 class Server:
     order_tickets: Dict[str, List[Ticket]]
+
+    @property
+    def order_names(self):
+        return self.order_tickets.keys()
 
     def __init__(self, cooked_dir: str = 'cooked'):
         self.cooked_dir = cooked_dir
@@ -75,7 +79,7 @@ class Server:
 
         return togo_parser
 
-    def take_order(self, args: List[str], kitchen: Kitchen, order_name: str = None) -> List[str]:
+    def take_order(self, args: List[str], kitchen: Kitchen) -> List[str]:
         """
         use a chef to parse list of strings into Tickets
         """
@@ -92,8 +96,7 @@ class Server:
 
         dish = Dish.from_path(path=input_path)
 
-        if order_name is None:
-            order_name = uuid.uuid4().hex
+        order_name = os.path.splitext(os.path.basename(input_path))[0]
 
         output_filenames = []
 
@@ -107,17 +110,24 @@ class Server:
             self.order_tickets[order_name] = []
 
             frame_index = 1
+            digits = math.floor(math.log(frames, 10)) + 1
+
+            if not frames > 0 and os.path.isdir(self.cooked_dir):
+                os.makedirs(self.cooked_dir)
+
             for ticket in self.write_tickets(dish, input_path, parsed_vars):
                 self.order_tickets[order_name].append(ticket)
 
-                if not os.path.isdir(self.cooked_dir):
-                    os.makedirs(self.cooked_dir)
-
                 if frames > 1:
+                    padded_frame_index = str(frame_index).zfill(digits)
+
                     output_filename = os.path.join(
                         self.cooked_dir,
-                        order_name + '-' + str(frame_index) + '.png'
+                        order_name + '-' + padded_frame_index + '.png'
                     )
+
+                    if os.path.isfile(output_filename):
+                        os.remove(output_filename)
 
                     frame_index += 1
                 else:
@@ -166,7 +176,7 @@ class Server:
             order_name: str = None,
             args: List[str] = None,
             output_filename: str = None,
-            fps: float = None,
+            fps: float = 25,
             optimize: bool = None,
             frame_duration: int = None,
     ) -> str:

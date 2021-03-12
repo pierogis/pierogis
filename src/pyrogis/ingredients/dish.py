@@ -6,6 +6,7 @@ from typing import List, Callable
 import imageio as imageio
 import numpy as np
 from PIL import UnidentifiedImageError
+from natsort import natsorted
 
 from .ingredient import Ingredient
 from .pierogi import Pierogi
@@ -110,10 +111,10 @@ class Dish(Ingredient):
         pierogis = []
 
         if order_name is None:
-            files = sorted(os.listdir(dir))
+            files = natsorted(os.listdir(dir))
 
         else:
-            files = sorted([filename for filename in os.listdir(dir) if filename.startswith(order_name)])
+            files = natsorted([filename for filename in os.listdir(dir) if filename.startswith(order_name)])
 
         for file in files:
             file_path = os.path.join(dir, file)
