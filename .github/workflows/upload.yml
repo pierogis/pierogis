@@ -16,7 +16,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
-          DIST_DIR: ${{ github.sha }}
 
   macos-arm-build:
     runs-on: [ "self-hosted", "macos" ]
@@ -30,7 +29,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
-          DIST_DIR: ${{ github.sha }}
 
   macos-windows-build:
     runs-on: ${{ matrix.platform.os }}
@@ -70,9 +68,9 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
-          DIST_DIR: ${{ github.sha }}
         run: |
           pip install -U awscli
+          export DIST_DIR = $(python setup.py -V)
           python -m awscli s3 sync --exact-timestamps ./dist "s3://pierogis/dist/$DIST_DIR"
 
   publish:
@@ -84,19 +82,21 @@ jobs:
       - name: install python
         uses: actions/setup-python@v2
 
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
       - name: retrieve all wheels
         shell: bash
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
-          DIST_DIR: ${{ github.sha }}
         run: |
           pip install awscli
+          export DIST_DIR = $(python setup.py -V)
           aws s3 sync "s3://pierogis/dist/$DIST_DIR" ./dist
-      - name: Install dependencies
-        run: |
-          pip install setuptools wheel setuptools-rust
+
       - name: create source distribution
         run: |
           python setup.py sdist

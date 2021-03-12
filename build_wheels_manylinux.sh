@@ -18,4 +18,5 @@ rm dist/*-linux_*
 
 # Upload wheels
 /opt/python/cp37-cp37m/bin/pip install -U awscli
+export DIST_DIR=$(/opt/python/cp37-cp37m/bin/python setup.py -V)
 /opt/python/cp37-cp37m/bin/python -m awscli s3 sync --exact-timestamps ./dist "s3://pierogis/dist/$DIST_DIR"
