@@ -100,15 +100,16 @@ class Server:
 
         dish = Dish.from_path(path=input_path, order_name=order_name)
 
-        if order_name is None:
-            order_name = os.path.splitext(os.path.basename(input_path))[0]
-
         output_filenames = []
 
         # if the order is just togo, don't need the kitchen
         if parsed_vars['order'] == 'togo':
-            self.togo(input_path=input_path, order_name=order_name, args=args)
+            output_filename = self.togo(input_path=input_path, order_name=order_name, args=unknown)
+            output_filenames = [output_filename]
         else:
+            if order_name is None:
+                order_name = os.path.splitext(os.path.basename(input_path))[0]
+
             frames = dish.frames
 
             self.order_tickets[order_name] = []
@@ -207,6 +208,8 @@ class Server:
             pass
 
         if output_filename is None:
+            if order_name is None:
+                order_name = os.path.splitext(os.path.basename(input_path))[0]
             if dish.frames == 1:
                 output_filename = order_name + '.png'
             else:

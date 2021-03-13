@@ -69,7 +69,7 @@ class Dish(Ingredient):
 
     @classmethod
     def _file_loader(cls, file: str) -> List[Pierogi]:
-        reader = imageio.get_reader(file, 'ffmpeg')
+        reader = imageio.get_reader(file)
         frames = reader.get_length()
 
         # first try to load as video/animation
@@ -82,7 +82,7 @@ class Dish(Ingredient):
         else:
             pierogis = []
 
-            for frame_index in frames:
+            for frame_index in range(frames):
                 pierogis.append(
                     Pierogi.from_path(file, frame_index)
                 )

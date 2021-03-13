@@ -9,7 +9,6 @@ class Kitchen:
 
     def __init__(self, chef):
         self.chef = chef
-        mp.set_start_method('spawn')
         self.pool = mp.Pool()
 
     def cook_ticket(self, output_filename: str, ticket: Ticket):

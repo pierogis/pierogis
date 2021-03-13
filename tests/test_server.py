@@ -66,7 +66,7 @@ def dir_args() -> List[str]:
 
 @pytest.fixture
 def kitchen():
-    return Kitchen(Chef())
+    return Kitchen(Chef)
 
 
 def test_write_tickets_image(server: Server, image_file, image_dish: Dish, parsed_vars):
@@ -137,10 +137,13 @@ def test_check_cooked(server):
 
 # take_order
 
-def take_order(server, kitchen, args, order_name):
-    output_filenames = server.take_order(args, kitchen, order_name)
+def run_take_order(server: Server, kitchen: Kitchen, args: List[str]):
+    """
 
-    time.sleep(1)
+    """
+    output_filenames = server.take_order(args, kitchen)
+
+    time.sleep(.5)
 
     for output_filename in output_filenames:
         assert os.path.isfile(output_filename)
@@ -150,9 +153,7 @@ def take_order(server, kitchen, args, order_name):
 def test_take_order_sort(server, kitchen):
     args = ["sort", "resources/gnome.jpg"]
 
-    order_name = 'sort'
-
-    take_order(server, kitchen, args, order_name)
+    run_take_order(server, kitchen, args)
 
 
 def test_take_order_sort_options(server, kitchen):
@@ -161,17 +162,12 @@ def test_take_order_sort_options(server, kitchen):
     """
     args = ["sort", "resources/gnome.jpg", "-u", "120", "-l", "20", "-t", "2", "--ccw"]
 
-    order_name = 'sort'
-
-    take_order(server, kitchen, args, order_name)
+    run_take_order(server, kitchen, args)
 
 
 def test_take_order_quantize(server, kitchen):
     args = ["quantize", "resources/gnome.jpg"]
-
-    order_name = 'quantize'
-
-    take_order(server, kitchen, args, order_name)
+    run_take_order(server, kitchen, args)
 
 
 def test_take_order_quantize_options(server, kitchen):
@@ -189,17 +185,13 @@ def test_take_order_quantize_options(server, kitchen):
         "--dithering-level", "0.5",
     ]
 
-    order_name = 'quantize'
-
-    take_order(server, kitchen, args, order_name)
+    run_take_order(server, kitchen, args)
 
 
 def test_take_order_threshold(server, kitchen):
     args = ["threshold", "resources/gnome.jpg"]
 
-    order_name = 'threshold'
-
-    take_order(server, kitchen, args, order_name)
+    run_take_order(server, kitchen, args)
 
 
 def test_take_order_threshold_options(server, kitchen):
@@ -214,17 +206,13 @@ def test_take_order_threshold_options(server, kitchen):
         "-e", "333433"
     ]
 
-    order_name = 'threshold'
-
-    take_order(server, kitchen, args, order_name)
+    run_take_order(server, kitchen, args)
 
 
-def test_take_order_resize(server, kitchen):
+def test_take_order(server, kitchen):
     args = ["resize", "resources/gnome.jpg"]
 
-    order_name = 'resize'
-
-    take_order(server, kitchen, args, order_name)
+    run_take_order(server, kitchen, args)
 
 
 def test_take_order_resize_options(server, kitchen):
@@ -239,41 +227,38 @@ def test_take_order_resize_options(server, kitchen):
         "-r", "bicubic"
     ]
 
-    order_name = 'resize'
-
-    take_order(server, kitchen, args, order_name)
+    run_take_order(server, kitchen, args)
 
 
 def test_take_order_chef(server, kitchen):
     args = ["chef", "resources/gnome.jpg", "sort; quantize"]
 
-    order_name = 'chef'
-
-    take_order(server, kitchen, args, order_name)
+    run_take_order(server, kitchen, args)
 
 
 def test_take_order_chef_txt(server, kitchen):
     args = ["chef", "resources/gnome.jpg", "resources/recipe.txt"]
 
-    order_name = 'chef'
-
-    take_order(server, kitchen, args, order_name)
+    run_take_order(server, kitchen, args)
 
 
 def test_take_order_togo(server, kitchen):
     args = ["togo", "resources/frames"]
 
-    order_name = 'togo'
-
-    take_order(server, kitchen, args, order_name)
+    run_take_order(server, kitchen, args)
 
 
 def test_take_order_togo_options(server, kitchen):
-    args = ["togo", "resources/frames", "--fps", "25", "--duration", "20", "--no-optimize"]
+    args = [
+        "togo", "resources/frames",
+        "--fps", "25",
+        "--duration", "20",
+        "--no-optimize",
+        "--output", "frames.mp4",
+        "--order-name", "octo"
+    ]
 
-    order_name = 'togo'
-
-    take_order(server, kitchen, args, order_name)
+    run_take_order(server, kitchen, args)
 
 
 # def test_take_order_image_with_output():
@@ -289,9 +274,8 @@ def test_take_order_animation(server, kitchen):
     test making an animation order
     """
     args = ["resize", "resources/octo.mp4"]
-    order_name = 'resize'
 
-    take_order(server, kitchen, args, order_name)
+    run_take_order(server, kitchen, args)
 
 # def test_take_order_animation_with_output_gif():
 #     """

@@ -1,5 +1,3 @@
-import os
-from threading import Thread
 from typing import Dict, List
 
 from .menu import MenuItem
@@ -17,8 +15,9 @@ class Chef:
     and cooking a parsed representation
     """
 
+    @classmethod
     def create_pierogi_objects(
-            self,
+            cls,
             pierogi_descs: Dict[str, PierogiDesc],
             files: Dict[str, str]
     ) -> Dict[str, Pierogi]:
@@ -35,8 +34,9 @@ class Chef:
 
         return pierogi_objects
 
+    @classmethod
     def create_ingredient_objects(
-            self,
+            cls,
             ingredient_descs: Dict[str, IngredientDesc],
             pierogis: Dict[str, Pierogi],
             menu: Dict[str, MenuItem]
@@ -59,7 +59,7 @@ class Chef:
                 pierogi = pierogis[pierogi_name]
                 ingredient_desc.kwargs['pierogi'] = pierogi
 
-            ingredient = self.get_ingredient(
+            ingredient = cls.get_ingredient(
                 ingredients, ingredient_descs, ingredient_name, menu
             )
 
@@ -67,8 +67,9 @@ class Chef:
 
         return ingredients
 
+    @classmethod
     def get_ingredient(
-            self,
+            cls,
             ingredients: dict,
             ingredient_descs: Dict[str, IngredientDesc],
             ingredient_name: str,
@@ -92,7 +93,7 @@ class Chef:
                 )
 
                 if ingredient_name is not None:
-                    ingredient = self.get_ingredient(
+                    ingredient = cls.get_ingredient(
                         ingredients, ingredient_descs, ingredient_name, menu
                     )
                     ingredient_desc.kwargs[ingredient_type_name] = ingredient
@@ -102,15 +103,17 @@ class Chef:
 
         return ingredient
 
-    def apply_seasonings(self, ingredients, seasoning_links) -> None:
+    @classmethod
+    def apply_seasonings(cls, ingredients, seasoning_links) -> None:
         for seasoning, recipient in seasoning_links.items():
             seasoning = ingredients[seasoning]
             recipient = ingredients[recipient]
 
             recipient.season(seasoning)
 
+    @classmethod
     def create_recipe_object(
-            self,
+            cls,
             ingredients: Dict[str, Ingredient],
             recipe_order: List[str]
     ) -> Recipe:
@@ -136,7 +139,8 @@ class Chef:
 
         return recipe
 
-    def assemble_ticket(self, ticket: Ticket, menu: Dict) -> Dish:
+    @classmethod
+    def assemble_ticket(cls, ticket: Ticket, menu: Dict) -> Dish:
         """
         cook a dish from a series of descriptive dicts
         """
@@ -147,23 +151,23 @@ class Chef:
         base = ticket.base
         seasoning_links = ticket.seasoning_links
 
-        pierogis = self.create_pierogi_objects(
+        pierogis = cls.create_pierogi_objects(
             pierogi_descs,
             files
         )
 
-        ingredients = self.create_ingredient_objects(
+        ingredients = cls.create_ingredient_objects(
             ingredient_descs,
             pierogis,
             menu
         )
 
-        self.apply_seasonings(
+        cls.apply_seasonings(
             ingredients,
             seasoning_links
         )
 
-        recipe_object = self.create_recipe_object(
+        recipe_object = cls.create_recipe_object(
             ingredients,
             recipe
         )
@@ -173,8 +177,9 @@ class Chef:
             recipe=recipe_object
         )
 
+    @classmethod
     def cook_dish(
-            self,
+            cls,
             dish: Dish
     ) -> Dish:
         """
