@@ -188,7 +188,6 @@ class Dish(Ingredient):
 
         for frame in range(self.frames):
             pierogi = self.pierogis[frame]
-            a = np.average(pierogi.pixels)
             # cook with these pixels as first input
             recipe = self.recipe(frame + 1, self.frames)
             cooked_pixels = recipe.cook(pierogi.pixels)
@@ -206,7 +205,7 @@ class Dish(Ingredient):
             path: str,
             optimize: bool = True,
             duration: float = None,
-            fps: float = 25
+            fps: float = None
     ) -> None:
         """
         :param duration: ms duration between frames
@@ -215,6 +214,9 @@ class Dish(Ingredient):
             ims = [np.asarray(pierogi.image) for pierogi in self.pierogis]
             if duration is not None:
                 fps = 1000 / duration
+
+            if fps is None:
+                fps = 30
 
             imageio.mimwrite(
                 path,

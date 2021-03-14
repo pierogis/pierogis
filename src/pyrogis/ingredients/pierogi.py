@@ -88,7 +88,7 @@ class Pierogi(Ingredient):
         def loader():
             reader = imageio.get_reader(path)
             reader.set_image_index(frame_index)
-            return np.rot90(np.array(reader.get_next_data()), axes=(1, 0))
+            return np.rot90(np.array(reader.get_next_data())[:,:,:3], axes=(1, 0))
 
         return cls(loader=loader)
 
@@ -171,10 +171,11 @@ class Pierogi(Ingredient):
         >    If omitted, or if the image has mode “1” or “P”, it is set PIL.Image.NEAREST."
         """
 
-        self._pixels = np.array(
-            Image.fromarray(
-                self.pixels
-            ).resize(
-                (height, width), resample
+        if height != self.height and width != self.width:
+            self._pixels = np.array(
+                Image.fromarray(
+                    self.pixels
+                ).resize(
+                    (height, width), resample
+                )
             )
-        )

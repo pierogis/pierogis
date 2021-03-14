@@ -5,9 +5,7 @@ import argparse
 import math
 import os
 import time
-from typing import List, Generator
-
-from rich.progress import Progress
+from typing import List, Generator, Callable
 
 from .kitchen import Kitchen
 from .order import Order
@@ -86,15 +84,22 @@ class Server:
 
         return togo_parser
 
-    def take_order(self, args: List[str], kitchen: Kitchen) -> List[str]:
+    def take_order(
+            self, args: List[str], kitchen: Kitchen,
+            update_cook_task: Callable = None,
+            update_order_status: Callable = None
+    ) -> List[str]:
         """
         use a chef to parse list of strings into Tickets
         """
 
-        parser = self._create_parser(kitchen.menu)
+        togo_parser = self._create_togo_parser()
+        parsed, unknown = togo_parser.parse_known_args(args)
+        parsed_togo_vars = vars(parsed)
 
+        parser = self._create_parser(kitchen.menu)
         # parse the input args with the applicable arguments attached
-        parsed, unknown = parser.parse_known_args(args)
+        parsed = parser.parse_args(unknown)
         parsed_vars = vars(parsed)
 
         # need the path to use as input for some recipes
@@ -106,22 +111,37 @@ class Server:
 
         output_filenames = []
 
+        output_filename = parsed_togo_vars.pop('output_filename')
+        fps = parsed_togo_vars.pop('fps')
+        optimize = parsed_togo_vars.pop('optimize')
+        frame_duration = parsed_togo_vars.pop('frame_duration')
+
+        if fps is None:
+            fps = dish.fps
+
+        order = Order(
+            order_name,
+            fps=fps,
+            output_filename=output_filename,
+            optimize=optimize,
+            duration=frame_duration
+        )
+
         # if the order is just togo, don't need the kitchen
         if parsed_vars['order'] == 'togo':
             output_filename = self.togo(
+                order=order,
                 input_path=input_path,
-                order_name=order_name,
-                args=unknown,
-                fps=dish.fps
             )
             output_filenames = [output_filename]
         else:
-            if order_name is None:
-                order_name = os.path.splitext(os.path.basename(input_path))[0]
+            if order.order_name is None:
+                order.order_name = os.path.splitext(os.path.basename(input_path))[0]
 
             frames = dish.frames
 
-            order = Order(order_name)
+            if update_cook_task is not None:
+                update_cook_task(total=frames, description=order.order_name)
 
             frame_index = 1
             digits = math.floor(math.log(frames, 10)) + 1
@@ -130,32 +150,51 @@ class Server:
                 if not os.path.isdir(self.cooked_dir):
                     os.makedirs(self.cooked_dir)
 
-            order.fps = dish.fps
+            queueing = False
 
-            with Progress() as progress:
-                queue_ticket_task = progress.add_task('Queueing tickets...', total=frames)
-                for ticket in self.write_tickets(dish, input_path, parsed_vars):
-                    order.add_ticket(ticket)
+            for ticket in self.write_tickets(dish, input_path, parsed_vars):
+                order.add_ticket(ticket)
 
-                    if frames > 1:
-                        padded_frame_index = str(frame_index).zfill(digits)
+                if frames > 1:
+                    padded_frame_index = str(frame_index).zfill(digits)
 
-                        output_filename = os.path.join(
-                            self.cooked_dir,
-                            order_name + '-' + padded_frame_index + '.png'
-                        )
+                    output_filename = os.path.join(
+                        self.cooked_dir,
+                        order.order_name + '-' + padded_frame_index + '.png'
+                    )
 
-                        if os.path.isfile(output_filename):
-                            os.remove(output_filename)
+                    if os.path.isfile(output_filename):
+                        os.remove(output_filename)
 
-                        frame_index += 1
-                    else:
-                        output_filename = os.path.join(self.cooked_dir, order_name + '.png')
+                    frame_index += 1
+                else:
+                    output_filename = os.path.join(self.cooked_dir, order.order_name + '.png')
+
+                if frame_index < 10:
+                    if update_order_status is not None:
+                        update_order_status(description='pilot')
+
+                    start = time.perf_counter()
+                    kitchen.cook_ticket(output_filename, ticket)
+                    elapsed = time.perf_counter() - start
+                    order.smooth_cook_rate(1 / elapsed)
+
+                    if update_cook_task is not None:
+                        update_cook_task(advance=1, cook_rate=order.cook_rate)
+
+                    if frame_index > 10 and order.cook_rate > 10:
+                        if update_order_status is not None:
+                            update_order_status(description='cooking')
+
+                else:
+                    if not queueing:
+                        queueing = True
+                        if update_order_status is not None:
+                            update_order_status(description='queueing')
 
                     kitchen.queue_ticket(output_filename, ticket)
-                    output_filenames.append(output_filename)
 
-                    progress.update(queue_ticket_task, advance=1, refresh=True)
+                output_filenames.append(output_filename)
 
             self.orders.append(order)
 
@@ -195,60 +234,69 @@ class Server:
 
         return cooked_tickets
 
-    def check_order(self, order: Order, args: List[str]):
-        """"""
-        total = self.order_size(order)
-        with Progress() as progress:
-            cook_task = progress.add_task("[cyan]Cooking tickets...", total=total)
-            while True:
-                completed = self.cooked_tickets(order)
-                progress.update(cook_task, completed=completed, refresh=True)
+    def check_order(
+            self,
+            order: Order,
+            timeout: float = 1200,
+            update_callback=None
+    ):
 
-                if completed == total:
-                    self.togo(args=args, order=order)
-                    break
+        """"""
+
+        total = self.order_size(order)
+
+        retries = 0
+        wait_time = 1
+        last_completed = None
+
+        while True:
+            completed = self.cooked_tickets(order)
+            if update_callback is not None:
+                if last_completed is not None:
+                    order.smooth_cook_rate((completed - last_completed) / wait_time)
+                    update_callback(completed=completed, cook_rate=order.cook_rate)
                 else:
-                    time.sleep(1)
+                    update_callback(completed=completed)
+
+            if completed == total:
+                success = True
+                break
+            # elif retries * wait_time > timeout:
+            #     success = False
+            #     break
+            else:
+                time.sleep(wait_time)
+
+            last_completed = completed
+            retries += 1
+
+        return success
 
     def togo(
             self,
+            order: Order,
             input_path: str = None,
-            order: Order = None,
-            args: List[str] = None,
-            output_filename: str = None,
-            fps: float = 25,
-            optimize: bool = None,
-            frame_duration: int = None,
     ) -> str:
-        """
-
-        """
+        """"""
         if input_path is None:
             input_path = self.cooked_dir
 
-        dish = Dish.from_path(input_path, order.order_name)
+        order_name = order.order_name
 
-        if args is not None:
-            parser = self._create_togo_parser()
+        dish = Dish.from_path(input_path, order_name)
 
-            parsed_vars = vars(parser.parse_known_args(args)[0])
-
-            output_filename = parsed_vars.pop('output_filename')
-            fps = parsed_vars.pop('fps')
-            optimize = parsed_vars.pop('optimize')
-            frame_duration = parsed_vars.pop('frame_duration')
-
-        else:
-            # prompt for vars
-            pass
+        output_filename = order.output_filename
+        fps = order.fps
+        optimize = order.optimize
+        frame_duration = order.duration
 
         if output_filename is None:
-            if order.order_name is None:
+            if order_name is None:
                 order_name = os.path.splitext(os.path.basename(input_path))[0]
             if dish.frames == 1:
-                output_filename = order.order_name + '.png'
+                output_filename = order_name + '.png'
             else:
-                output_filename = order.order_name + '.gif'
+                output_filename = order_name + '.gif'
 
         if fps is None:
             fps = order.fps

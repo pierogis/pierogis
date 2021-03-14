@@ -7,6 +7,7 @@ import pytest
 from pyrogis import Dish
 from pyrogis.kitchen import Kitchen, Chef, Server
 from pyrogis.kitchen.menu import ResizeOrder
+from pyrogis.kitchen.order import Order
 
 
 @pytest.fixture
@@ -85,11 +86,16 @@ def test_togo_gif(server):
     input_path = 'resources/octo.gif'
     output_filename = 'output.gif'
     optimize = True
-    output_path = server.togo(
-        input_path=input_path,
+
+    order = Order(
         output_filename=output_filename,
         fps=25,
         optimize=optimize
+    )
+
+    output_path = server.togo(
+        order,
+        input_path=input_path
     )
 
     assert os.path.isfile(output_path)
@@ -101,11 +107,15 @@ def test_togo_mp4(server):
     input_path = 'resources/octo.mp4'
     output_filename = 'output.mp4'
     optimize = True
-    output_path = server.togo(
-        input_path=input_path,
+    order = Order(
         output_filename=output_filename,
         fps=25,
         optimize=optimize
+    )
+
+    output_path = server.togo(
+        order,
+        input_path=input_path
     )
 
     assert os.path.isfile(output_path)
@@ -117,11 +127,15 @@ def test_togo_dir(server):
     input_path = 'resources/frames'
     output_filename = 'output.mp4'
     optimize = True
-    output_path = server.togo(
-        input_path=input_path,
+    order = Order(
         output_filename=output_filename,
         fps=25,
         optimize=optimize
+    )
+
+    output_path = server.togo(
+        order,
+        input_path=input_path
     )
 
     assert os.path.isfile(output_path)
@@ -130,20 +144,20 @@ def test_togo_dir(server):
 
 
 def test_check_cooked(server):
-    order_name = 'test_check_cooked'
+    order = Order('frames')
 
-    assert server.check_order(order_name=order_name)
+    assert server.check_order(order=order)
 
 
 # take_order
 
-def run_take_order(server: Server, kitchen: Kitchen, args: List[str]):
+def run_take_order(server: Server, kitchen: Kitchen, args: List[str], wait: float = .1):
     """
 
     """
     output_filenames = server.take_order(args, kitchen)
 
-    time.sleep(.5)
+    time.sleep(wait)
 
     for output_filename in output_filenames:
         assert os.path.isfile(output_filename)
@@ -252,7 +266,7 @@ def test_take_order_togo_options(server, kitchen):
     args = [
         "togo", "resources/frames",
         "--fps", "25",
-        "--duration", "20",
+        "--frame-duration", "20",
         "--no-optimize",
         "--output", "frames.mp4",
         "--order-name", "octo"
@@ -275,7 +289,7 @@ def test_take_order_animation(server, kitchen):
     """
     args = ["resize", "resources/octo.mp4"]
 
-    run_take_order(server, kitchen, args)
+    run_take_order(server, kitchen, args, 1)
 
 # def test_take_order_animation_with_output_gif():
 #     """
