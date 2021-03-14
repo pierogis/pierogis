@@ -4,23 +4,27 @@ parsing
 import argparse
 import math
 import os
-from typing import List, Dict, Generator
+import time
+from typing import List, Generator
+
+from rich.progress import Progress
 
 from .kitchen import Kitchen
+from .order import Order
 from .ticket import Ticket
 from ..ingredients import Dish
 
 
 class Server:
-    order_tickets: Dict[str, List[Ticket]]
+    orders: List[Order]
 
     @property
     def order_names(self):
-        return self.order_tickets.keys()
+        return [order.order_name for order in self.orders]
 
     def __init__(self, cooked_dir: str = 'cooked'):
         self.cooked_dir = cooked_dir
-        self.order_tickets = {}
+        self.orders = []
 
     def _create_parser(self, menu):
         # create top level parser
@@ -69,8 +73,8 @@ class Server:
         )
         togo_parser.add_argument(
             '--fps',
-            default=25,
-            type=int
+            type=int,
+            help="frames per second"
         )
         togo_parser.add_argument(
             '--no-optimize',
@@ -104,7 +108,12 @@ class Server:
 
         # if the order is just togo, don't need the kitchen
         if parsed_vars['order'] == 'togo':
-            output_filename = self.togo(input_path=input_path, order_name=order_name, args=unknown)
+            output_filename = self.togo(
+                input_path=input_path,
+                order_name=order_name,
+                args=unknown,
+                fps=dish.fps
+            )
             output_filenames = [output_filename]
         else:
             if order_name is None:
@@ -112,34 +121,43 @@ class Server:
 
             frames = dish.frames
 
-            self.order_tickets[order_name] = []
+            order = Order(order_name)
 
             frame_index = 1
             digits = math.floor(math.log(frames, 10)) + 1
 
-            if not frames > 0 and os.path.isdir(self.cooked_dir):
-                os.makedirs(self.cooked_dir)
+            if frames > 0:
+                if not os.path.isdir(self.cooked_dir):
+                    os.makedirs(self.cooked_dir)
 
-            for ticket in self.write_tickets(dish, input_path, parsed_vars):
-                self.order_tickets[order_name].append(ticket)
+            order.fps = dish.fps
 
-                if frames > 1:
-                    padded_frame_index = str(frame_index).zfill(digits)
+            with Progress() as progress:
+                queue_ticket_task = progress.add_task('Queueing tickets...', total=frames)
+                for ticket in self.write_tickets(dish, input_path, parsed_vars):
+                    order.add_ticket(ticket)
 
-                    output_filename = os.path.join(
-                        self.cooked_dir,
-                        order_name + '-' + padded_frame_index + '.png'
-                    )
+                    if frames > 1:
+                        padded_frame_index = str(frame_index).zfill(digits)
 
-                    if os.path.isfile(output_filename):
-                        os.remove(output_filename)
+                        output_filename = os.path.join(
+                            self.cooked_dir,
+                            order_name + '-' + padded_frame_index + '.png'
+                        )
 
-                    frame_index += 1
-                else:
-                    output_filename = os.path.join(self.cooked_dir, order_name + '.png')
+                        if os.path.isfile(output_filename):
+                            os.remove(output_filename)
 
-                kitchen.queue_ticket(output_filename, ticket)
-                output_filenames.append(output_filename)
+                        frame_index += 1
+                    else:
+                        output_filename = os.path.join(self.cooked_dir, order_name + '.png')
+
+                    kitchen.queue_ticket(output_filename, ticket)
+                    output_filenames.append(output_filename)
+
+                    progress.update(queue_ticket_task, advance=1, refresh=True)
+
+            self.orders.append(order)
 
         return output_filenames
 
@@ -157,28 +175,45 @@ class Server:
 
             yield ticket
 
-    def check_order(self, order_name) -> int:
-        cooked_tickets = len(
-            [
-                filename for filename
-                in os.listdir(self.cooked_dir)
-                if filename.startswith(order_name)
-            ]
-        )
-
-        order_tickets = self.order_tickets.get(order_name)
+    def order_size(self, order: Order) -> int:
+        order_tickets = order.tickets
         if order_tickets is not None:
             submitted_tickets = len(order_tickets)
         else:
             submitted_tickets = 0
 
-        print("{} tickets cooked of {}".format(cooked_tickets, submitted_tickets), end='\r')
-        return cooked_tickets == submitted_tickets
+        return submitted_tickets
+
+    def cooked_tickets(self, order: Order):
+        cooked_tickets = len(
+            [
+                filename for filename
+                in os.listdir(self.cooked_dir)
+                if filename.startswith(order.order_name)
+            ]
+        )
+
+        return cooked_tickets
+
+    def check_order(self, order: Order, args: List[str]):
+        """"""
+        total = self.order_size(order)
+        with Progress() as progress:
+            cook_task = progress.add_task("[cyan]Cooking tickets...", total=total)
+            while True:
+                completed = self.cooked_tickets(order)
+                progress.update(cook_task, completed=completed, refresh=True)
+
+                if completed == total:
+                    self.togo(args=args, order=order)
+                    break
+                else:
+                    time.sleep(1)
 
     def togo(
             self,
             input_path: str = None,
-            order_name: str = None,
+            order: Order = None,
             args: List[str] = None,
             output_filename: str = None,
             fps: float = 25,
@@ -191,7 +226,7 @@ class Server:
         if input_path is None:
             input_path = self.cooked_dir
 
-        dish = Dish.from_path(input_path, order_name)
+        dish = Dish.from_path(input_path, order.order_name)
 
         if args is not None:
             parser = self._create_togo_parser()
@@ -208,12 +243,15 @@ class Server:
             pass
 
         if output_filename is None:
-            if order_name is None:
+            if order.order_name is None:
                 order_name = os.path.splitext(os.path.basename(input_path))[0]
             if dish.frames == 1:
-                output_filename = order_name + '.png'
+                output_filename = order.order_name + '.png'
             else:
-                output_filename = order_name + '.gif'
+                output_filename = order.order_name + '.gif'
+
+        if fps is None:
+            fps = order.fps
 
         dish.save(output_filename, optimize, duration=frame_duration, fps=fps)
 

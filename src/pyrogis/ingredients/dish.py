@@ -27,6 +27,13 @@ class Dish(Ingredient):
 
     _pierogis: List[Pierogi] = None
     _frames: int = None
+    _fps: int = None
+
+    @property
+    def frames(self):
+        if self._frames is None:
+            self._frames = len(self.pierogis)
+        return self._frames
 
     @property
     def frames(self):
@@ -39,6 +46,7 @@ class Dish(Ingredient):
             pierogis: List[Pierogi] = None,
             loader: Callable[[], List[Pierogi]] = None,
             recipe=None,
+            fps: float = None,
             **kwargs
     ):
         """
@@ -55,6 +63,7 @@ class Dish(Ingredient):
             loader = lambda: pierogis
 
         self._loader = loader
+        self.fps = fps
 
         if recipe is None:
             recipe = Recipe()
@@ -63,9 +72,15 @@ class Dish(Ingredient):
     @property
     def pierogis(self) -> List[Pierogi]:
         if self._pierogis is None:
-            self._pierogis = self._loader()
+            self.load()
 
         return self._pierogis
+
+    def load(self) -> None:
+        """
+        use the loader return the contained pixels one time
+        """
+        self._pierogis = self._loader()
 
     @classmethod
     def _file_loader(cls, file: str) -> List[Pierogi]:
@@ -91,7 +106,6 @@ class Dish(Ingredient):
 
     @classmethod
     def _stream_loader(cls, stream, lazy: bool = True):
-
         if lazy:
             for frame_index in range(stream.count_frames()):
                 path = stream.request.filename
@@ -101,7 +115,7 @@ class Dish(Ingredient):
         else:
             for frame in stream:
                 def loader():
-                    np.rot90()
+                    return np.rot90(np.asarray(frame), axis=(1, 0))
 
                 pierogi = Pierogi(loader=loader)
                 yield pierogi
@@ -148,16 +162,19 @@ class Dish(Ingredient):
 
     @classmethod
     def from_path(cls, path: str, order_name: str = None) -> 'Dish':
+        fps = None
         if os.path.isdir(path):
             def loader():
                 return cls._dir_loader(path, order_name)
         elif os.path.isfile(path):
+            fps = imageio.get_reader(path).get_meta_data().get('fps')
+
             def loader():
                 return cls._file_loader(path)
         else:
             raise Exception("{} is not a valid path".format(path))
 
-        return cls(loader=loader)
+        return cls(loader=loader, fps=fps)
 
     def cook(self, pixels: np.ndarray, i: int = 0) -> np.ndarray:
         return self.recipe(0, 0).cook(self.pierogis[i].pixels)

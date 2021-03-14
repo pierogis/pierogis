@@ -84,10 +84,10 @@ class Pierogi(Ingredient):
         :param frame_index: if path is a multiframe format (video),
         use this specified frame
         """
-        reader = imageio.get_reader(path)
-        reader.set_image_index(frame_index)
 
         def loader():
+            reader = imageio.get_reader(path)
+            reader.set_image_index(frame_index)
             return np.rot90(np.array(reader.get_next_data()), axes=(1, 0))
 
         return cls(loader=loader)
