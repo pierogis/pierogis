@@ -20,20 +20,8 @@ class Order:
         self.tickets = []
         self.output_filename = output_filename
         self.fps = fps
-        self.duration = fps
+        self.duration = duration
         self.optimize = optimize
-        self.cook_rate = 0
-        self.cook_rate_trend = 0
 
     def add_ticket(self, ticket: Ticket):
         self.tickets.append(ticket)
-
-    def smooth_cook_rate(self, sample: float):
-        alpha = .2
-        gamma = 0
-        previous_cook_rate = self.cook_rate
-        self.cook_rate = alpha * sample + (1 - alpha) * (previous_cook_rate + self.cook_rate_trend)
-        cook_rate_change = self.cook_rate - previous_cook_rate
-
-        previous_cook_rate_trend = self.cook_rate_trend
-        self.cook_rate_trend = gamma * cook_rate_change + (1 - gamma) * previous_cook_rate_trend

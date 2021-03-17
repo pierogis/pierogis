@@ -6,6 +6,7 @@
 /.eggs/
 /cooked*
 /tests/cooked*
+*.so
 
 # venv
 venv

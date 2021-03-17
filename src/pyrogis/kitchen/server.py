@@ -20,9 +20,16 @@ class Server:
     def order_names(self):
         return [order.order_name for order in self.orders]
 
-    def __init__(self, cooked_dir: str = 'cooked'):
+    def __init__(
+            self,
+            cooked_dir: str = 'cooked',
+            report_status: Callable = None,
+            report_times: Callable = None
+    ):
         self.cooked_dir = cooked_dir
         self.orders = []
+        self.report_status = report_status
+        self.report_times = report_times
 
     def _create_parser(self, menu):
         # create top level parser
@@ -86,8 +93,8 @@ class Server:
 
     def take_order(
             self, args: List[str], kitchen: Kitchen,
-            update_cook_task: Callable = None,
-            update_order_status: Callable = None
+            report_times: Callable = None,
+            report_status: Callable = None
     ) -> List[str]:
         """
         use a chef to parse list of strings into Tickets
@@ -109,8 +116,6 @@ class Server:
 
         dish = Dish.from_path(path=input_path, order_name=order_name)
 
-        output_filenames = []
-
         output_filename = parsed_togo_vars.pop('output_filename')
         fps = parsed_togo_vars.pop('fps')
         optimize = parsed_togo_vars.pop('optimize')
@@ -127,6 +132,10 @@ class Server:
             duration=frame_duration
         )
 
+        output_filenames = []
+
+        # when reading the input file is slower than saving an output frame, save the frames
+
         # if the order is just togo, don't need the kitchen
         if parsed_vars['order'] == 'togo':
             output_filename = self.togo(
@@ -140,8 +149,21 @@ class Server:
 
             frames = dish.frames
 
-            if update_cook_task is not None:
-                update_cook_task(total=frames, description=order.order_name)
+            if report_status is not None:
+                self.report_status(total=frames, description=order.order_name)
+
+            def report_times(times):
+                assembly_time = times[0]
+                cook_time = times[1]
+                save_time = times[2]
+
+                assembly_times.append(assembly_time)
+
+                total_cook_time = sum(times)
+
+                alpha * total_cook_time + (1 - alpha) * self.cook_rate
+
+                kitchen_progress.update(kitchen_task, refresh=False, cook_rate=cook_rate)
 
             frame_index = 1
             digits = math.floor(math.log(frames, 10)) + 1
@@ -155,32 +177,28 @@ class Server:
             for ticket in self.write_tickets(dish, input_path, parsed_vars):
                 order.add_ticket(ticket)
 
+                padded_frame_index = str(frame_index).zfill(digits)
                 if frames > 1:
-                    padded_frame_index = str(frame_index).zfill(digits)
-
                     output_filename = os.path.join(
                         self.cooked_dir,
                         order.order_name + '-' + padded_frame_index + '.png'
                     )
-
-                    if os.path.isfile(output_filename):
-                        os.remove(output_filename)
-
-                    frame_index += 1
                 else:
                     output_filename = os.path.join(self.cooked_dir, order.order_name + '.png')
 
+                if os.path.isfile(output_filename):
+                    os.remove(output_filename)
+
+                frame_index += 1
+
                 if frame_index < 10:
-                    if update_order_status is not None:
-                        update_order_status(description='pilot')
+                    times = kitchen.cook_ticket(
+                        kitchen.chef,
+                        output_filename,
+                        ticket
+                    )
 
-                    start = time.perf_counter()
-                    kitchen.cook_ticket(output_filename, ticket)
-                    elapsed = time.perf_counter() - start
-                    order.smooth_cook_rate(1 / elapsed)
-
-                    if update_cook_task is not None:
-                        update_cook_task(advance=1, cook_rate=order.cook_rate)
+                    self.report_status(times)
 
                     if frame_index > 10 and order.cook_rate > 10:
                         if update_order_status is not None:
