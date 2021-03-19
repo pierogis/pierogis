@@ -5,7 +5,10 @@ import argparse
 import math
 import os
 import time
+from threading import Thread
 from typing import List, Generator, Callable
+
+import imageio
 
 from .kitchen import Kitchen
 from .order import Order
@@ -95,7 +98,7 @@ class Server:
             self, args: List[str], kitchen: Kitchen,
             report_times: Callable = None,
             report_status: Callable = None
-    ) -> List[str]:
+    ) -> None:
         """
         use a chef to parse list of strings into Tickets
         """
@@ -114,123 +117,61 @@ class Server:
         input_path = parsed_vars.pop('path')
         order_name = parsed_vars.pop('order_name')
 
-        dish = Dish.from_path(path=input_path, order_name=order_name)
-
         output_filename = parsed_togo_vars.pop('output_filename')
         fps = parsed_togo_vars.pop('fps')
         optimize = parsed_togo_vars.pop('optimize')
         frame_duration = parsed_togo_vars.pop('frame_duration')
 
-        if fps is None:
-            fps = dish.fps
-
         order = Order(
             order_name,
+            input_path,
             fps=fps,
             output_filename=output_filename,
             optimize=optimize,
             duration=frame_duration
         )
 
-        output_filenames = []
+        # output_filenames = []
 
         # when reading the input file is slower than saving an output frame, save the frames
 
         # if the order is just togo, don't need the kitchen
         if parsed_vars['order'] == 'togo':
-            output_filename = self.togo(
-                order=order,
-                input_path=input_path,
+            output_filename = kitchen.plate(
+                order=order
             )
-            output_filenames = [output_filename]
+            # output_filenames = [output_filename]
         else:
             if order.order_name is None:
                 order.order_name = os.path.splitext(os.path.basename(input_path))[0]
 
-            frames = dish.frames
+            self.write_tickets(order, parsed_vars)
 
-            if report_status is not None:
-                self.report_status(total=frames, description=order.order_name)
+            Thread(target=self.check_order, args=(order)).start()
 
-            def report_times(times):
-                assembly_time = times[0]
-                cook_time = times[1]
-                save_time = times[2]
+            kitchen.queue_order(order)
 
-                assembly_times.append(assembly_time)
+            # output_filenames.append(output_filename)
 
-                total_cook_time = sum(times)
-
-                alpha * total_cook_time + (1 - alpha) * self.cook_rate
-
-                kitchen_progress.update(kitchen_task, refresh=False, cook_rate=cook_rate)
-
-            frame_index = 1
-            digits = math.floor(math.log(frames, 10)) + 1
-
-            if frames > 0:
-                if not os.path.isdir(self.cooked_dir):
-                    os.makedirs(self.cooked_dir)
-
-            queueing = False
-
-            for ticket in self.write_tickets(dish, input_path, parsed_vars):
-                order.add_ticket(ticket)
-
-                padded_frame_index = str(frame_index).zfill(digits)
-                if frames > 1:
-                    output_filename = os.path.join(
-                        self.cooked_dir,
-                        order.order_name + '-' + padded_frame_index + '.png'
-                    )
-                else:
-                    output_filename = os.path.join(self.cooked_dir, order.order_name + '.png')
-
-                if os.path.isfile(output_filename):
-                    os.remove(output_filename)
-
-                frame_index += 1
-
-                if frame_index < 10:
-                    times = kitchen.cook_ticket(
-                        kitchen.chef,
-                        output_filename,
-                        ticket
-                    )
-
-                    self.report_status(times)
-
-                    if frame_index > 10 and order.cook_rate > 10:
-                        if update_order_status is not None:
-                            update_order_status(description='cooking')
-
-                else:
-                    if not queueing:
-                        queueing = True
-                        if update_order_status is not None:
-                            update_order_status(description='queueing')
-
-                    kitchen.queue_ticket(output_filename, ticket)
-
-                output_filenames.append(output_filename)
-
-            self.orders.append(order)
-
-        return output_filenames
+            # self.orders.append(order)
 
     def write_tickets(
-            self, dish: Dish, input_path, parsed_vars
-    ) -> Generator[Ticket, None, None]:
+            self, order: Order, parsed_vars
+    ) -> None:
         """
         create tickets from a list of pierogis and parsed vars
         """
         generate_ticket = parsed_vars.pop('generate_ticket')
 
-        for frame_index in range(len(dish.pierogis)):
-            ticket = Ticket()
-            ticket = generate_ticket(ticket, input_path, frame_index, **parsed_vars.copy())
+        reader = imageio.get_reader(order.input_path)
 
-            yield ticket
+        frames = reader.count_frames()
+
+        for frame_index in range(frames):
+            ticket = Ticket()
+            ticket = generate_ticket(ticket, order.input_path, frame_index, **parsed_vars.copy())
+
+            order.add_ticket(ticket)
 
     def order_size(self, order: Order) -> int:
         order_tickets = order.tickets
@@ -254,9 +195,7 @@ class Server:
 
     def check_order(
             self,
-            order: Order,
-            timeout: float = 1200,
-            update_callback=None
+            order: Order
     ):
 
         """"""
@@ -269,56 +208,13 @@ class Server:
 
         while True:
             completed = self.cooked_tickets(order)
-            if update_callback is not None:
-                if last_completed is not None:
-                    order.smooth_cook_rate((completed - last_completed) / wait_time)
-                    update_callback(completed=completed, cook_rate=order.cook_rate)
-                else:
-                    update_callback(completed=completed)
+            # order.smooth_cook_rate((completed - last_completed) / wait_time)
 
             if completed == total:
                 success = True
                 break
-            # elif retries * wait_time > timeout:
-            #     success = False
-            #     break
             else:
                 time.sleep(wait_time)
 
-            last_completed = completed
             retries += 1
-
-        return success
-
-    def togo(
-            self,
-            order: Order,
-            input_path: str = None,
-    ) -> str:
-        """"""
-        if input_path is None:
-            input_path = self.cooked_dir
-
-        order_name = order.order_name
-
-        dish = Dish.from_path(input_path, order_name)
-
-        output_filename = order.output_filename
-        fps = order.fps
-        optimize = order.optimize
-        frame_duration = order.duration
-
-        if output_filename is None:
-            if order_name is None:
-                order_name = os.path.splitext(os.path.basename(input_path))[0]
-            if dish.frames == 1:
-                output_filename = order_name + '.png'
-            else:
-                output_filename = order_name + '.gif'
-
-        if fps is None:
-            fps = order.fps
-
-        dish.save(output_filename, optimize, duration=frame_duration, fps=fps)
-
-        return output_filename
+            S

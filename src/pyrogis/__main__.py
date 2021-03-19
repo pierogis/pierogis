@@ -5,33 +5,20 @@ from .kitchen import Chef, Server, Kitchen
 from .interface import Interface
 
 
-def main(args=None, report_times=None, report_status=None):
+def main(args=None):
     """cli program"""
     if args is None:
         args = sys.argv[1:]
 
-    server = Server(report_status=report_status)
+    server = Server()
 
     mp.set_start_method('spawn', force=True)
-    kitchen = Kitchen(Chef(), report_times=report_times)
+    kitchen = Kitchen(Chef())
 
     server.take_order(
         args,
         kitchen
     )
-
-    for order in server.orders:
-        report_status(order, "awaiting")
-
-        server.check_order(
-            order
-        )
-
-        report_status(order, "plating")
-
-        server.togo(order=order)
-
-        report_status(order, "done")
 
 
 if __name__ == "__main__":
