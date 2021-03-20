@@ -38,7 +38,7 @@ class Interface:
 
         panels = Columns([Panel(server_group, width=16), Panel(kitchen_group)], expand=True)
         with Live(panels):
-            main(report_times=self.report_times, report_status=self.report_status)
+            main()
 
     def report_status(self, order, status):
         server_task = self.order_tasks[order.order_name]

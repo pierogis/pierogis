@@ -2,18 +2,16 @@
 parsing
 """
 import argparse
-import math
 import os
 import time
 from threading import Thread
-from typing import List, Generator, Callable
+from typing import List, Callable
 
 import imageio
 
 from .kitchen import Kitchen
 from .order import Order
 from .ticket import Ticket
-from ..ingredients import Dish
 
 
 class Server:
@@ -147,13 +145,14 @@ class Server:
 
             self.write_tickets(order, parsed_vars)
 
-            Thread(target=self.check_order, args=(order)).start()
+            thread = Thread(target=self.check_order, args=[order])
+            thread.start()
 
             kitchen.queue_order(order)
 
-            # output_filenames.append(output_filename)
-
-            # self.orders.append(order)
+            kitchen.close()
+            thread.join()
+            kitchen.plate(order)
 
     def write_tickets(
             self, order: Order, parsed_vars
@@ -217,4 +216,3 @@ class Server:
                 time.sleep(wait_time)
 
             retries += 1
-            S

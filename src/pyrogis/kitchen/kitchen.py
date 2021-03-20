@@ -2,7 +2,6 @@ import math
 import multiprocessing  as mp
 import os
 import time
-from collections import Callable
 from typing import Tuple
 
 import imageio
@@ -10,13 +9,13 @@ import imageio
 from .menu import menu
 from .order import Order
 from .ticket import Ticket
-from .. import Dish
+from .. import Pierogi, Dish
 
 
 class Kitchen:
     menu = menu
 
-    def __init__(self, chef, report_times: Callable[Tuple[float, float, float]] = None):
+    def __init__(self, chef):
         self.chef = chef
         self.pool = mp.Pool()
 
@@ -47,8 +46,6 @@ class Kitchen:
 
         digits = math.floor(math.log(frames, 10)) + 1
 
-        frame_index = 1
-
         cooked_dir = 'cooked'
 
         if frames > 0:
@@ -56,6 +53,8 @@ class Kitchen:
                 os.makedirs(cooked_dir)
 
         reader = imageio.get_reader(order.input_path)
+
+        frame_index = 1
 
         for ticket in order.tickets:
             padded_frame_index = str(frame_index).zfill(digits)
@@ -85,10 +84,10 @@ class Kitchen:
 
             times = []
 
-            def handler(result):
-                times.append(result.get())
+            def handler(process_times):
+                times.append(process_times)
 
-            cook_async = False
+            cook_async = True
 
             if cook_async:
                 self.pool.apply_async(
@@ -97,10 +96,14 @@ class Kitchen:
                     callback=handler
                 )
             else:
-                self.cook_ticket(self.chef, output_filename, ticket)
+                serial_times = self.cook_ticket(self.chef, output_filename, ticket)
+                cook_time = serial_times[1]
+
+            frame_index += 1
 
     def close(self):
         self.pool.close()
+        self.pool.join()
 
     def __getstate__(self):
         self_dict = self.__dict__.copy()
@@ -118,7 +121,15 @@ class Kitchen:
         input_path = order.input_path
         order_name = order.order_name
 
-        dish = self.chef.plate(input_path, order_name)
+        pierogis = []
+
+        cooked_dir = 'cooked'
+
+        for filename in sorted(os.listdir(cooked_dir)):
+            input_path = os.path.join(cooked_dir, filename)
+            pierogis.append(Pierogi.from_path(path=input_path, frame_index=0))
+
+        dish = Dish(pierogis=pierogis)
 
         output_filename = order.output_filename
         fps = order.fps
