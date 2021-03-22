@@ -93,7 +93,10 @@ class Dish(Ingredient):
                 fps = 1000 / duration
 
             if fps is None:
-                fps = 30
+                if self._fps is None:
+                    fps = 30
+                else:
+                    fps = self._fps
 
             imageio.mimwrite(
                 path,

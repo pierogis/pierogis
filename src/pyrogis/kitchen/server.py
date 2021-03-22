@@ -108,7 +108,7 @@ class Server:
 
         # need the path to use as input for some recipes
         # like opening files for ingredients
-        input_path = parsed_vars.pop('path')
+        input_path = os.path.expanduser(parsed_vars.pop('path'))
         order_name = parsed_vars.pop('order_name')
 
         output_filename = parsed_togo_vars.pop('output_filename')
@@ -125,9 +125,9 @@ class Server:
             duration=frame_duration
         )
 
-        # output_filenames = []
-
-        # when reading the input file is slower than saving an output frame, save the frames
+        if order.fps is None:
+            if os.path.isfile(input_path):
+                order.fps = imageio.get_reader(input_path).get_meta_data()['fps']
 
         # if the order is just togo, don't need the kitchen
         if parsed_vars['order'] == 'togo':
@@ -153,9 +153,10 @@ class Server:
             def start_callback():
                 check_thread.start()
 
-            kitchen.queue_order(order, start_callback, self.report_status)
+            close_callback = kitchen.queue_order(order, start_callback, self.report_status)
 
             self.report_status(order, status='awaiting')
+            close_callback()
             check_thread.join()
 
             self.report_status(order, status='plating')

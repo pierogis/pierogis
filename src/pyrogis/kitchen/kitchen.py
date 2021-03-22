@@ -202,8 +202,14 @@ class Kitchen:
         self.cook_tickets(next_tickets, pool=pool, reader=reader)
 
         if pool is not None:
-            pool.close()
-            pool.join()
+            def close_callback():
+                pool.close()
+                pool.join()
+        else:
+            def close_callback():
+                pass
+
+        return close_callback
 
     def plate(
             self,
