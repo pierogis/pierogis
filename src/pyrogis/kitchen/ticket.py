@@ -85,6 +85,8 @@ class Ticket:
     }
     """
 
+    output_filename: str = None
+
     def __init__(
             self,
             pierogis: Dict[str, PierogiDesc] = None,
@@ -92,7 +94,8 @@ class Ticket:
             ingredients: Dict[str, IngredientDesc] = None,
             recipe: List[str] = None,
             base: str = None,
-            seasoning_links: Dict[str, str] = None
+            seasoning_links: Dict[str, str] = None,
+            output_filename: str = None
     ):
         """
         create a Ticket
@@ -114,6 +117,7 @@ class Ticket:
         self.recipe = recipe
         self.base = base
         self.seasoning_links = seasoning_links
+        self.output_filename = output_filename
 
     def add_file(self, path: str) -> str:
         """

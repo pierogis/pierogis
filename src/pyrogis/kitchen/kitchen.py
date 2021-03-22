@@ -2,7 +2,7 @@ import math
 import multiprocessing  as mp
 import os
 import time
-from typing import Tuple
+from typing import Callable, List
 
 import imageio
 
@@ -15,33 +15,134 @@ from .. import Pierogi, Dish
 class Kitchen:
     menu = menu
 
-    def __init__(self, chef):
+    def __init__(self, chef, processes: int = None):
         self.chef = chef
-        self.pool = mp.Pool()
+        if processes is None:
+            processes = os.cpu_count()
+        self.processes = processes
+
+    def __getstate__(self):
+        self_dict = self.__dict__.copy()
+        del self_dict['pool']
+        return self_dict
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
 
     @staticmethod
     def cook_ticket(
-            chef, output_filename: str,
+            chef,
             ticket: Ticket
-    ) -> Tuple[float, float, float]:
+    ) -> None:
         """
         cook a ticket with a thread pool
         """
-        assemble_start = time.perf_counter()
         dish = chef.assemble_ticket(ticket, menu)
-        assemble_time = time.perf_counter() - assemble_start
 
-        cook_start = time.perf_counter()
         cooked_dish = chef.cook_dish(dish)
-        cook_time = time.perf_counter() - cook_start
 
-        save_start = time.perf_counter()
-        cooked_dish.save(output_filename)
-        save_time = time.perf_counter() - save_start
+        cooked_dish.save(ticket.output_filename)
 
-        return assemble_time, cook_time, save_time
+    def cook_tickets(self, tickets: List[Ticket], pool: mp.Pool = None, reader=None):
+        """provide reader if you want to presave frames"""
 
-    def queue_order(self, order: Order):
+        for ticket in tickets:
+            if reader is not None:
+                frame = reader.get_next_data()
+                raw_dir = os.path.join('/tmp', 'raw')
+                if not os.path.isdir(raw_dir):
+                    os.makedirs(raw_dir)
+
+                input_filename = os.path.join(raw_dir, os.path.basename(ticket.output_filename))
+                writer = imageio.get_writer(input_filename)
+                writer.append_data(frame)
+
+                pierogi_desc = ticket.pierogis[ticket.base]
+                ticket.files[pierogi_desc.files_key] = input_filename
+                pierogi_desc.frame_index = 0
+
+            if pool is not None:
+                pool.apply_async(
+                    func=self.cook_ticket,
+                    args=(self.chef, ticket)
+                )
+
+            else:
+                self.cook_ticket(self.chef, ticket)
+
+    def _auto_pilot(self, order: Order, reader=None):
+        """test some frames in the animation"""
+        tickets = order.tickets
+
+        # test with 5% of the frames, within 2 and 10
+        pilot_frames = max(2, min(round(len(tickets) * .05), 10))
+
+        next_frame_index = 0
+
+        if len(tickets) > 8:
+            frame_index = 0
+
+            next_frame_index = frame_index + pilot_frames
+            next_tickets = tickets[frame_index:next_frame_index]
+            frame_index = next_frame_index
+
+            # sync cooking
+            start = time.perf_counter()
+            self.cook_tickets(next_tickets)
+            elapsed = time.perf_counter() - start
+
+            next_frame_index = frame_index + pilot_frames
+            next_tickets = tickets[frame_index:next_frame_index]
+            frame_index = next_frame_index
+
+            # sync cooking with presave frames
+            presave_start = time.perf_counter()
+            self.cook_tickets(next_tickets, reader=reader)
+            presave_elapsed = time.perf_counter() - presave_start
+
+            if presave_elapsed < elapsed:
+                order.presave = True
+
+                pool = mp.Pool()
+
+                next_frame_index = frame_index + pilot_frames
+                next_tickets = tickets[frame_index:next_frame_index]
+                frame_index = next_frame_index
+
+                # async cooking with presave frames
+                async_presave_start = time.perf_counter()
+
+                self.cook_tickets(next_tickets, reader=reader, pool=pool)
+                pool.close()
+                pool.join()
+
+                async_presave_elapsed = time.perf_counter() - async_presave_start
+
+                if async_presave_elapsed < presave_elapsed:
+                    order.cook_async = True
+
+            else:
+                order.presave = False
+
+                # async cooking
+                pool = mp.Pool()
+
+                next_frame_index = frame_index + pilot_frames
+                next_tickets = tickets[frame_index:next_frame_index]
+                frame_index = next_frame_index
+
+                async_start = time.perf_counter()
+                self.cook_tickets(next_tickets, pool=pool)
+                pool.close()
+                pool.join()
+                async_elapsed = time.perf_counter() - async_start
+
+                if async_elapsed < elapsed:
+                    order.cook_async = True
+
+        return next_frame_index
+
+    def queue_order(self, order: Order, start_callback: Callable, report_status: Callable):
         frames = len(order.tickets)
 
         digits = math.floor(math.log(frames, 10)) + 1
@@ -51,8 +152,6 @@ class Kitchen:
         if frames > 0:
             if not os.path.isdir(cooked_dir):
                 os.makedirs(cooked_dir)
-
-        reader = imageio.get_reader(order.input_path)
 
         frame_index = 1
 
@@ -64,54 +163,47 @@ class Kitchen:
                     cooked_dir,
                     order.order_name + '-' + padded_frame_index + '.png'
                 )
+
+                ticket.output_filename = output_filename
+
+                if os.path.isfile(output_filename):
+                    if order.resume:
+                        continue
+                    else:
+                        os.remove(output_filename)
             else:
                 output_filename = os.path.join(cooked_dir, order.order_name + '.png')
 
-            save_frames = False
-
-            if os.path.isfile(output_filename):
-                os.remove(output_filename)
-
-            if save_frames:
-                reader.set_frame_index(frame_index)
-                frame = reader.get_next_data()
-                writer = imageio.get_writer(output_filename)
-                writer.write(frame)
-
-                pierogi_desc = ticket.pierogis[ticket.base]
-                pierogi_desc.files_key = output_filename
-                pierogi_desc.frame_index = 0
-
-            times = []
-
-            def handler(process_times):
-                times.append(process_times)
-
-            cook_async = True
-
-            if cook_async:
-                self.pool.apply_async(
-                    func=self.cook_ticket,
-                    args=(self.chef, output_filename, ticket),
-                    callback=handler
-                )
-            else:
-                serial_times = self.cook_ticket(self.chef, output_filename, ticket)
-                cook_time = serial_times[1]
-
+            ticket.output_filename = output_filename
             frame_index += 1
 
-    def close(self):
-        self.pool.close()
-        self.pool.join()
+        start_callback()
 
-    def __getstate__(self):
-        self_dict = self.__dict__.copy()
-        del self_dict['pool']
-        return self_dict
+        if os.path.isfile(order.input_path):
+            reader = imageio.get_reader(order.input_path)
+        else:
+            reader = None
 
-    def __setstate__(self, state):
-        self.__dict__.update(state)
+        report_status(order, status='preprocessing')
+
+        processed_frame_index = self._auto_pilot(order, reader)
+
+        if not order.presave:
+            reader = None
+        if order.cook_async:
+            pool = mp.Pool()
+        else:
+            pool = None
+
+        next_tickets = order.tickets[processed_frame_index:]
+
+        report_status(order, status='cooking')
+
+        self.cook_tickets(next_tickets, pool=pool, reader=reader)
+
+        if pool is not None:
+            pool.close()
+            pool.join()
 
     def plate(
             self,

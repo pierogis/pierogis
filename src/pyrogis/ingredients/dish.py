@@ -1,12 +1,9 @@
-import math
 import os
-import threading
+import subprocess
 from typing import List, Callable
 
 import imageio as imageio
 import numpy as np
-from PIL import UnidentifiedImageError
-from natsort import natsorted
 
 from .ingredient import Ingredient
 from .pierogi import Pierogi
@@ -36,7 +33,7 @@ class Dish(Ingredient):
     def prep(
             self,
             pierogis: List[Pierogi] = None,
-            recipe:Callable=None,
+            recipe: Callable = None,
             fps: float = None,
             **kwargs
     ):
@@ -105,11 +102,13 @@ class Dish(Ingredient):
             )
 
             if optimize and os.path.splitext(path)[1] == ".gif":
-                try:
-                    import pygifsicle
-                    pygifsicle.optimize(path)
-                except FileNotFoundError as err:
-                    print(err)
+                return_code = subprocess.call(
+                    ["gifsicle", '--optimize', path, "--output", path],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL
+                )
+                if return_code != 0:
+                    print("install gifsicle and ensure it's on PATH")
 
         elif len(self.pierogis) == 1:
             self.pierogis[0].save(path)

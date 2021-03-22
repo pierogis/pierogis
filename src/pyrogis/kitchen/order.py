@@ -7,6 +7,9 @@ class Order:
     order_name: str
     tickets: List[Ticket]
     fps: float
+    resume: bool = False
+    presave: bool = False
+    cook_async: bool = False
 
     def __init__(
             self,

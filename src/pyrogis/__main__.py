@@ -1,16 +1,17 @@
 import multiprocessing as mp
 import sys
+from typing import Callable
 
-from .kitchen import Chef, Server, Kitchen
-from .interface import Interface
+from .kitchen import Chef, Server, Kitchen, Order
+from .restaurant import Restaurant
 
 
-def main(args=None):
+def main(args=None, report_status: Callable = None):
     """cli program"""
     if args is None:
         args = sys.argv[1:]
 
-    server = Server()
+    server = Server(report_status)
 
     mp.set_start_method('spawn', force=True)
     kitchen = Kitchen(Chef())
@@ -21,6 +22,5 @@ def main(args=None):
     )
 
 
-if __name__ == "__main__":
-    interface = Interface()
-    sys.exit(interface.run(main))
+restaurant = Restaurant()
+sys.exit(restaurant.run(main))

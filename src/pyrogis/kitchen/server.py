@@ -23,14 +23,12 @@ class Server:
 
     def __init__(
             self,
-            cooked_dir: str = 'cooked',
             report_status: Callable = None,
-            report_times: Callable = None
+            # cooked_dir: str = 'cooked',
     ):
-        self.cooked_dir = cooked_dir
+        # self.cooked_dir = cooked_dir
         self.orders = []
-        self.report_status = report_status
-        self.report_times = report_times
+        self._report_status = report_status
 
     def _create_parser(self, menu):
         # create top level parser
@@ -93,9 +91,7 @@ class Server:
         return togo_parser
 
     def take_order(
-            self, args: List[str], kitchen: Kitchen,
-            report_times: Callable = None,
-            report_status: Callable = None
+            self, args: List[str], kitchen: Kitchen
     ) -> None:
         """
         use a chef to parse list of strings into Tickets
@@ -135,24 +131,37 @@ class Server:
 
         # if the order is just togo, don't need the kitchen
         if parsed_vars['order'] == 'togo':
-            output_filename = kitchen.plate(
+            self.report_status(order, status='boxing')
+            kitchen.plate(
                 order=order
             )
-            # output_filenames = [output_filename]
         else:
             if order.order_name is None:
                 order.order_name = os.path.splitext(os.path.basename(input_path))[0]
 
+            self.report_status(order, status='writing tickets')
+
+            # order has tickets attached (for frames)
             self.write_tickets(order, parsed_vars)
 
-            thread = Thread(target=self.check_order, args=[order])
-            thread.start()
+            frames = len(order.tickets)
+            self.report_status(order, total=frames)
 
-            kitchen.queue_order(order)
+            # the Server splits off part of their consciousness into a new thread
+            check_thread = Thread(target=self.check_order, args=[order])
 
-            kitchen.close()
-            thread.join()
+            def start_callback():
+                check_thread.start()
+
+            kitchen.queue_order(order, start_callback, self.report_status)
+
+            self.report_status(order, status='awaiting')
+            check_thread.join()
+
+            self.report_status(order, status='plating')
             kitchen.plate(order)
+
+        self.report_status(order, status='done')
 
     def write_tickets(
             self, order: Order, parsed_vars
@@ -182,13 +191,10 @@ class Server:
         return submitted_tickets
 
     def cooked_tickets(self, order: Order):
-        cooked_tickets = len(
-            [
-                filename for filename
-                in os.listdir(self.cooked_dir)
-                if filename.startswith(order.order_name)
-            ]
-        )
+        cooked_tickets = 0
+        for filename in os.listdir('cooked'):
+            if filename.startswith(order.order_name):
+                cooked_tickets += 1
 
         return cooked_tickets
 
@@ -203,11 +209,23 @@ class Server:
 
         retries = 0
         wait_time = 1
-        last_completed = None
+        last_completed = 0
+        smooth_cook_rate = 0
+        alpha = .2
+        last_time = time.perf_counter()
 
         while True:
             completed = self.cooked_tickets(order)
-            # order.smooth_cook_rate((completed - last_completed) / wait_time)
+            current_time = time.perf_counter()
+            elapsed = current_time - last_time
+            cook_rate = (completed - last_completed) / elapsed
+            smooth_cook_rate = alpha * cook_rate + (1 - alpha) * smooth_cook_rate
+
+            self.report_status(
+                order,
+                completed=completed,
+                cook_rate=smooth_cook_rate
+            )
 
             if completed == total:
                 success = True
@@ -216,3 +234,9 @@ class Server:
                 time.sleep(wait_time)
 
             retries += 1
+            last_completed = completed
+            last_time = current_time
+
+    def report_status(self, order, **kwargs):
+        if self._report_status is not None:
+            self._report_status(order, **kwargs)
