@@ -129,23 +129,21 @@ class Server:
             if os.path.isfile(input_path):
                 order.fps = imageio.get_reader(input_path).get_meta_data()['fps']
 
+        frames = len(order.tickets)
+        self.report_status(order, total=frames)
+
         # if the order is just togo, don't need the kitchen
         if parsed_vars['order'] == 'togo':
             self.report_status(order, status='boxing')
             kitchen.plate(
-                order=order
+                order=order,
+                report_status=self.report_status
             )
         else:
-            if order.order_name is None:
-                order.order_name = os.path.splitext(os.path.basename(input_path))[0]
-
             self.report_status(order, status='writing tickets')
 
             # order has tickets attached (for frames)
             self.write_tickets(order, parsed_vars)
-
-            frames = len(order.tickets)
-            self.report_status(order, total=frames)
 
             # the Server splits off part of their consciousness into a new thread
             check_thread = Thread(target=self.check_order, args=[order])
@@ -210,33 +208,21 @@ class Server:
 
         retries = 0
         wait_time = 1
-        last_completed = 0
-        smooth_cook_rate = 0
-        alpha = .2
-        last_time = time.perf_counter()
 
         while True:
             completed = self.cooked_tickets(order)
-            current_time = time.perf_counter()
-            elapsed = current_time - last_time
-            cook_rate = (completed - last_completed) / elapsed
-            smooth_cook_rate = alpha * cook_rate + (1 - alpha) * smooth_cook_rate
 
             self.report_status(
                 order,
-                completed=completed,
-                cook_rate=smooth_cook_rate
+                completed=completed
             )
 
             if completed == total:
-                success = True
                 break
             else:
                 time.sleep(wait_time)
 
             retries += 1
-            last_completed = completed
-            last_time = current_time
 
     def report_status(self, order, **kwargs):
         if self._report_status is not None:

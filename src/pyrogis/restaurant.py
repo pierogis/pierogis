@@ -1,3 +1,5 @@
+import os
+import time
 from datetime import timedelta
 from typing import Callable
 
@@ -13,7 +15,7 @@ from .kitchen.order import Order
 
 
 class TimeElapsedMsColumn(ProgressColumn):
-    def __init__(self, decimal_places: int = 3, *args, **kwargs) -> None:
+    def __init__(self, decimal_places: int = 1, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         self.decimal_places = decimal_places
@@ -40,9 +42,32 @@ class TreeColumn(ProgressColumn):
         input_paths = task.fields.get('input_paths')
 
         for path in input_paths:
-            tree.add(path)
+            tree.add(os.path.basename(path))
 
         return tree
+
+class SmoothCookRateColumn(ProgressColumn):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        self.completed = 0
+        self.smooth_cook_rate = 0
+        self.alpha = .2
+        self.last_time = time.perf_counter()
+
+    def render(self, task: Task) -> Text:
+        completed = task.completed
+        current_time = time.perf_counter()
+
+        elapsed = current_time - self.last_time
+        cook_rate_sample = (completed - self.completed) / elapsed
+        self.smooth_cook_rate = self.alpha * cook_rate_sample + (1 - self.alpha) * self.smooth_cook_rate
+
+        self.completed = completed
+        self.last_time = current_time
+
+        rate_string = "{cook_rate:>6.2f}🥟/s".format(cook_rate=self.smooth_cook_rate)
+        return Text(rate_string)
 
 
 class Restaurant:
@@ -58,7 +83,8 @@ class Restaurant:
             BarColumn(bar_width=10),
             " [progress.percentage]{task.percentage:>3.0f}% ",
             TimeElapsedMsColumn(),
-            "[bold cyan][progress.description]{task.fields[cook_rate]:>6.2f}🥟/s",
+            SmoothCookRateColumn(),
+            # "[bold cyan][progress.description]{task.fields[cook_rate]:>6.2f}🥟/s",
             console=self.console,
             refresh_per_second=2
         )
@@ -90,11 +116,11 @@ class Restaurant:
 
         panels = RenderGroup(aligned_kitchen_panel, aligned_server_panel)
         with Live(panels, refresh_per_second=10):
-
             main(report_status=self.report_status)
 
-    def report_status(self, order: Order, status: str = None, completed: int = None, total: int = None,
-                      cook_rate: float = None, cook_async: bool = None, presave: bool = None):
+    def report_status(self, order: Order, status: str = None,
+                      completed: int = None, advance: int = None, total: int = None,
+                      cook_async: bool = None, presave: bool = None):
         server_task = self.server_tasks.get(order.order_name)
         if server_task is None:
             server_task = self.add_server_task(order)
@@ -108,8 +134,10 @@ class Restaurant:
             self.kitchen_progress.update(kitchen_task, completed=completed)
         if total is not None:
             self.kitchen_progress.update(kitchen_task, total=total)
-        if cook_rate is not None:
-            self.kitchen_progress.update(kitchen_task, cook_rate=cook_rate)
+        if advance is not None:
+            self.kitchen_progress.update(kitchen_task, advance=advance)
+        # if cook_rate is not None:
+        #     self.kitchen_progress.update(kitchen_task, cook_rate=cook_rate)
 
         input_path = order.input_path
         if input_path is not None:

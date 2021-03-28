@@ -54,7 +54,7 @@ class Dish(Ingredient):
         self.recipe = recipe
 
     def cook(self, pixels: np.ndarray, frame: int = 0) -> np.ndarray:
-        return self.recipe(0, 0).cook(self.pierogis[i].pixels)
+        return self.recipe(0, 0).cook(self.pierogis[frame].pixels)
 
     def serve(self) -> 'Dish':
         """
@@ -82,13 +82,13 @@ class Dish(Ingredient):
             path: str,
             optimize: bool = True,
             duration: float = None,
-            fps: float = None
+            fps: float = None,
+            callback: Callable = None
     ) -> None:
         """
         :param duration: ms duration between frames
         """
         if len(self.pierogis) > 1:
-            ims = [np.asarray(pierogi.image) for pierogi in self.pierogis]
             if duration is not None:
                 fps = 1000 / duration
 
@@ -98,11 +98,17 @@ class Dish(Ingredient):
                 else:
                     fps = self._fps
 
-            imageio.mimwrite(
+            writer = imageio.get_writer(
                 path,
-                ims=ims,
                 fps=fps
             )
+
+            for pierogi in self.pierogis:
+                writer.append_data(np.asarray(pierogi.image)[:, :, 1])
+
+                callback()
+
+            writer.close()
 
             if optimize and os.path.splitext(path)[1] == ".gif":
                 return_code = subprocess.call(
@@ -111,7 +117,7 @@ class Dish(Ingredient):
                     stderr=subprocess.DEVNULL
                 )
                 if return_code != 0:
-                    print("install gifsicle and ensure it's on PATH")
+                    print("install gifsicle and ensure it's on PATH to optimize gif")
 
         elif len(self.pierogis) == 1:
             self.pierogis[0].save(path)
