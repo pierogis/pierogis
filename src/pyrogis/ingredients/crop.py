@@ -40,27 +40,29 @@ class Crop(Ingredient):
         width = pixels.shape[0]
         height = pixels.shape[1]
 
-        if self.aspect is not None:
-            aspect = self.aspect
-        else:
-            aspect = width / height
-
         if self.width is not None and self.height is not None:
             width = self.width
             height = self.height
         elif self.width is None and self.height is None:
             # neither provided, use aspect to smallenate the oversized dim
-            if width / height > aspect:
-                width = height * aspect
-            else:
-                height = width / aspect
+            if self.aspect is not None:
+                if width / height > self.aspect:
+                    width = height * self.aspect
+                else:
+                    height = width / self.aspect
         elif self.width is None:
-            width = self.height * aspect
+            if self.aspect is not None:
+                aspect = self.aspect
+                width = self.height * aspect
+
             height = self.height
         elif self.height is None:
-            height = self.width / aspect
+            if self.aspect is not None:
+                aspect = self.aspect
+                height = self.width / aspect
+
             width = self.width
 
-        cooked_pixels = pixels[self.origin[0]: width, self.origin[1]: height]
+        cooked_pixels = pixels[self.origin[0]: self.origin[0] + round(width), self.origin[1]: self.origin[1] + round(height)]
 
         return cooked_pixels
