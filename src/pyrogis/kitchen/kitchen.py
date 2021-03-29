@@ -2,6 +2,7 @@ import math
 import multiprocessing  as mp
 import os
 import time
+from collections import defaultdict
 from typing import Callable
 
 import imageio
@@ -85,11 +86,10 @@ class Kitchen:
             self.cook_ticket(self.chef, ticket)
         seq_rate = seq_pilot_frames / (time.perf_counter() - start)
 
-        next_frame_index = frame_index + 2
-        next_tickets = tickets[frame_index:next_frame_index]
-        frame_index = next_frame_index
-
         if order.presave is None:
+            next_frame_index = frame_index + 2
+            next_tickets = tickets[frame_index:next_frame_index]
+            frame_index = next_frame_index
             # sync cooking with presave frames
             presave_start = time.perf_counter()
 
@@ -160,37 +160,49 @@ class Kitchen:
 
         cooked_dir = 'cooked'
 
-        if frames > 0:
-            if not os.path.isdir(cooked_dir):
-                os.makedirs(cooked_dir)
-
-        frame_index = 1
+        if not os.path.isdir(cooked_dir):
+            os.makedirs(cooked_dir)
 
         tickets_to_cook = []
 
-        for ticket in order.tickets:
-            padded_frame_index = str(frame_index).zfill(digits)
+        suborders = defaultdict(list)
 
-            if frames > 1:
+        for ticket in order.tickets:
+            suborder_name = ticket.input_filename
+
+            suborders[suborder_name].append(ticket)
+
+        for suborder_name, suborder in suborders.items():
+            suborder_length = len(suborder)
+
+            frame_index = 1
+
+            for ticket in suborder:
+                if suborder_length > 1:
+                    padded_frame_index = str(frame_index).zfill(digits)
+                    frame_suffix = '-' + padded_frame_index
+                else:
+                    frame_suffix = ''
+
                 output_filename = os.path.join(
                     cooked_dir,
-                    order.order_name + '-' + padded_frame_index + '.png'
+                    '{suborder_base}{frame_suffix}{extension}'.format(
+                        suborder_base=os.path.splitext(suborder_name)[0],
+                        frame_suffix=frame_suffix,
+                        extension='.png'
+                    )
                 )
-
-                ticket.output_filename = output_filename
 
                 if os.path.isfile(output_filename):
                     if order.resume:
                         continue
                     else:
                         os.remove(output_filename)
-            else:
-                output_filename = os.path.join(cooked_dir, order.order_name + '.png')
 
-            ticket.output_filename = output_filename
-            frame_index += 1
+                ticket.output_filename = output_filename
+                frame_index += 1
 
-            tickets_to_cook.append(ticket)
+                tickets_to_cook.append(ticket)
 
         order.tickets = tickets_to_cook
 
@@ -240,18 +252,19 @@ class Kitchen:
         order_name = order.order_name
 
         pierogis = []
+        i = 0
+        for ticket in order.tickets:
+            if os.path.isdir(input_path):
+                frame_path = ticket.output_filename
+                frame_index = 0
 
-        if os.path.isdir(input_path):
-            # debug here
-            for filename in sorted(os.listdir(input_path)):
-                if filename.startswith(order_name):
-                    frame_path = os.path.join(input_path, filename)
-                    pierogis.append(Pierogi.from_path(path=frame_path, frame_index=0))
-        elif os.path.isfile(input_path):
-            reader = imageio.get_reader(input_path)
+            else:
+                frame_path = input_path
+                frame_index = i
 
-            for i in range(reader.count_frames()):
-                pierogis.append(Pierogi.from_path(path=input_path, frame_index=i))
+                i += 1
+
+            pierogis.append(Pierogi.from_path(path=frame_path, frame_index=frame_index))
 
         dish = Dish(pierogis=pierogis)
 

@@ -129,12 +129,25 @@ class Server:
             if os.path.isfile(input_path):
                 order.fps = imageio.get_reader(input_path).get_meta_data()['fps']
 
-        frames = len(order.tickets)
-        self.report_status(order, total=frames)
-
         # if the order is just togo, don't need the kitchen
         if parsed_vars['order'] == 'togo':
             self.report_status(order, status='boxing')
+
+            if os.path.isdir(input_path):
+                # debug here
+                for filename in sorted(os.listdir(input_path)):
+                    if filename.startswith(order_name):
+                        frame_path = os.path.join(input_path, filename)
+                        ticket = Ticket(output_filename=frame_path)
+                        order.add_ticket(ticket)
+            else:
+                for i in range(imageio.get_reader(input_path).count_frames()):
+                    ticket = Ticket()
+                    order.add_ticket(ticket)
+
+            frames = len(order.tickets)
+            self.report_status(order, total=frames)
+
             kitchen.plate(
                 order=order,
                 report_status=self.report_status
@@ -144,6 +157,9 @@ class Server:
 
             # order has tickets attached (for frames)
             self.write_tickets(order, parsed_vars)
+
+            frames = len(order.tickets)
+            self.report_status(order, total=frames)
 
             # the Server splits off part of their consciousness into a new thread
             check_thread = Thread(target=self.check_order, args=[order])
@@ -158,7 +174,11 @@ class Server:
             check_thread.join()
 
             self.report_status(order, status='plating')
-            kitchen.plate(order)
+
+            kitchen.plate(
+                order,
+                report_status=self.report_status
+            )
 
         self.report_status(order, status='done')
 
@@ -170,15 +190,32 @@ class Server:
         """
         generate_ticket = parsed_vars.pop('generate_ticket')
 
-        reader = imageio.get_reader(order.input_path)
+        order_input_path = order.input_path
+        order_name = order.order_name
 
-        frames = reader.count_frames()
+        if os.path.isfile(order_input_path):
+            reader = imageio.get_reader(order_input_path)
+            frames = reader.count_frames()
 
-        for frame_index in range(frames):
-            ticket = Ticket()
-            ticket = generate_ticket(ticket, order.input_path, frame_index, **parsed_vars.copy())
+            for frame_index in range(frames):
+                ticket = Ticket()
+                ticket = generate_ticket(ticket, order_input_path, frame_index, **parsed_vars.copy())
 
-            order.add_ticket(ticket)
+                order.add_ticket(ticket)
+
+        elif os.path.isdir(order_input_path):
+            # debug here
+            for filename in sorted(os.listdir(order_input_path)):
+                if filename.startswith(order_name):
+                    input_path = os.path.join(
+                        order_input_path,
+                        filename
+                    )
+
+                    ticket = Ticket()
+                    ticket = generate_ticket(ticket, input_path, 0, **parsed_vars.copy())
+
+                    order.add_ticket(ticket)
 
     def order_size(self, order: Order) -> int:
         order_tickets = order.tickets
@@ -191,8 +228,8 @@ class Server:
 
     def cooked_tickets(self, order: Order):
         cooked_tickets = 0
-        for filename in os.listdir('cooked'):
-            if filename.startswith(order.order_name):
+        for filename in order.output_filenames:
+            if os.path.exists(os.path.join(filename)):
                 cooked_tickets += 1
 
         return cooked_tickets

@@ -1,3 +1,4 @@
+import os
 import uuid
 from typing import Dict, List
 
@@ -86,6 +87,10 @@ class Ticket:
     """
 
     output_filename: str = None
+
+    @property
+    def input_filename(self):
+        return os.path.basename(self.files[self.pierogis[self.base].files_key])
 
     def __init__(
             self,

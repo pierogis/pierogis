@@ -31,9 +31,15 @@ class Order:
     @property
     def reader(self):
         if self._reader is None:
-            self._reader = imageio.get_reader(self.input_path)
+            if os.path.isfile(self.input_path):
+                self._reader = imageio.get_reader(self.input_path)
 
         return self._reader
+
+    @property
+    def output_filenames(self):
+        for ticket in self.tickets:
+            yield ticket.output_filename
 
     def __init__(
             self,

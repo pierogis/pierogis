@@ -104,7 +104,7 @@ class Dish(Ingredient):
             )
 
             for pierogi in self.pierogis:
-                writer.append_data(np.asarray(pierogi.image)[:, :, 1])
+                writer.append_data(np.asarray(pierogi.image))
 
                 callback()
 
