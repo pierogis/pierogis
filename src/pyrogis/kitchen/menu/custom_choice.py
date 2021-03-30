@@ -1,12 +1,11 @@
 import argparse
 import os
 
-from .menu_item import MenuItem
+from .menu_choice import MenuChoice
 from ..ticket import Ticket
-from ...ingredients import Pierogi
 
 
-class RecipeOrder(MenuItem):
+class CustomChoice(MenuChoice):
     @staticmethod
     def read_recipe(
             ticket: Ticket,

@@ -1,8 +1,8 @@
-from .menu_item import MenuItem
+from .menu_choice import MenuChoice
 from ...ingredients import SpatialQuantize
 
 
-class QuantizeOrder(MenuItem):
+class QuantizeChoice(MenuChoice):
     type_name = 'quantize'
     type = SpatialQuantize
 

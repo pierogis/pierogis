@@ -6,7 +6,7 @@ import pytest
 
 from pyrogis import Dish
 from pyrogis.kitchen import Kitchen, Chef, Server
-from pyrogis.kitchen.menu import ResizeOrder
+from pyrogis.kitchen.menu import ResizeChoice
 from pyrogis.kitchen.order import Order
 
 
@@ -39,7 +39,7 @@ def animation_dish(animation_file) -> Dish:
 def parsed_vars() -> dict:
     parsed_vars = {
         'order': 'resize',
-        'generate_ticket': ResizeOrder.generate_ticket
+        'generate_ticket': ResizeChoice.generate_ticket
     }
     return parsed_vars
 

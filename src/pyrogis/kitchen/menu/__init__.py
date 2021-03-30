@@ -1,16 +1,16 @@
-from .menu_item import MenuItem
-from .recipe_order import RecipeOrder
-from .quantize_order import QuantizeOrder
-from .sort_order import SortOrder
-from .threshold_order import ThresholdOrder
-from .resize_order import ResizeOrder
-from .rotate_order import RotateOrder
+from .menu_choice import MenuChoice
+from .custom_choice import CustomChoice
+from .quantize_choice import QuantizeChoice
+from .sort_choice import SortChoice
+from .threshold_choice import ThresholdChoice
+from .resize_choice import ResizeChoice
+from .rotate_choice import RotateChoice
 
 menu = {
-    SortOrder.type_name: SortOrder,
-    QuantizeOrder.type_name: QuantizeOrder,
-    'chef': RecipeOrder,
-    ThresholdOrder.type_name: ThresholdOrder,
-    ResizeOrder.type_name: ResizeOrder,
-    'rotate': RotateOrder
+    SortChoice.type_name: SortChoice,
+    QuantizeChoice.type_name: QuantizeChoice,
+    'custom': CustomChoice,
+    ThresholdChoice.type_name: ThresholdChoice,
+    ResizeChoice.type_name: ResizeChoice,
+    'rotate': RotateChoice
 }

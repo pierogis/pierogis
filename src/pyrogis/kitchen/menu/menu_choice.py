@@ -2,10 +2,9 @@ import argparse
 from abc import ABC, abstractmethod
 
 from ..ticket import Ticket, IngredientDesc
-from ...ingredients import Pierogi
 
 
-class MenuItem(ABC):
+class MenuChoice(ABC):
     type_name = None
 
     @classmethod

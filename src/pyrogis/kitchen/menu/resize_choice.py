@@ -1,9 +1,8 @@
-from .menu_item import MenuItem
-
+from .menu_choice import MenuChoice
 from ...ingredients import Resize
 
 
-class ResizeOrder(MenuItem):
+class ResizeChoice(MenuChoice):
     type_name = 'resize'
     type = Resize
 

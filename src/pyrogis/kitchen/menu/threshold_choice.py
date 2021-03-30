@@ -1,10 +1,8 @@
-from .menu_item import MenuItem
-
-from ..ticket import Ticket, IngredientDesc
-from ...ingredients import Threshold, Pierogi
+from .menu_choice import MenuChoice
+from ...ingredients import Threshold
 
 
-class ThresholdOrder(MenuItem):
+class ThresholdChoice(MenuChoice):
     type_name = 'threshold'
     type = Threshold
 

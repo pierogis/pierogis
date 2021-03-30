@@ -1,8 +1,8 @@
-from pyrogis.kitchen.menu.menu_item import MenuItem
-from pyrogis.ingredients import Rotate
+from .menu_choice import MenuChoice
+from ...ingredients import Rotate
 
 
-class RotateOrder(MenuItem):
+class RotateChoice(MenuChoice):
     type_name = 'rotate'
     type = Rotate
 
