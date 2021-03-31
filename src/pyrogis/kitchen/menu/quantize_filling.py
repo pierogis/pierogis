@@ -1,8 +1,8 @@
-from .menu_choice import MenuChoice
+from .filling import Filling
 from ...ingredients import SpatialQuantize
 
 
-class QuantizeChoice(MenuChoice):
+class QuantizeFilling(Filling):
     type_name = 'quantize'
     type = SpatialQuantize
 

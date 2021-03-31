@@ -1,11 +1,11 @@
-from .menu_choice import MenuChoice
-from .rotate_choice import RotateChoice
-from .threshold_choice import ThresholdChoice
+from .filling import Filling
+from .rotate_filling import RotateFilling
+from .threshold_filling import ThresholdFilling
 from ..ticket import Ticket, IngredientDesc
 from ...ingredients import Sort
 
 
-class SortChoice(MenuChoice):
+class SortFilling(Filling):
     type_name = 'sort'
     type = Sort
 
@@ -72,6 +72,6 @@ class SortChoice(MenuChoice):
         """
         add the arguments that a sort parser would need
         """
-        RotateChoice.add_parser_arguments(parser)
+        RotateFilling.add_parser_arguments(parser)
 
-        ThresholdChoice.add_parser_arguments(parser)
+        ThresholdFilling.add_parser_arguments(parser)

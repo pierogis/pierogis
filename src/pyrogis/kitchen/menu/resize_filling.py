@@ -1,8 +1,8 @@
-from .menu_choice import MenuChoice
+from .filling import Filling
 from ...ingredients import Resize
 
 
-class ResizeChoice(MenuChoice):
+class ResizeFilling(Filling):
     type_name = 'resize'
     type = Resize
 

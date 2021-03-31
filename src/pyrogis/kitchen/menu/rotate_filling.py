@@ -1,8 +1,8 @@
-from .menu_choice import MenuChoice
+from .filling import Filling
 from ...ingredients import Rotate
 
 
-class RotateChoice(MenuChoice):
+class RotateFilling(Filling):
     type_name = 'rotate'
     type = Rotate
 

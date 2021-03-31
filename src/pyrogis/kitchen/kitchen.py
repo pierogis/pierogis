@@ -11,6 +11,7 @@ from .menu import menu
 from .order import Order
 from .ticket import Ticket
 from .. import Pierogi, Dish
+from ..course import Course
 
 
 class Kitchen:
@@ -52,7 +53,7 @@ class Kitchen:
 
         cooked_dish = chef.cook_dish(dish)
 
-        cooked_dish.save(ticket.output_filename)
+        cooked_dish.pierogi.save(ticket.output_filename)
 
     def _presave_ticket(self, frame, ticket: Ticket):
         raw_dir = os.path.join('/tmp', 'raw')
@@ -251,7 +252,7 @@ class Kitchen:
         input_path = order.input_path
         order_name = order.order_name
 
-        pierogis = []
+        dishes = []
         i = 0
         for ticket in order.tickets:
             if os.path.isdir(input_path):
@@ -264,9 +265,11 @@ class Kitchen:
 
                 i += 1
 
-            pierogis.append(Pierogi.from_path(path=frame_path, frame_index=frame_index))
+            dish = Dish(pierogi=Pierogi.from_path(path=frame_path, frame_index=frame_index))
 
-        dish = Dish(pierogis=pierogis)
+            dishes.append(dish)
+
+        course = Course(dishes=dishes)
 
         output_filename = order.output_filename
         fps = order.fps
@@ -276,7 +279,7 @@ class Kitchen:
         if output_filename is None:
             if order_name is None:
                 order_name = os.path.splitext(os.path.basename(input_path))[0]
-            if dish.frames == 1:
+            if course.frames == 1:
                 output_filename = order_name + '.png'
             else:
                 output_filename = order_name + '.gif'
@@ -287,7 +290,7 @@ class Kitchen:
                 advance=1
             )
 
-        dish.save(
+        course.save(
             output_filename,
             optimize,
             duration=frame_duration,

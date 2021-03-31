@@ -1,16 +1,16 @@
-from .menu_choice import MenuChoice
-from .custom_choice import CustomChoice
-from .quantize_choice import QuantizeChoice
-from .sort_choice import SortChoice
-from .threshold_choice import ThresholdChoice
-from .resize_choice import ResizeChoice
-from .rotate_choice import RotateChoice
+from .filling import Filling
+from .custom_filling import CustomFilling
+from .quantize_filling import QuantizeFilling
+from .sort_filling import SortFilling
+from .threshold_filling import ThresholdFilling
+from .resize_filling import ResizeFilling
+from .rotate_filling import RotateFilling
 
 menu = {
-    SortChoice.type_name: SortChoice,
-    QuantizeChoice.type_name: QuantizeChoice,
-    'custom': CustomChoice,
-    ThresholdChoice.type_name: ThresholdChoice,
-    ResizeChoice.type_name: ResizeChoice,
-    'rotate': RotateChoice
+    SortFilling.type_name: SortFilling,
+    QuantizeFilling.type_name: QuantizeFilling,
+    'custom': CustomFilling,
+    ThresholdFilling.type_name: ThresholdFilling,
+    ResizeFilling.type_name: ResizeFilling,
+    'rotate': RotateFilling
 }

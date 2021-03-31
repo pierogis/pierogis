@@ -127,7 +127,7 @@ class Server:
 
         if order.fps is None:
             if os.path.isfile(input_path):
-                order.fps = imageio.get_reader(input_path).get_meta_data()['fps']
+                order.fps = imageio.get_reader(input_path).get_meta_data().get('fps')
 
         # if the order is just togo, don't need the kitchen
         if parsed_vars['order'] == 'togo':
@@ -195,7 +195,10 @@ class Server:
 
         if os.path.isfile(order_input_path):
             reader = imageio.get_reader(order_input_path)
-            frames = reader.count_frames()
+            if hasattr(reader, 'count_frames'):
+                frames = reader.count_frames()
+            else:
+                frames = len(reader)
 
             for frame_index in range(frames):
                 ticket = Ticket()

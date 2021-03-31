@@ -41,9 +41,6 @@ class Ingredient:
         self.prep(**kwargs)
         self.seasonings = []
 
-    def __call__(self, frame: int, frames: int):
-        return self
-
     def prep(self, **kwargs) -> None:
         """
         parameterize the cook function

@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from .menu import MenuChoice
+from .menu import Filling
 from .ticket import Ticket, PierogiDesc, IngredientDesc
 from ..ingredients import (
     Ingredient, Dish, Pierogi, Recipe
@@ -39,7 +39,7 @@ class Chef:
             cls,
             ingredient_descs: Dict[str, IngredientDesc],
             pierogis: Dict[str, Pierogi],
-            menu: Dict[str, MenuChoice]
+            menu: Dict[str, Filling]
     ) -> Dict[str, Ingredient]:
         """
         create a dict of uuid->Ingredient
@@ -173,7 +173,7 @@ class Chef:
         )
 
         return Dish(
-            pierogis=[pierogis[base]],
+            pierogi=pierogis[base],
             recipe=recipe_object
         )
 

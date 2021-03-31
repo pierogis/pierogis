@@ -1,11 +1,11 @@
 import argparse
 import os
 
-from .menu_choice import MenuChoice
+from .filling import Filling
 from ..ticket import Ticket
 
 
-class CustomChoice(MenuChoice):
+class CustomFilling(Filling):
     @staticmethod
     def read_recipe(
             ticket: Ticket,

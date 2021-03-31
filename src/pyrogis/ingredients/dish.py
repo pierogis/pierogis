@@ -1,8 +1,3 @@
-import os
-import subprocess
-from typing import List, Callable
-
-import imageio as imageio
 import numpy as np
 
 from .ingredient import Ingredient
@@ -12,29 +7,15 @@ from .recipe import Recipe
 
 class Dish(Ingredient):
     """
-    crop and cook an entire recipe for all pixels
-
-    create a Dish from:
-    - single Pierogi
-    - list of Pierogis
-    - image file
-    - video file
-    - directory
+    cook a pierogi with a recipe
     """
 
-    _pierogis: List[Pierogi] = None
-    _frames: int = None
-    _fps: int = None
-
-    @property
-    def frames(self):
-        return len(self.pierogis)
+    _pierogi: Pierogi = None
 
     def prep(
             self,
-            pierogis: List[Pierogi] = None,
-            recipe: Callable = None,
-            fps: float = None,
+            pierogi: Pierogi,
+            recipe: Recipe = None,
             **kwargs
     ):
         """
@@ -46,81 +27,25 @@ class Dish(Ingredient):
 
         :param pierogis: a list of Pierogi to cook
         """
-        self.pierogis = pierogis
-        self.fps = fps
+        self.pierogi = pierogi
 
         if recipe is None:
             recipe = Recipe()
         self.recipe = recipe
 
-    def cook(self, pixels: np.ndarray, frame: int = 0) -> np.ndarray:
-        return self.recipe(0, 0).cook(self.pierogis[frame].pixels)
+    def cook(self, pixels: np.ndarray) -> np.ndarray:
+        return self.recipe.cook(self.pierogi.pixels)
 
     def serve(self) -> 'Dish':
         """
         cook the recipe and set the output to this object's pixel array
         """
 
-        cooked_pierogis = []
+        # cook with these pixels as first input
+        cooked_pixels = self.recipe.cook(self.pierogi.pixels)
+        # ensure that the cooked pixels do not overflow 0-255
+        clipped_pixels = np.clip(cooked_pixels, 0, 255)
+        # # set the objects own pixels to the result of cooking
+        cooked_pierogi = Pierogi(pixels=clipped_pixels)
 
-        for frame in range(self.frames):
-            pierogi = self.pierogis[frame]
-            # cook with these pixels as first input
-            recipe = self.recipe(frame + 1, self.frames)
-            cooked_pixels = recipe.cook(pierogi.pixels)
-            # ensure that the cooked pixels do not overflow 0-255
-            clipped_pixels = np.clip(cooked_pixels, 0, 255)
-            # # set the objects own pixels to the result of cooking
-            cooked_pierogi = Pierogi(pixels=clipped_pixels)
-
-            cooked_pierogis.append(cooked_pierogi)
-
-        return Dish(pierogis=cooked_pierogis)
-
-    def save(
-            self,
-            path: str,
-            optimize: bool = True,
-            duration: float = None,
-            fps: float = None,
-            callback: Callable = None
-    ) -> None:
-        """
-        :param duration: ms duration between frames
-        """
-        if len(self.pierogis) > 1:
-            if duration is not None:
-                fps = 1000 / duration
-
-            if fps is None:
-                if self._fps is None:
-                    fps = 30
-                else:
-                    fps = self._fps
-
-            writer = imageio.get_writer(
-                path,
-                fps=fps
-            )
-
-            for pierogi in self.pierogis:
-                writer.append_data(np.asarray(pierogi.image))
-
-                callback()
-
-            writer.close()
-
-            if optimize and os.path.splitext(path)[1] == ".gif":
-                return_code = subprocess.call(
-                    ["gifsicle", '--optimize', path, "--output", path],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL
-                )
-                if return_code != 0:
-                    print("install gifsicle and ensure it's on PATH to optimize gif")
-
-        elif len(self.pierogis) == 1:
-            self.pierogis[0].save(path)
-
-        else:
-            raise Exception("Dish has no pierogis")
+        return Dish(pierogi=cooked_pierogi)

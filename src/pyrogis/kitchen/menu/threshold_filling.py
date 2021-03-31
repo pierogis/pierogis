@@ -1,8 +1,8 @@
-from .menu_choice import MenuChoice
+from .filling import Filling
 from ...ingredients import Threshold
 
 
-class ThresholdChoice(MenuChoice):
+class ThresholdFilling(Filling):
     type_name = 'threshold'
     type = Threshold
 

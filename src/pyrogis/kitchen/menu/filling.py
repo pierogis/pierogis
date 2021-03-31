@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from ..ticket import Ticket, IngredientDesc
 
 
-class MenuChoice(ABC):
+class Filling(ABC):
     type_name = None
 
     @classmethod
