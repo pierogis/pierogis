@@ -1,16 +1,12 @@
-import os
 from typing import Dict
 
+import numpy as np
 import pytest
+from PIL import Image
 
-from pyrogis import Dish
+from pyrogis import Dish, Pierogi
 from pyrogis.kitchen import Chef, menu
 from pyrogis.kitchen.ticket import Ticket, PierogiDesc, IngredientDesc
-
-
-# @pytest.fixture
-# def chef() -> Chef:
-#     return Chef()
 
 
 @pytest.fixture
@@ -34,24 +30,29 @@ def pierogi_desc(files_key) -> PierogiDesc:
 
 
 @pytest.fixture
-def image_file():
-    return 'resources/gnome.jpg'
+def array():
+    return np.asarray([[[200, 200, 200], [30, 30, 30]],
+                       [[130, 130, 130], [60, 60, 60]]]).astype(np.dtype('uint8'))
 
 
 @pytest.fixture
-def cooked_dir():
-    return 'cooked'
+def image_path(array: np.ndarray, tmp_path):
+    image = Image.fromarray(array)
+    output_path = tmp_path / 'output.png'
+    image.save(output_path)
+
+    return output_path
 
 
 @pytest.fixture
-def chef(cooked_dir):
+def chef():
     return Chef()
 
 
 @pytest.fixture
-def image_files(files_key, image_file) -> Dict[str, str]:
+def image_paths(files_key, image_path) -> Dict[str, str]:
     files = {
-        files_key: image_file
+        files_key: image_path
     }
     return files
 
@@ -62,15 +63,15 @@ def ingredient_desc(ingredient_key) -> IngredientDesc:
 
 
 @pytest.fixture
-def pierogi_objects(chef, pierogi_key, pierogi_desc, image_files):
+def pierogi_objects(chef, pierogi_key, pierogi_desc, image_paths):
     pierogi_descs = {
         pierogi_key: pierogi_desc
     }
-    return chef.create_pierogi_objects(pierogi_descs, image_files)
+    return chef.create_pierogi_objects(pierogi_descs, image_paths)
 
 
 @pytest.fixture
-def ticket(pierogi_key, pierogi_desc, ingredient_desc, ingredient_key, image_files):
+def ticket(pierogi_key, pierogi_desc, ingredient_desc, ingredient_key, image_paths):
     pierogi_descs = {
         pierogi_key: pierogi_desc
     }
@@ -84,7 +85,7 @@ def ticket(pierogi_key, pierogi_desc, ingredient_desc, ingredient_key, image_fil
 
     ticket = Ticket(
         pierogis=pierogi_descs,
-        files=image_files,
+        files=image_paths,
         ingredients=ingredient_descs,
         base=base,
         recipe=[ingredient_key],
@@ -95,13 +96,8 @@ def ticket(pierogi_key, pierogi_desc, ingredient_desc, ingredient_key, image_fil
 
 
 @pytest.fixture
-def image_dish() -> Dish:
-    return Dish.from_path('resources/gnome.jpg')
-
-
-@pytest.fixture
-def animation_dish() -> Dish:
-    return Dish.from_path('resources/octo.mp4')
+def image_dish(image_path: str) -> Dish:
+    return Dish(pierogi=Pierogi.from_path(image_path))
 
 
 def test_create_pierogi_objects(pierogi_objects):
@@ -148,7 +144,6 @@ def test_get_ingredient_create(chef, ingredient_desc, ingredient_key):
 
 
 def test_assemble_dish(chef, ticket):
-    order_name = 'test_assemble_dish'
     dish = chef.assemble_ticket(ticket, menu)
 
     assert dish
@@ -156,11 +151,5 @@ def test_assemble_dish(chef, ticket):
 
 def test_cook_dish_image(chef, image_dish):
     dish = chef.cook_dish(image_dish)
-
-    assert dish
-
-
-def test_cook_dish_animation(chef, cooked_dir, animation_dish):
-    dish = chef.cook_dish(animation_dish)
 
     assert dish

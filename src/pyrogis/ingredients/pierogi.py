@@ -1,7 +1,8 @@
 """
 define an image wrapper ingredient
 """
-from typing import Callable
+from pathlib import Path
+from typing import Callable, Union
 
 import imageio
 import numpy as np
@@ -88,7 +89,7 @@ class Pierogi(Ingredient):
         def loader():
             reader = imageio.get_reader(path)
             reader.set_image_index(frame_index)
-            return np.rot90(np.array(reader.get_next_data())[:,:,:3], axes=(1, 0))
+            return np.rot90(np.array(reader.get_next_data())[:, :, :3], axes=(1, 0))
 
         return cls(loader=loader)
 
@@ -139,16 +140,12 @@ class Pierogi(Ingredient):
         """
         self.image.show()
 
-    def save(self, path: str, optimize: bool = False) -> None:
+    def save(self, path: Union[str, Path], optimize: bool = False) -> None:
         """
         save the image to the given path
         """
 
         output_filename = path
-        # if os.path.isdir(path):
-        #     output_filename = os.path.join(
-        #         path, os.path.split(self.file)[1]
-        #     )
 
         self.image.save(output_filename, optimize=optimize)
 

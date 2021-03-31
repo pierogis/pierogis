@@ -200,7 +200,7 @@ class Kitchen:
                     else:
                         os.remove(output_filename)
 
-                ticket.output_filename = output_filename
+                ticket.output_path = output_filename
                 frame_index += 1
 
                 tickets_to_cook.append(ticket)
@@ -254,12 +254,17 @@ class Kitchen:
 
         dishes = []
         i = 0
+
+        if len(order.tickets) == 0:
+            raise Exception("Order has no tickets")
+
         for ticket in order.tickets:
             if os.path.isdir(input_path):
                 frame_path = ticket.output_filename
                 frame_index = 0
 
             else:
+                """we are plating from a file"""
                 frame_path = input_path
                 frame_index = i
 
@@ -271,7 +276,7 @@ class Kitchen:
 
         course = Course(dishes=dishes)
 
-        output_filename = order.output_filename
+        output_filename = order.output_path
         fps = order.fps
         optimize = order.optimize
         frame_duration = order.duration
@@ -284,11 +289,14 @@ class Kitchen:
             else:
                 output_filename = order_name + '.gif'
 
-        def callback():
-            report_status(
-                order,
-                advance=1
-            )
+        if report_status is not None:
+            def callback():
+                report_status(
+                    order,
+                    advance=1
+                )
+        else:
+            callback = None
 
         course.save(
             output_filename,

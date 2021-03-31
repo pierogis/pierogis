@@ -67,7 +67,8 @@ class Course:
             for dish in self.dishes:
                 writer.append_data(np.asarray(dish.pierogi.image))
 
-                callback()
+                if callback is not None:
+                    callback()
 
             writer.close()
 

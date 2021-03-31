@@ -1,5 +1,6 @@
 import os
-from typing import List
+from pathlib import Path
+from typing import List, Union
 
 import imageio
 
@@ -9,6 +10,7 @@ from .ticket import Ticket
 class Order:
     order_name: str
     tickets: List[Ticket]
+    output_path: str
     fps: float
     resume: bool = False
     presave: bool = None
@@ -45,7 +47,7 @@ class Order:
             self,
             order_name: str,
             input_path: str,
-            output_filename: str = None,
+            output_path: Union[str, Path] = None,
             fps: float = None,
             duration: int = None,
             optimize: bool = None
@@ -53,7 +55,7 @@ class Order:
         self._order_name = order_name
         self.input_path = input_path
         self.tickets = []
-        self.output_filename = output_filename
+        self.output_path = output_path
         self.fps = fps
         self.duration = duration
         self.optimize = optimize

@@ -15,19 +15,12 @@ from .ticket import Ticket
 
 
 class Server:
-    orders: List[Order]
-
-    @property
-    def order_names(self):
-        return [order.order_name for order in self.orders]
+    """"""
 
     def __init__(
             self,
             report_status: Callable = None,
-            # cooked_dir: str = 'cooked',
     ):
-        # self.cooked_dir = cooked_dir
-        self.orders = []
         self._report_status = report_status
 
     def _create_parser(self, menu):
@@ -116,14 +109,8 @@ class Server:
         optimize = parsed_togo_vars.pop('optimize')
         frame_duration = parsed_togo_vars.pop('frame_duration')
 
-        order = Order(
-            order_name,
-            input_path,
-            fps=fps,
-            output_filename=output_filename,
-            optimize=optimize,
-            duration=frame_duration
-        )
+        order = Order(order_name, input_path, output_path=output_filename, fps=fps, duration=frame_duration,
+                      optimize=optimize)
 
         if order.fps is None:
             if os.path.isfile(input_path):
@@ -220,16 +207,8 @@ class Server:
 
                     order.add_ticket(ticket)
 
-    def order_size(self, order: Order) -> int:
-        order_tickets = order.tickets
-        if order_tickets is not None:
-            submitted_tickets = len(order_tickets)
-        else:
-            submitted_tickets = 0
-
-        return submitted_tickets
-
-    def cooked_tickets(self, order: Order):
+    @staticmethod
+    def cooked_tickets(order: Order):
         cooked_tickets = 0
         for filename in order.output_filenames:
             if os.path.exists(os.path.join(filename)):
@@ -244,7 +223,7 @@ class Server:
 
         """"""
 
-        total = self.order_size(order)
+        total = len(order.tickets)
 
         retries = 0
         wait_time = 1
@@ -263,6 +242,8 @@ class Server:
                 time.sleep(wait_time)
 
             retries += 1
+
+        return completed
 
     def report_status(self, order, **kwargs):
         if self._report_status is not None:

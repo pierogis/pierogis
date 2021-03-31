@@ -12,7 +12,7 @@ def array():
                        [[20, 40, 100], [10, 20, 200]]]).astype(np.dtype('uint8'))
 
 
-def test_resize_1(array):
+def test_resize_width(array):
     """
     provide only width
     """
@@ -26,7 +26,7 @@ def test_resize_1(array):
     assert cooked_array.shape[1] == int(width / aspect)
 
 
-def test_resize_2(array):
+def test_resize_height(array):
     """
     provide only height
     """
@@ -40,7 +40,7 @@ def test_resize_2(array):
     assert cooked_array.shape[1] == height
 
 
-def test_resize_3(array):
+def test_resize_width_height(array):
     """
     provide height and width
     """
@@ -54,7 +54,7 @@ def test_resize_3(array):
     assert cooked_array.shape[1] == height
 
 
-def test_resize_4(array):
+def test_resize_width_scale(array):
     """
     provide width and scale
     """
@@ -69,7 +69,7 @@ def test_resize_4(array):
     assert cooked_array.shape[1] == int(scale * width / aspect)
 
 
-def test_resize_5(array):
+def test_resize_height_scale(array):
     """
     provide height and scale
     """
@@ -84,7 +84,7 @@ def test_resize_5(array):
     assert cooked_array.shape[1] == height * scale
 
 
-def test_resize_6(array):
+def test_resize_scale(array):
     """
     provide only scale
     """
@@ -97,7 +97,7 @@ def test_resize_6(array):
     assert cooked_array.shape[1] == array.shape[1] * scale
 
 
-def test_resize_7(array):
+def test_resize_height_width_scale(array):
     """
     provide height, width, and scale
     """
@@ -112,9 +112,9 @@ def test_resize_7(array):
     assert cooked_array.shape[1] == height * scale
 
 
-def test_resize_8(array):
+def test_resize_height_width_scale_resample(array):
     """
-    provide height, width, and scale
+    provide height, width, scale, and resample
     """
     width = 100
     height = 200
