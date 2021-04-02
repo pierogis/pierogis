@@ -215,9 +215,13 @@ class Kitchen:
                     )
                 )
 
-                if os.path.isfile(output_path) and order.input_path != output_path:
+                if os.path.isfile(output_path):
+                    input_is_output = os.path.samefile(ticket.input_path, output_path)
+
                     if order.resume:
                         continue
+                    elif input_is_output:
+                        pass
                     else:
                         os.remove(output_path)
 

@@ -90,7 +90,11 @@ class Ticket:
 
     @property
     def input_filename(self):
-        return os.path.basename(self.files[self.pierogis[self.base].files_key])
+        return os.path.basename(self.input_path)
+
+    @property
+    def input_path(self):
+        return self.files[self.pierogis[self.base].files_key]
 
     def __init__(
             self,

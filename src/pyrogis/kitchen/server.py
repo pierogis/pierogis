@@ -166,6 +166,7 @@ class Server(OrderTaker):
 
             # the Server splits off part of their consciousness into a new thread
             check_thread = Thread(target=self.check_order, args=[order])
+            check_thread.daemon = True
 
             def start_callback():
                 check_thread.start()
@@ -216,13 +217,13 @@ class Server(OrderTaker):
             # debug here
             for filename in sorted(os.listdir(input_path)):
                 if order_name is None or filename.startswith(order_name):
-                    input_path = os.path.join(
+                    ticket_input_path = os.path.join(
                         input_path,
                         filename
                     )
 
                     ticket = Ticket()
-                    ticket = generate_ticket(ticket, input_path, 0, **parsed_vars.copy())
+                    ticket = generate_ticket(ticket, ticket_input_path, 0, **parsed_vars.copy())
 
                     order.add_ticket(ticket)
 
