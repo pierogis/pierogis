@@ -95,17 +95,17 @@ class Restaurant:
             refresh_per_second=2
         )
 
-    def add_kitchen_task(self, order):
-        task = self.kitchen_progress.add_task(description=order.order_name, input_paths=[order.input_path], cook_rate=0)
-        self.kitchen_tasks[order.order_name] = task
+    def add_kitchen_task(self, order_name: str, input_path:str):
+        task = self.kitchen_progress.add_task(description=order_name, input_paths=[input_path], cook_rate=0)
+        self.kitchen_tasks[order_name] = task
         return task
 
-    def add_server_task(self, order):
+    def add_server_task(self, order_name: str):
         task = self.server_progress.add_task('...')
-        self.server_tasks[order.order_name] = task
+        self.server_tasks[order_name] = task
         return task
 
-    def run(self, main: Callable):
+    def open(self, main: Callable):
         kitchen_group = RenderGroup(Text.from_markup("[bold blue]kitchen", style='u', justify='center'),
                                     Align(self.kitchen_progress, align='right'))
         server_group = RenderGroup(Text.from_markup("[bold blue]server", style='u', justify="center"),
@@ -121,15 +121,24 @@ class Restaurant:
     def report_status(self, order: Order, status: str = None,
                       completed: int = None, advance: int = None, total: int = None,
                       cook_async: bool = None, presave: bool = None):
-        server_task = self.server_tasks.get(order.order_name)
+        order_name = order.order_name
+        input_path = order.input_path
+
+        if order_name is None:
+            # set order name to first word of input filename if none given
+            order_name = os.path.splitext(
+                os.path.basename(input_path)
+            )[0].split()[0]
+
+        server_task = self.server_tasks.get(order_name)
         if server_task is None:
-            server_task = self.add_server_task(order)
+            server_task = self.add_server_task(order_name)
         if status is not None:
             self.server_progress.update(server_task, description=status)
 
-        kitchen_task = self.kitchen_tasks.get(order.order_name)
+        kitchen_task = self.kitchen_tasks.get(order_name)
         if kitchen_task is None:
-            kitchen_task = self.add_kitchen_task(order)
+            kitchen_task = self.add_kitchen_task(order_name, input_path)
         if completed is not None:
             self.kitchen_progress.update(kitchen_task, completed=completed)
         if total is not None:

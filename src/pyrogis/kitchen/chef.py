@@ -1,4 +1,5 @@
-from typing import Dict, List
+from abc import abstractmethod
+from typing import Dict, List, Protocol
 
 from .menu import Filling
 from .ticket import Ticket, PierogiDesc, IngredientDesc
@@ -7,7 +8,20 @@ from ..ingredients import (
 )
 
 
-class Chef:
+class Cooker(Protocol):
+    @abstractmethod
+    def assemble_ticket(self, ticket: Ticket, menu: Dict) -> Dish:
+        pass
+
+    @abstractmethod
+    def cook_dish(
+            self,
+            dish: Dish
+    ) -> Dish:
+        pass
+
+
+class Chef(Cooker):
     """
     handles text and json representations of pierogis constructs
 

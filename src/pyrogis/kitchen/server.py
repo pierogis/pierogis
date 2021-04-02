@@ -4,8 +4,9 @@ parsing
 import argparse
 import os
 import time
+from abc import abstractmethod
 from threading import Thread
-from typing import List, Callable
+from typing import List, Callable, Protocol
 
 import imageio
 
@@ -14,7 +15,22 @@ from .order import Order
 from .ticket import Ticket
 
 
-class Server:
+class OrderTaker(Protocol):
+    @abstractmethod
+    def take_order(
+            self, args: List[str], kitchen: Kitchen
+    ) -> Order:
+        pass
+
+    @abstractmethod
+    def check_order(
+            self,
+            order: Order
+    ) -> int:
+        pass
+
+
+class Server(OrderTaker):
     """"""
 
     def __init__(
@@ -29,7 +45,7 @@ class Server:
             description='** image processing pipelines **'
         )
         subparsers = parser.add_subparsers(
-            dest='order', required=True
+            dest='filling', required=True
         )
 
         # create parent parser to pass down arguments only
@@ -40,7 +56,7 @@ class Server:
             help="path to file or directory to use as input")
         base_parser.add_argument(
             '--order-name',
-            help="path to file or directory to use as input")
+            help="name of order for naming identifying related")
 
         subparsers.add_parser('togo', parents=[base_parser], add_help=False)
 
@@ -60,7 +76,7 @@ class Server:
         togo_parser = argparse.ArgumentParser(add_help=False)
         togo_parser.add_argument(
             '-o', '--output',
-            dest='output_filename',
+            dest='output_path',
             help="path to save resulting image"
         )
         togo_parser.add_argument(
@@ -85,7 +101,7 @@ class Server:
 
     def take_order(
             self, args: List[str], kitchen: Kitchen
-    ) -> None:
+    ) -> Order:
         """
         use a chef to parse list of strings into Tickets
         """
@@ -104,12 +120,12 @@ class Server:
         input_path = os.path.expanduser(parsed_vars.pop('path'))
         order_name = parsed_vars.pop('order_name')
 
-        output_filename = parsed_togo_vars.pop('output_filename')
+        output_path = parsed_togo_vars.pop('output_path')
         fps = parsed_togo_vars.pop('fps')
         optimize = parsed_togo_vars.pop('optimize')
         frame_duration = parsed_togo_vars.pop('frame_duration')
 
-        order = Order(order_name, input_path, output_path=output_filename, fps=fps, duration=frame_duration,
+        order = Order(order_name, input_path, output_path=output_path, fps=fps, duration=frame_duration,
                       optimize=optimize)
 
         if order.fps is None:
@@ -117,15 +133,15 @@ class Server:
                 order.fps = imageio.get_reader(input_path).get_meta_data().get('fps')
 
         # if the order is just togo, don't need the kitchen
-        if parsed_vars['order'] == 'togo':
+        if parsed_vars['filling'] == 'togo':
             self.report_status(order, status='boxing')
 
             if os.path.isdir(input_path):
                 # debug here
                 for filename in sorted(os.listdir(input_path)):
-                    if filename.startswith(order_name):
+                    if order_name is None or filename.startswith(order_name):
                         frame_path = os.path.join(input_path, filename)
-                        ticket = Ticket(output_filename=frame_path)
+                        ticket = Ticket(output_path=frame_path)
                         order.add_ticket(ticket)
             else:
                 for i in range(imageio.get_reader(input_path).count_frames()):
@@ -143,7 +159,7 @@ class Server:
             self.report_status(order, status='writing tickets')
 
             # order has tickets attached (for frames)
-            self.write_tickets(order, parsed_vars)
+            self._write_tickets(order, parsed_vars)
 
             frames = len(order.tickets)
             self.report_status(order, total=frames)
@@ -169,19 +185,22 @@ class Server:
 
         self.report_status(order, status='done')
 
-    def write_tickets(
+        return order
+
+    def _write_tickets(
             self, order: Order, parsed_vars
     ) -> None:
         """
         create tickets from a list of pierogis and parsed vars
         """
         generate_ticket = parsed_vars.pop('generate_ticket')
+        filling = parsed_vars.pop('filling')
 
-        order_input_path = order.input_path
+        input_path = order.input_path
         order_name = order.order_name
 
-        if os.path.isfile(order_input_path):
-            reader = imageio.get_reader(order_input_path)
+        if os.path.isfile(input_path):
+            reader = imageio.get_reader(input_path)
             if hasattr(reader, 'count_frames'):
                 frames = reader.count_frames()
             else:
@@ -189,16 +208,16 @@ class Server:
 
             for frame_index in range(frames):
                 ticket = Ticket()
-                ticket = generate_ticket(ticket, order_input_path, frame_index, **parsed_vars.copy())
+                ticket = generate_ticket(ticket, input_path, frame_index, **parsed_vars.copy())
 
                 order.add_ticket(ticket)
 
-        elif os.path.isdir(order_input_path):
+        elif os.path.isdir(input_path):
             # debug here
-            for filename in sorted(os.listdir(order_input_path)):
-                if filename.startswith(order_name):
+            for filename in sorted(os.listdir(input_path)):
+                if order_name is None or filename.startswith(order_name):
                     input_path = os.path.join(
-                        order_input_path,
+                        input_path,
                         filename
                     )
 
@@ -207,10 +226,13 @@ class Server:
 
                     order.add_ticket(ticket)
 
+        else:
+            raise FileNotFoundError(input_path)
+
     @staticmethod
-    def cooked_tickets(order: Order):
+    def _cooked_tickets(order: Order):
         cooked_tickets = 0
-        for filename in order.output_filenames:
+        for filename in order.output_paths:
             if os.path.exists(os.path.join(filename)):
                 cooked_tickets += 1
 
@@ -219,17 +241,17 @@ class Server:
     def check_order(
             self,
             order: Order
-    ):
+    ) -> int:
 
         """"""
 
         total = len(order.tickets)
 
         retries = 0
-        wait_time = 1
+        wait_time = .1
 
         while True:
-            completed = self.cooked_tickets(order)
+            completed = self._cooked_tickets(order)
 
             self.report_status(
                 order,

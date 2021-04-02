@@ -25,8 +25,6 @@ class Order:
                 self._order_name = os.path.splitext(
                     os.path.basename(self.input_path)
                 )[0].split()[0]
-            else:
-                self._order_name = ''
 
         return self._order_name
 
@@ -39,9 +37,9 @@ class Order:
         return self._reader
 
     @property
-    def output_filenames(self):
+    def output_paths(self):
         for ticket in self.tickets:
-            yield ticket.output_filename
+            yield ticket.output_path
 
     def __init__(
             self,

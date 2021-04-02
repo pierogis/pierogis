@@ -1,4 +1,0 @@
-resize -s .5;
-sort;
-quantize;
-resize -s 2;

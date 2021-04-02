@@ -2,12 +2,11 @@ import multiprocessing as mp
 import sys
 from typing import Callable
 
-from .kitchen import Chef, Server, Kitchen, Order
+from .kitchen import Chef, Server, Kitchen
 from .restaurant import Restaurant
 
 
-def main(args=None, report_status: Callable = None):
-    """cli program"""
+def run(args=None, report_status: Callable = None):
     if args is None:
         args = sys.argv[1:]
 
@@ -22,5 +21,12 @@ def main(args=None, report_status: Callable = None):
     )
 
 
-restaurant = Restaurant()
-sys.exit(restaurant.run(main))
+def main():
+    """cli program"""
+
+    restaurant = Restaurant()
+    sys.exit(restaurant.open(run))
+
+
+if __name__ == '__main__':
+    main()

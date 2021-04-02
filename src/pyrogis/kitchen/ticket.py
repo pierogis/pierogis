@@ -86,7 +86,7 @@ class Ticket:
     }
     """
 
-    output_filename: str = None
+    output_path: str = None
 
     @property
     def input_filename(self):
@@ -100,7 +100,7 @@ class Ticket:
             recipe: List[str] = None,
             base: str = None,
             seasoning_links: Dict[str, str] = None,
-            output_filename: str = None
+            output_path: str = None
     ):
         """
         create a Ticket
@@ -122,7 +122,7 @@ class Ticket:
         self.recipe = recipe
         self.base = base
         self.seasoning_links = seasoning_links
-        self.output_filename = output_filename
+        self.output_path = output_path
 
     def add_file(self, path: str) -> str:
         """
