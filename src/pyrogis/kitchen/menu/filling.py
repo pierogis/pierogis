@@ -47,11 +47,13 @@ class Filling(ABC):
         parser.add_argument(
             '--presave',
             action='store_true',
+            default=None,
             help="presave frames for cooking animations"
         )
         parser.add_argument(
             '--async',
             action='store_true',
+            default=None,
             help="use multiple python processes to cook frames"
         )
         parser.add_argument(
