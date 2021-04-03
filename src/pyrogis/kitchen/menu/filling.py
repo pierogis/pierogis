@@ -43,6 +43,24 @@ class Filling(ABC):
         """
         parser = argparse.ArgumentParser(add_help=False)
         parser.set_defaults(generate_ticket=cls.generate_ticket)
+
+        parser.add_argument(
+            '--presave',
+            action='store_true',
+            help="presave frames for cooking animations"
+        )
+        parser.add_argument(
+            '--async',
+            action='store_true',
+            help="use multiple python processes to cook frames"
+        )
+        parser.add_argument(
+            '--processes',
+            type=int,
+            help="number of async processes to use"
+        )
+
+        # get extra parser arguments from subclasses
         cls.add_parser_arguments(parser)
 
         return parser

@@ -125,8 +125,13 @@ class Server(OrderTaker):
         optimize = parsed_togo_vars.pop('optimize')
         frame_duration = parsed_togo_vars.pop('frame_duration')
 
-        order = Order(order_name, input_path, output_path=output_path, fps=fps, duration=frame_duration,
-                      optimize=optimize)
+        order = Order(
+            order_name, input_path,
+            output_path=output_path,
+            fps=fps,
+            duration=frame_duration,
+            optimize=optimize
+        )
 
         if order.fps is None:
             if os.path.isfile(input_path):
@@ -156,6 +161,17 @@ class Server(OrderTaker):
                 report_status=self.report_status
             )
         else:
+            presave = parsed_vars.pop('presave')
+            cook_async = parsed_vars.pop('async')
+            processes = parsed_vars.pop('processes')
+
+            if processes is not None:
+                cook_async = True
+
+            order.presave = presave
+            order.cook_async = cook_async
+            order.processes = processes
+
             self.report_status(order, status='writing tickets')
 
             # order has tickets attached (for frames)

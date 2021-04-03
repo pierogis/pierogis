@@ -15,6 +15,7 @@ class Order:
     resume: bool = False
     presave: bool = None
     cook_async: bool = None
+    processes: int = None
     _reader = None
 
     @property
@@ -48,7 +49,10 @@ class Order:
             output_path: Union[str, Path] = None,
             fps: float = None,
             duration: int = None,
-            optimize: bool = None
+            optimize: bool = None,
+            presave: bool = None,
+            cook_async: bool = None,
+            processes: int = None
     ):
         self._order_name = order_name
         self.input_path = input_path
@@ -57,6 +61,9 @@ class Order:
         self.fps = fps
         self.duration = duration
         self.optimize = optimize
+        self.presave = presave
+        self.cook_async = cook_async
+        self.processes = processes
 
         if not os.path.isfile(input_path):
             self.presave = False

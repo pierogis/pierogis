@@ -155,7 +155,10 @@ def test_take_order_resize_options(server, kitchen, image_path):
         "--width", "200",
         "--height", "300",
         "-s", "2",
-        "-r", "bicubic"
+        "-r", "bicubic",
+        "--presave",
+        "--async",
+        "--processes", "4"
     ]
 
     run_take_order(server, kitchen, args)
