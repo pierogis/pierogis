@@ -72,9 +72,7 @@ def test_check_cooked(server: Server, image_order: Order, image_path: str):
 # take_order
 
 def run_take_order(server: Server, kitchen: Kitchen, args: List[str]):
-    """
-
-    """
+    """handle take order call and successful output checking"""
     order = server.take_order(args, kitchen)
 
     for output_path in order.output_paths:
@@ -82,29 +80,27 @@ def run_take_order(server: Server, kitchen: Kitchen, args: List[str]):
 
 
 def test_take_order_sort(server, kitchen, image_path):
+    """test sort order"""
     args = ["sort", image_path]
 
     run_take_order(server, kitchen, args)
 
 
 def test_take_order_sort_options(server, kitchen, image_path):
-    """
-    test sort order with options
-    """
+    """test sort order with options"""
     args = ["sort", image_path, "-u", "120", "-l", "20", "-t", "2", "--ccw"]
 
     run_take_order(server, kitchen, args)
 
 
 def test_take_order_quantize(server, kitchen, image_path):
+    """test quantize order"""
     args = ["quantize", image_path]
     run_take_order(server, kitchen, args)
 
 
 def test_take_order_quantize_options(server, kitchen, image_path):
-    """
-    test quantize order with options
-    """
+    """test quantize order with options"""
     args = [
         "quantize", image_path,
         "-c", "012312", "043251",
@@ -126,9 +122,7 @@ def test_take_order_threshold(server, kitchen, image_path):
 
 
 def test_take_order_threshold_options(server, kitchen, image_path):
-    """
-    test threshold order with options
-    """
+    """test threshold order with options"""
     args = [
         "threshold", image_path,
         "-u", "200",
@@ -140,22 +134,21 @@ def test_take_order_threshold_options(server, kitchen, image_path):
     run_take_order(server, kitchen, args)
 
 
-def test_take_order(server, kitchen, image_path):
+def test_take_order_resize(server, kitchen, image_path):
+    """test resize order"""
     args = ["resize", image_path]
 
     run_take_order(server, kitchen, args)
 
 
 def test_take_order_resize_options(server, kitchen, image_path):
-    """
-    test resize order with options
-    """
+    """test resize order with options"""
     args = [
         "resize", image_path,
         "--width", "200",
         "--height", "300",
         "-s", "2",
-        "-r", "bicubic",
+        "--resample-filter", "bicubic",
         "--presave",
         "--async",
         "--processes", "4"
@@ -164,25 +157,51 @@ def test_take_order_resize_options(server, kitchen, image_path):
     run_take_order(server, kitchen, args)
 
 
-def test_take_order_chef(server, kitchen, image_path):
+def test_take_order_presave_async_processes(server, kitchen, image_path):
+    """test queue/async options"""
+    args = [
+        "resize", image_path,
+        "--presave",
+        "--async",
+        "--processes", "4"
+    ]
+
+    run_take_order(server, kitchen, args)
+
+
+def test_take_order_resume(server, kitchen, image_path):
+    """test resume flag"""
+    args = [
+        "resize", image_path,
+        "--resume"
+    ]
+
+    run_take_order(server, kitchen, args)
+
+
+def test_take_order_custom(server, kitchen, image_path):
+    """test custom with a txt file as a recipe"""
     args = ["custom", image_path, "sort; quantize"]
 
     run_take_order(server, kitchen, args)
 
 
-def test_take_order_chef_txt(server, kitchen, image_path, recipe_path):
+def test_take_order_custom_txt(server, kitchen, image_path, recipe_path):
+    """test custom with a txt file as a recipe"""
     args = ["custom", image_path, recipe_path]
 
     run_take_order(server, kitchen, args)
 
 
 def test_take_order_togo(server, kitchen, dir_path):
+    """test togo"""
     args = ["togo", dir_path]
 
     run_take_order(server, kitchen, args)
 
 
 def test_take_order_togo_options(server, kitchen, dir_path, mp4_output_path):
+    """test togo with options"""
     args = [
         "togo", dir_path,
         "--fps", "25",
@@ -195,60 +214,15 @@ def test_take_order_togo_options(server, kitchen, dir_path, mp4_output_path):
     run_take_order(server, kitchen, args)
 
 
-# def test_take_order_image_with_output():
-#     args=["resize", image_path, "--output", "output.png"]
-#
-#     order_name = 'resize'
-#
-#     take_order(args, order_name)
-
-
-def test_take_order_animation(server, kitchen, animation_path):
-    """
-    test making an animation order
-    """
-    args = ["resize", animation_path]
+def test_take_order_image_with_output(server, kitchen, image_path, png_output_path):
+    """test image output path given"""
+    args = ["resize", image_path, "--output", png_output_path]
 
     run_take_order(server, kitchen, args)
 
-# def test_take_order_animation_with_output_gif():
-#     """
-#     test making an animation order
-#     and providing an output gif filename
-#     """
-#     args=["resize", "resources/octo.mp4", "--output", "output.gif"]
-#     order_name = 'resize'
-#
-#     take_order(args, order_name)
-#
-# def test_take_order_animation_with_output_mp4():
-#     """
-#     test making an animation order
-#     and providing an output gif filename
-#     """
-#     args=["resize", "resources/octo.mp4", "--output", "cooked.mp4"]
-#     order_name = 'resize'
-#
-#     take_order(args, order_name)
 
+def test_take_order_animation(server, kitchen, animation_path):
+    """test making an animation order"""
+    args = ["resize", animation_path]
 
-# def test_take_order_animation_frames():
-#     """
-#     test making an animation order and not bundling the output
-#     """
-#     args=["resize", "resources/octo.mp4", "--frames"]
-#
-#     order_name = 'resize'
-#
-#     take_order(args, order_name)
-#
-#
-# def test_take_order_animation_frames_with_output_dir():
-#     """
-#     test making an animation order and not bundling the output
-#     provided an output dir
-#     """
-#     args=["resize", "resources/octo.mp4", "--frames", "--output", "frames"]
-#     order_name = 'quantize'
-#
-#     take_order(args, order_name)
+    run_take_order(server, kitchen, args)

@@ -53,10 +53,14 @@ class Server(OrderTaker):
         base_parser.add_argument(
             'path',
             default='./',
-            help="path to file or directory to use as input")
+            help="path to file or directory to use as input"
+        )
         base_parser.add_argument(
             '--order-name',
-            help="name of order for naming identifying related")
+            help="""
+            name of order for filename prefixes; used to identify files for output
+            """
+        )
 
         subparsers.add_parser('togo', parents=[base_parser], add_help=False)
 
@@ -161,9 +165,12 @@ class Server(OrderTaker):
                 report_status=self.report_status
             )
         else:
+            self.report_status(order, status='writing tickets')
+
             presave = parsed_vars.pop('presave')
             cook_async = parsed_vars.pop('async')
             processes = parsed_vars.pop('processes')
+            resume = parsed_vars.pop('resume')
 
             if processes is not None:
                 cook_async = True
@@ -171,8 +178,7 @@ class Server(OrderTaker):
             order.presave = presave
             order.cook_async = cook_async
             order.processes = processes
-
-            self.report_status(order, status='writing tickets')
+            order.resume = resume
 
             # order has tickets attached (for frames)
             self._write_tickets(order, parsed_vars)

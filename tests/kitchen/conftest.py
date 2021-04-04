@@ -51,6 +51,11 @@ def dir_path(image_path, tmp_path, order_name) -> str:
 
 
 @pytest.fixture
+def png_output_path(tmp_path):
+    return str(tmp_path / 'output.png')
+
+
+@pytest.fixture
 def gif_output_path(tmp_path):
     return str(tmp_path / 'output.gif')
 

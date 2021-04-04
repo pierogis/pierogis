@@ -61,6 +61,11 @@ class Filling(ABC):
             type=int,
             help="number of async processes to use"
         )
+        parser.add_argument(
+            '--resume',
+            action='store_true',
+            help="resume from already cooked frames in the cooked directory with the same order name"
+        )
 
         # get extra parser arguments from subclasses
         cls.add_parser_arguments(parser)

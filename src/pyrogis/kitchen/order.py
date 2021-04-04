@@ -52,7 +52,8 @@ class Order:
             optimize: bool = None,
             presave: bool = None,
             cook_async: bool = None,
-            processes: int = None
+            processes: int = None,
+            resume: bool = None,
     ):
         self._order_name = order_name
         self.input_path = input_path
@@ -64,6 +65,7 @@ class Order:
         self.presave = presave
         self.cook_async = cook_async
         self.processes = processes
+        self.resume = resume
 
         if not os.path.isfile(input_path):
             self.presave = False

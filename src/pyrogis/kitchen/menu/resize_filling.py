@@ -30,7 +30,7 @@ class ResizeFilling(Filling):
             help='scale multiplier of size (can be used with width and height or alone)'
         )
         parser.add_argument(
-            '-r', '--resample',
+            '--resample-filter',
             default=Resize.FILTERS['default'],
             choices=Resize.FILTERS.keys(),
             help='resample filter for resize'

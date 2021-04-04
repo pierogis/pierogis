@@ -4,7 +4,7 @@ import os
 import sys
 import time
 from collections import defaultdict
-from typing import Callable
+from typing import Callable, List
 
 import imageio
 
@@ -91,9 +91,9 @@ class Kitchen:
         ticket.files[pierogi_desc.files_key] = input_filename
         pierogi_desc.frame_index = 0
 
-    def _auto_pilot(self, order: Order):
+    def _auto_pilot(self, order: Order) -> List[Ticket]:
         """test some frames in the animation"""
-        tickets = order.tickets
+        tickets = [ticket for ticket in order.tickets if not ticket.skip]
 
         # test with 5% of the frames, within 2 and 10
         seq_pilot_frames = 2
@@ -175,7 +175,9 @@ class Kitchen:
             if par_rate > seq_rate:
                 order.cook_async = True
 
-        return next_frame_index
+        next_tickets = tickets[frame_index:]
+
+        return next_tickets
 
     def queue_order(self, order: Order, start_callback: Callable, report_status: Callable):
         frames = len(order.tickets)
@@ -197,11 +199,11 @@ class Kitchen:
         for suborder_name, suborder in suborders.items():
             suborder_length = len(suborder)
 
-            frame_index = 1
+            frame_index = 0
 
             for ticket in suborder:
                 if suborder_length > 1:
-                    padded_frame_index = str(frame_index).zfill(digits)
+                    padded_frame_index = str(frame_index + 1).zfill(digits)
                     frame_suffix = '-' + padded_frame_index
                 else:
                     frame_suffix = ''
@@ -218,10 +220,10 @@ class Kitchen:
                 if os.path.isfile(output_path):
                     input_is_output = os.path.samefile(ticket.input_path, output_path)
 
+                    # this is really rough and can be solved by a system
+                    # for manipulating courses/animations as a whole
                     if order.resume:
-                        continue
-                    elif input_is_output:
-                        pass
+                        ticket.skip=True
                     else:
                         os.remove(output_path)
 
@@ -232,11 +234,10 @@ class Kitchen:
 
         report_status(order, status='preprocessing')
 
-        processed_frame_index = 0
         if len(order.tickets) > 8 and (order.presave is None or order.cook_async is None):
-            processed_frame_index = self._auto_pilot(order)
-
-        next_tickets = order.tickets[processed_frame_index:]
+            next_tickets = self._auto_pilot(order)
+        else:
+            next_tickets = order.tickets
 
         report_status(order, status='cooking')
 

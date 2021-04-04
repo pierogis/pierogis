@@ -104,7 +104,8 @@ class Ticket:
             recipe: List[str] = None,
             base: str = None,
             seasoning_links: Dict[str, str] = None,
-            output_path: str = None
+            output_path: str = None,
+            skip: bool = False
     ):
         """
         create a Ticket
@@ -127,6 +128,7 @@ class Ticket:
         self.base = base
         self.seasoning_links = seasoning_links
         self.output_path = output_path
+        self.skip = skip
 
     def add_file(self, path: str) -> str:
         """
