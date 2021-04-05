@@ -93,8 +93,12 @@ class Ticket:
         return os.path.basename(self.input_path)
 
     @property
-    def input_path(self):
+    def input_path(self) -> str:
         return self.files[self.pierogis[self.base].files_key]
+
+    @input_path.setter
+    def input_path(self, value: str):
+        self.files[self.pierogis[self.base].files_key] = value
 
     def __init__(
             self,

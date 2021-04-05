@@ -6,11 +6,11 @@ from .kitchen import Chef, Server, Kitchen
 from .restaurant import Restaurant
 
 
-def run(args=None, report_status: Callable = None):
+def run(args=None, report_callback: Callable = None):
     if args is None:
         args = sys.argv[1:]
 
-    server = Server(report_status)
+    server = Server(report_callback)
 
     mp.set_start_method('spawn', force=True)
     kitchen = Kitchen(Chef())

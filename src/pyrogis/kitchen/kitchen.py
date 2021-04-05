@@ -1,6 +1,7 @@
 import math
 import multiprocessing  as mp
 import os
+import signal
 import sys
 import time
 from collections import defaultdict
@@ -16,31 +17,27 @@ from ..course import Course
 from ..ingredients import Pierogi, Dish
 
 
-def mute():
+def initializer():
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
     sys.stdout = open(os.devnull, 'w')
 
 
 class Kitchen:
-    """
-    Allows a Chef to cook a collection of Ticket objects
-    """
+    """cook a collection of Ticket objects"""
     menu = menu
 
     _pool: mp.Pool
 
-    @property
-    def pool(self):
-        if self._pool is None:
-            self._pool = mp.Pool(self.processes, initializer=mute)
-
-        return self._pool
+    def _start_pool(self):
+        self.pool = mp.Pool(self.processes, initializer=initializer)
 
     def __init__(
             self,
             cooker: Cooker,
             processes: int = None,
             cooked_dir: str = 'cooked',
-            output_dir: str = ''
+            output_dir: str = '',
+            raw_dir: str = os.path.join('/tmp', 'raw'),
     ):
         """
         :param chef: Chef-like object to cook with - can be anything that implements the base Chef's methods
@@ -52,9 +49,10 @@ class Kitchen:
         if processes is None:
             processes = os.cpu_count()
         self.processes = processes
-        self._pool = None
+        self.pool = None
         self.cooked_dir = cooked_dir
         self.output_dir = output_dir
+        self.raw_dir = raw_dir
 
     def __getstate__(self):
         self_dict = self.__dict__.copy()
@@ -79,11 +77,10 @@ class Kitchen:
         cooked_dish.pierogi.save(ticket.output_path)
 
     def _presave_ticket(self, frame, ticket: Ticket):
-        raw_dir = os.path.join('/tmp', 'raw')
-        if not os.path.isdir(raw_dir):
-            os.makedirs(raw_dir)
+        if not os.path.isdir(self.raw_dir):
+            os.makedirs(self.raw_dir)
 
-        input_filename = os.path.join(raw_dir, os.path.basename(ticket.output_path))
+        input_filename = os.path.join(self.raw_dir, os.path.basename(ticket.output_path))
         writer = imageio.get_writer(input_filename)
         writer.append_data(frame)
 
@@ -165,6 +162,9 @@ class Kitchen:
                 results = []
 
                 for ticket in next_tickets:
+                    if self.pool is None:
+                        self._start_pool()
+
                     results.append(self.pool.apply_async(self.cook_ticket, (self.cooker, ticket)))
 
                 for result in results:
@@ -223,7 +223,16 @@ class Kitchen:
                     # this is really rough and can be solved by a system
                     # for manipulating courses/animations as a whole
                     if order.resume:
-                        ticket.skip=True
+                        ticket.skip = True
+                    elif input_is_output:
+                        if not os.path.isdir(self.raw_dir):
+                            os.makedirs(self.raw_dir)
+
+                        raw_input_path = os.path.join(
+                            self.raw_dir, os.path.basename(ticket.input_path)
+                        )
+                        os.rename(ticket.input_path, raw_input_path)
+                        ticket.input_path = raw_input_path
                     else:
                         os.remove(output_path)
 
@@ -233,6 +242,9 @@ class Kitchen:
         start_callback()
 
         report_status(order, status='preprocessing')
+
+        if not os.path.isfile(order.input_path):
+            order.presave = False
 
         if len(order.tickets) > 8 and (order.presave is None or order.cook_async is None):
             next_tickets = self._auto_pilot(order)
@@ -247,6 +259,9 @@ class Kitchen:
                 self._presave_ticket(frame, ticket)
 
             if order.cook_async:
+                if self.pool is None:
+                    self._start_pool()
+
                 self.pool.apply_async(
                     func=self.cook_ticket,
                     args=(self.cooker, ticket)
@@ -267,12 +282,9 @@ class Kitchen:
 
     def plate(
             self,
-            order: Order,
-            report_status: Callable = None
+            order: Order
     ) -> str:
         """"""
-        order_name = order.order_name
-
         dishes = []
 
         if len(order.tickets) == 0:
@@ -287,36 +299,17 @@ class Kitchen:
 
         course = Course(dishes=dishes)
 
-        output_path = order.output_path
         fps = order.fps
         optimize = order.optimize
         frame_duration = order.duration
 
-        if output_path is None:
-            if order_name is None:
-                order_name = os.path.splitext(os.path.basename(order.input_path))[0]
-            if course.frames == 1:
-                output_path = order_name + '.png'
-            else:
-                output_path = order_name + '.gif'
-
-        output_path = os.path.join(self.output_dir, output_path)
-
-        if report_status is not None:
-            def callback():
-                report_status(
-                    order,
-                    advance=1
-                )
-        else:
-            callback = None
+        output_path = os.path.join(self.output_dir, order.output_path)
 
         course.save(
             output_path,
             optimize,
             duration=frame_duration,
-            fps=fps,
-            callback=callback
+            fps=fps
         )
 
         return output_path

@@ -16,6 +16,8 @@ from .ticket import Ticket
 
 
 class OrderTaker(Protocol):
+    """any object that implements take_order and check_order is an OrderTaker"""
+
     @abstractmethod
     def take_order(
             self, args: List[str], kitchen: Kitchen
@@ -31,13 +33,13 @@ class OrderTaker(Protocol):
 
 
 class Server(OrderTaker):
-    """"""
+    """handles tasks related to taking input and preparing it for Kitchen"""
 
     def __init__(
             self,
-            report_status: Callable = None,
+            report_callback: Callable = None,
     ):
-        self._report_status = report_status
+        self._report_callback = report_callback
 
     def _create_parser(self, menu):
         # create top level parser
@@ -107,7 +109,7 @@ class Server(OrderTaker):
             self, args: List[str], kitchen: Kitchen
     ) -> Order:
         """
-        use a chef to parse list of strings into Tickets
+        take a list of args and turn it into an Order for the Kitchen
         """
 
         togo_parser = self._create_togo_parser()
@@ -143,11 +145,17 @@ class Server(OrderTaker):
 
         # if the order is just togo, don't need the kitchen
         if parsed_vars['filling'] == 'togo':
-            self.report_status(order, status='boxing')
+            self._report_status(order, status='boxing')
 
             if os.path.isdir(input_path):
                 # debug here
-                for filename in sorted(os.listdir(input_path)):
+                filenames = [
+                    filename
+                    for filename
+                    in os.listdir(input_path)
+                    if filename != ".DS_Store"
+                ]
+                for filename in sorted(filenames):
                     if order_name is None or filename.startswith(order_name):
                         frame_path = os.path.join(input_path, filename)
                         ticket = Ticket(output_path=frame_path)
@@ -158,14 +166,13 @@ class Server(OrderTaker):
                     order.add_ticket(ticket)
 
             frames = len(order.tickets)
-            self.report_status(order, total=frames)
+            self._report_status(order, total=frames)
 
             kitchen.plate(
-                order=order,
-                report_status=self.report_status
+                order=order
             )
         else:
-            self.report_status(order, status='writing tickets')
+            self._report_status(order, status='writing')
 
             presave = parsed_vars.pop('presave')
             cook_async = parsed_vars.pop('async')
@@ -184,40 +191,39 @@ class Server(OrderTaker):
             self._write_tickets(order, parsed_vars)
 
             frames = len(order.tickets)
-            self.report_status(order, total=frames)
+            self._report_status(order, total=frames)
 
             # the Server splits off part of their consciousness into a new thread
             check_thread = Thread(target=self.check_order, args=[order])
             check_thread.daemon = True
 
+            # don't start the checker thread until the kitchen is ready
             def start_callback():
                 check_thread.start()
 
-            close_callback = kitchen.queue_order(order, start_callback, self.report_status)
+            self._report_status(order, status='cooking')
 
-            self.report_status(order, status='awaiting')
+            close_callback = kitchen.queue_order(order, start_callback, self._report_status)
+
             close_callback()
             check_thread.join()
 
-            self.report_status(order, status='plating')
+            self._report_status(order, status='plating')
 
             kitchen.plate(
-                order,
-                report_status=self.report_status
+                order
             )
 
-        self.report_status(order, status='done')
+        self._report_status(order, status='done')
 
         return order
 
     def _write_tickets(
             self, order: Order, parsed_vars
     ) -> None:
-        """
-        create tickets from a list of pierogis and parsed vars
-        """
+        """create tickets from a list of pierogis and parsed vars"""
         generate_ticket = parsed_vars.pop('generate_ticket')
-        filling = parsed_vars.pop('filling')
+        parsed_vars.pop('filling')
 
         input_path = order.input_path
         order_name = order.order_name
@@ -237,7 +243,13 @@ class Server(OrderTaker):
 
         elif os.path.isdir(input_path):
             # debug here
-            for filename in sorted(os.listdir(input_path)):
+            filenames = [
+                filename
+                for filename
+                in os.listdir(input_path)
+                if filename != ".DS_Store"
+            ]
+            for filename in sorted(filenames):
                 if order_name is None or filename.startswith(order_name):
                     ticket_input_path = os.path.join(
                         input_path,
@@ -255,7 +267,7 @@ class Server(OrderTaker):
     @staticmethod
     def _cooked_tickets(order: Order):
         cooked_tickets = 0
-        for filename in order.output_paths:
+        for filename in order.ticket_output_paths:
             if os.path.exists(os.path.join(filename)):
                 cooked_tickets += 1
 
@@ -265,9 +277,7 @@ class Server(OrderTaker):
             self,
             order: Order
     ) -> int:
-
-        """"""
-
+        """check and report how many tickets from an Order have been cooked"""
         total = len(order.tickets)
 
         retries = 0
@@ -276,7 +286,7 @@ class Server(OrderTaker):
         while True:
             completed = self._cooked_tickets(order)
 
-            self.report_status(
+            self._report_status(
                 order,
                 completed=completed
             )
@@ -290,6 +300,6 @@ class Server(OrderTaker):
 
         return completed
 
-    def report_status(self, order, **kwargs):
-        if self._report_status is not None:
-            self._report_status(order, **kwargs)
+    def _report_status(self, order, **kwargs):
+        if self._report_callback is not None:
+            self._report_callback(order, **kwargs)

@@ -1,6 +1,6 @@
 import os
 import subprocess
-from typing import List, Callable
+from typing import List
 
 import imageio
 import numpy as np
@@ -9,7 +9,7 @@ from .ingredients.dish import Dish
 
 
 class Course:
-    """"""
+    """treat a series of Dishes as a unit (animation)"""
 
     _frames: int = None
     _fps: int = None
@@ -43,8 +43,7 @@ class Course:
             path: str,
             optimize: bool = True,
             duration: float = None,
-            fps: float = None,
-            callback: Callable = None
+            fps: float = None
     ) -> None:
         """
         :param duration: ms duration between frames
@@ -66,9 +65,6 @@ class Course:
 
             for dish in self.dishes:
                 writer.append_data(np.asarray(dish.pierogi.image))
-
-                if callback is not None:
-                    callback()
 
             writer.close()
 

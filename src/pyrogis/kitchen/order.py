@@ -38,9 +38,31 @@ class Order:
         return self._reader
 
     @property
-    def output_paths(self):
+    def ticket_output_paths(self):
         for ticket in self.tickets:
             yield ticket.output_path
+
+    @property
+    def frames(self) -> int:
+        return len(self.tickets)
+
+    @property
+    def output_path(self) -> str:
+        order_name = self.order_name
+
+        if self._output_path is None:
+            if order_name is None:
+                order_name = os.path.splitext(os.path.basename(self.input_path))[0]
+            if self.frames == 1:
+                self._output_path = order_name + '.png'
+            else:
+                self._output_path = order_name + '.gif'
+
+        return str(self._output_path)
+
+    @output_path.setter
+    def output_path(self, value: str) -> None:
+        self._output_path = value
 
     def __init__(
             self,
@@ -58,7 +80,7 @@ class Order:
         self._order_name = order_name
         self.input_path = input_path
         self.tickets = []
-        self.output_path = output_path
+        self._output_path = output_path
         self.fps = fps
         self.duration = duration
         self.optimize = optimize
@@ -66,9 +88,6 @@ class Order:
         self.cook_async = cook_async
         self.processes = processes
         self.resume = resume
-
-        if not os.path.isfile(input_path):
-            self.presave = False
 
     def add_ticket(self, ticket: Ticket):
         self.tickets.append(ticket)

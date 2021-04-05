@@ -75,7 +75,7 @@ def run_take_order(server: Server, kitchen: Kitchen, args: List[str]):
     """handle take order call and successful output checking"""
     order = server.take_order(args, kitchen)
 
-    for output_path in order.output_paths:
+    for output_path in order.ticket_output_paths:
         assert os.path.isfile(output_path)
 
 

@@ -191,4 +191,6 @@ __all__ = [
     'SpatialQuantize',
     'Sort',
     'Threshold',
+    'kitchen',
+    'ingredients'
 ]
