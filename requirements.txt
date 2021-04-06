@@ -5,5 +5,8 @@ imageio-ffmpeg>=0.4.3
 natsort>=7.1.1
 rich>=9.11.0
 
+sphinx
+sphinx-issues
+
 setuptools-rust>=0.11.6
 pytest>=6.2.2

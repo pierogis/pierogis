@@ -22,12 +22,7 @@ class Cooker(Protocol):
 
 
 class Chef(Cooker):
-    """
-    handles text and json representations of pierogis constructs
-
-    implements parsing into a standard representation
-    and cooking a parsed representation
-    """
+    """gets dishes from tickets and cooks"""
 
     @classmethod
     def create_pierogi_objects(
@@ -154,7 +149,7 @@ class Chef(Cooker):
         return recipe
 
     @classmethod
-    def assemble_ticket(cls, ticket: Ticket, menu: Dict) -> Dish:
+    def assemble_ticket(cls, ticket: Ticket, menu: Dict[str, Filling]) -> Dish:
         """
         cook a dish from a series of descriptive dicts
         """

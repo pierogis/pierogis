@@ -55,10 +55,12 @@ class Order:
                 order_name = os.path.splitext(os.path.basename(self.input_path))[0]
             if self.frames == 1:
                 self._output_path = order_name + '.png'
+            elif self.frames == 0:
+                pass
             else:
                 self._output_path = order_name + '.gif'
 
-        return str(self._output_path)
+        return self._output_path
 
     @output_path.setter
     def output_path(self, value: str) -> None:

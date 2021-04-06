@@ -1,16 +1,18 @@
 import math
-import multiprocessing  as mp
+import multiprocessing as mp
 import os
 import signal
 import sys
+import tempfile
 import time
 from collections import defaultdict
-from typing import Callable, List
+from typing import Callable, List, Dict
 
 import imageio
 
 from .chef import Cooker
-from .menu import menu
+from .menu import Filling
+from . import menu
 from .order import Order
 from .ticket import Ticket
 from ..course import Course
@@ -24,7 +26,7 @@ def initializer():
 
 class Kitchen:
     """cook a collection of Ticket objects"""
-    menu = menu
+    menu: Dict[str, Filling] = menu.menu
 
     _pool: mp.Pool
 
@@ -37,13 +39,20 @@ class Kitchen:
             processes: int = None,
             cooked_dir: str = 'cooked',
             output_dir: str = '',
-            raw_dir: str = os.path.join('/tmp', 'raw'),
+            raw_dir: str = None
     ):
         """
-        :param chef: Chef-like object to cook with - can be anything that implements the base Chef's methods
-        :param processes: number of cpus to use (defaults to os.cpu_count)
-        :param cooked_dir: to output cooked frames
-        :param output_dir: dir to output fully cooked and plated courses to
+
+        :param cooker:
+                Chef-like object to cook with - can be anything that implements the base Chef's methods
+        :param processes:
+                number of cpus to use (defaults to os.cpu_count)
+        :param cooked_dir:
+                to output cooked frames
+        :param output_dir:
+                dir to output fully cooked and plated courses to
+        :param raw_dir:
+                dir to store raw input files if necessary (defaults to tempfile.mkdtemp)
         """
         self.cooker = cooker
         if processes is None:
@@ -52,6 +61,9 @@ class Kitchen:
         self.pool = None
         self.cooked_dir = cooked_dir
         self.output_dir = output_dir
+
+        if raw_dir is None:
+            raw_dir = tempfile.mkdtemp(suffix='raw')
         self.raw_dir = raw_dir
 
     def __getstate__(self):
@@ -62,17 +74,16 @@ class Kitchen:
     def __setstate__(self, state):
         self.__dict__.update(state)
 
-    @staticmethod
+    @classmethod
     def cook_ticket(
-            chef,
+            cls,
+            cooker: Cooker,
             ticket: Ticket
     ) -> None:
-        """
-        cook a ticket with a thread pool
-        """
-        dish = chef.assemble_ticket(ticket, menu)
+        """cook a ticket with a thread pool"""
+        dish = cooker.assemble_ticket(ticket, cls.menu)
 
-        cooked_dish = chef.cook_dish(dish)
+        cooked_dish = cooker.cook_dish(dish)
 
         cooked_dish.pierogi.save(ticket.output_path)
 

@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from pyrogis import Dish, Pierogi, Recipe
+from pyrogis.ingredients import Dish, Pierogi, Recipe
 
 
 @pytest.fixture

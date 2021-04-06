@@ -71,12 +71,16 @@ def test_check_cooked(server: Server, image_order: Order, image_path: str):
 
 # take_order
 
-def run_take_order(server: Server, kitchen: Kitchen, args: List[str]):
+def run_take_order(
+        server: Server, kitchen: Kitchen, args: List[str]
+) -> Order:
     """handle take order call and successful output checking"""
     order = server.take_order(args, kitchen)
 
     for output_path in order.ticket_output_paths:
         assert os.path.isfile(output_path)
+
+    return order
 
 
 def test_take_order_sort(server, kitchen, image_path):
@@ -127,8 +131,8 @@ def test_take_order_threshold_options(server, kitchen, image_path):
         "threshold", image_path,
         "-u", "200",
         "-l", "20",
-        "-i", "abaabb",
-        "-e", "333433"
+        "--include", "abaabb",
+        "--exclude", "333433"
     ]
 
     run_take_order(server, kitchen, args)
@@ -138,7 +142,10 @@ def test_take_order_resize(server, kitchen, image_path):
     """test resize order"""
     args = ["resize", image_path]
 
-    run_take_order(server, kitchen, args)
+    order = run_take_order(server, kitchen, args)
+
+    assert len(order.tickets) == 1
+    print(order.tickets[0].output_path)
 
 
 def test_take_order_resize_options(server, kitchen, image_path):

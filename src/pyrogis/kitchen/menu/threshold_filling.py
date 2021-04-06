@@ -24,13 +24,13 @@ class ThresholdFilling(Filling):
                  "this threshold are included"
         )
         parser.add_argument(
-            '-i', '--include',
+            '--include',
             dest='include',
             default="ffffff", type=str,
             help="Hex color for included pixels"
         )
         parser.add_argument(
-            '-e', '--exclude',
+            '--exclude',
             dest='exclude',
             default="000000", type=str,
             help="Hex color for excluded pixels"

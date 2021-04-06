@@ -180,7 +180,11 @@ class Restaurant:
         server_task = self.server_tasks.get(order_name)
 
         input_path = os.path.basename(order.input_path)
-        output_path = os.path.basename(order.output_path)
+
+        if order.output_path is None:
+            output_path = '...'
+        else:
+            output_path = os.path.basename(order.output_path)
 
         if server_task is None:
             server_task = self.add_server_task(order_name, input_path, output_path)

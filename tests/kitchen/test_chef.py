@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from pyrogis import Dish, Pierogi
+from pyrogis.ingredients import Dish, Pierogi
 from pyrogis.kitchen import Chef, menu
 from pyrogis.kitchen.ticket import Ticket, PierogiDesc, IngredientDesc
 
@@ -109,7 +109,7 @@ def test_create_ingredient_objects(chef, ingredient_desc, pierogi_objects):
         ingredient_key: ingredient_desc
     }
     ingredient_objects = chef.create_ingredient_objects(
-        ingredient_descs, pierogi_objects, menu
+        ingredient_descs, pierogi_objects, menu.menu
     )
 
     assert len(ingredient_objects.values()) == 1
@@ -117,7 +117,7 @@ def test_create_ingredient_objects(chef, ingredient_desc, pierogi_objects):
 
 def test_get_ingredient_get(chef, ingredient_desc, ingredient_key):
     ingredients = {
-        ingredient_key: menu[ingredient_desc.type_name].type()
+        ingredient_key: menu.menu[ingredient_desc.type_name].type()
     }
     ingredient = chef.get_ingredient(
         ingredients,
@@ -135,16 +135,16 @@ def test_get_ingredient_create(chef, ingredient_desc, ingredient_key):
         ingredients,
         {ingredient_key: ingredient_desc},
         ingredient_key,
-        menu
+        menu.menu
     )
 
-    order_type = menu[ingredient_desc.type_name].type
+    order_type = menu.menu[ingredient_desc.type_name].type
 
     assert order_type == type(ingredient)
 
 
 def test_assemble_dish(chef, ticket):
-    dish = chef.assemble_ticket(ticket, menu)
+    dish = chef.assemble_ticket(ticket, menu.menu)
 
     assert dish
 

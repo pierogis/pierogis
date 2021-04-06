@@ -2,10 +2,13 @@ import argparse
 from abc import ABC, abstractmethod
 
 from ..ticket import Ticket, IngredientDesc
+from ...ingredients import Ingredient
 
 
 class Filling(ABC):
-    type_name = None
+    """bundles a parser with a method for generating a ticket"""
+    type_name: str = None
+    type: Ingredient = None
 
     @classmethod
     def generate_ticket(

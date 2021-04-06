@@ -1,13 +1,26 @@
+import argparse
+
 from .filling import Filling
 from .rotate_filling import RotateFilling
 from .threshold_filling import ThresholdFilling
 from ..ticket import Ticket, IngredientDesc
-from ...ingredients import Sort
+from ...ingredients import Sort, Ingredient
 
 
 class SortFilling(Filling):
-    type_name = 'sort'
-    type = Sort
+    type_name: str = 'sort'
+    type: Ingredient = Sort
+
+    @classmethod
+    def add_parser_arguments(cls, parser: argparse.ArgumentParser):
+        """
+        add the arguments that a sort parser would need
+        """
+        RotateFilling.add_parser_arguments(parser)
+
+        ThresholdFilling.add_parser_arguments(parser)
+
+        parser.set_defaults(turns=0)
 
     @classmethod
     def generate_ticket(
@@ -62,16 +75,3 @@ class SortFilling(Filling):
         ticket.add_seasoning_link(season_uuid, sort_uuid)
 
         return ticket
-
-    # put everything in cooked
-    # if input dish was many, tell chef/kitchen to append a frame number
-    #
-
-    @classmethod
-    def add_parser_arguments(cls, parser):
-        """
-        add the arguments that a sort parser would need
-        """
-        RotateFilling.add_parser_arguments(parser)
-
-        ThresholdFilling.add_parser_arguments(parser)

@@ -7,7 +7,7 @@ changelog = open("CHANGELOG.md").read()
 
 setup(
     name='pyrogis',
-    author="Kyle Moore",
+    author="pierogis-live",
     author_email="admin@pierogis.live",
     description="image processing framework",
     url="https://github.com/pierogis/pierogis",
@@ -24,6 +24,11 @@ setup(
         'natsort>=7.1.1',
         'rich>=9.11.0'
     ],
+    extra_requires={
+        'dev': [
+            'setuptools-scm', 'setuptools-rust'
+        ]
+    },
     rust_extensions=[
         RustExtension("pierogis_rs", binding=Binding.PyO3)
     ],

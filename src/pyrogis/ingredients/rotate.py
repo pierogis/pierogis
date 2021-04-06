@@ -24,7 +24,7 @@ class Rotate(Ingredient):
         """
         rotated_pixels = pixels
         # determine axes of rotation from clockwise or not
-        rotation_axes = (0, 1) if self.clockwise else (1, 0)
+        rotation_axes = (1, 0) if self.clockwise else (0, 1)
 
         # turn turns number of times
         for i in range(self.turns):

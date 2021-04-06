@@ -14,7 +14,7 @@ class RotateFilling(Filling):
         """
 
         # add palette and palette size
-        parser.add_argument('-t', '--turns', default=0, type=int)
+        parser.add_argument('-t', '--turns', default=1, type=int)
         parser.add_argument(
             '--ccw',
             dest='clockwise',

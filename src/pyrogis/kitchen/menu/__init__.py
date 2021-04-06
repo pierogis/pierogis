@@ -1,10 +1,10 @@
-from .filling import Filling
 from .custom_filling import CustomFilling
+from .filling import Filling
 from .quantize_filling import QuantizeFilling
-from .sort_filling import SortFilling
-from .threshold_filling import ThresholdFilling
 from .resize_filling import ResizeFilling
 from .rotate_filling import RotateFilling
+from .sort_filling import SortFilling
+from .threshold_filling import ThresholdFilling
 
 menu = {
     SortFilling.type_name: SortFilling,
