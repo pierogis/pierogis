@@ -1,5 +1,5 @@
 cli
-------------------
+---
 
 All of the cli commands look like this.
 
@@ -19,7 +19,7 @@ In addition, each ``filling`` or has its own set of options, seen in ``menu``.
     menu
 
 *common options*
-~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 ==================== ============================================= ========== =======
 arg                  description                                   default    valid
@@ -39,7 +39,7 @@ If ``processes`` is provided, ``async`` is set to ``True``.
 If ``async`` is provided without ``processes``, ``processes`` wil be ``os.cpu_count()``
 
 *togo options*
-~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 ==================== ============================================= ========== =======
 arg                  description                                   default    valid
@@ -59,7 +59,7 @@ the output will be an animation as well. Artifact "cooked" folder will contain f
 If you don't understand what output type to expect from your command, don't provide `output`.
 
 togo
-~~~~~~~~
+~~~~
 
 *bundle a directory of frames into an animation*
 

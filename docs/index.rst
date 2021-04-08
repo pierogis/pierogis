@@ -17,18 +17,17 @@ A cli wraps these operations and their parameterization in ``Fillings`` as liste
 
 In this realm, a single ``Pierogi`` is a pixel, many ``Pierogi`` is an image, and ``Pierogis`` is many images.
 
-usage
-------------------
 .. toctree::
    :maxdepth: 3
+   :caption: usage
 
    cli
    ingredients
    examples
    kitchen
 
-api
-------------------
 .. toctree::
+   :maxdepth: 3
+   :caption: api
 
-   api
+   api/modules
