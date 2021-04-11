@@ -1,4 +1,9 @@
+import os
+import sys
+
 from setuptools_scm import get_version
+
+sys.path.insert(0, os.path.abspath('../'))
 
 # Project --------------------------------------------------------------
 
@@ -11,10 +16,11 @@ version = get_version(root='..', relative_to=__file__)
 
 master_doc = "index"
 extensions = [
-    "sphinx.ext.autodoc",
-    "sphinx.ext.intersphinx",
-    # "sphinxcontrib.log_cabinet",
-    "sphinx_issues",
+    'sphinx.ext.autodoc',
+    'sphinx.ext.intersphinx',
+    'sphinxcontrib.apidoc',
+    'sphinx_issues',
+    'sphinx.ext.viewcode'
 ]
 intersphinx_mapping = {
     "rich": ("https://rich.readthedocs.io/en/stable/", None),
@@ -22,6 +28,9 @@ intersphinx_mapping = {
     "Pillow": ("https://pillow.readthedocs.io/en/stable/", None),
 }
 issues_github_path = "pierogis/pierogis"
+apidoc_module_dir = '../src/pyrogis'
+apidoc_output_dir = 'source'
+apidoc_separate_modules = True
 
 # HTML -----------------------------------------------------------------
 

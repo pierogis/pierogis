@@ -1,8 +1,14 @@
 menu
-----------------
+----
+
+.. currentmodule:: pyrogis.ingredients
+
+Here lie a bunch of commands for creating à la carte recipes and a command for combining several.
+
+.. _quantize:
 
 quantize
-~~~~~~~~~~~~~~~~
+~~~~~~~~
 
 *quantize an image to a smaller set of colors*
 
@@ -18,12 +24,12 @@ quantize
 
    *very chill.*
 
-Wraps `rscolorq <https://github.com/okaneco/rscolorq>`_ in python through pyo3 using ``SpatialQuantize``.
+Wraps `rscolorq <https://github.com/okaneco/rscolorq>`_ in python through pyo3 using :py:class:`~quantize.SpatialQuantize`.
 Thank you to the author of that package.
 
-========================== ==================================================== ========= =======
+========================== ==================================================== ========= =========
 arg                        description                                          default   valid
-========================== ==================================================== ========= =======
+========================== ==================================================== ========= =========
 ``-c``, ``--colors``       hex colors to base palette on (palette size ignored) ``None``  ``int``
 ``-n``, ``--palette-size`` number of colors in the palette to cluster for       ``8``     ``int``
 ``--repeats``              number of times to repeat a temperature for DA       ``1``     ``int``
@@ -31,10 +37,14 @@ arg                        description                                          
 ``--initial-temp``         initial temp to use in DA for optimization           ``1``     ``float``
 ``--final-temp``           final temp to use in DA for optimization             ``0.001`` ``float``
 ``--dithering-level``      relative dithering level (use .5-1.5)                ``0.8``   ``float``
-========================== ==================================================== ========= =======
+========================== ==================================================== ========= =========
+
+See: :py:class:`~pyrogis.kitchen.menu.quantize_filling.QuantizeFilling`
+
+.. _custom:
 
 custom
-~~~~~~~~~~~~~~~~
+~~~~~~
 
 *parse text for a recipe*
 
@@ -64,8 +74,12 @@ arg        description                                 default    valid
 ``recipe`` path to json or txt file to use as a recipe recipe.txt `str`
 ========== =========================================== ========== =====
 
+See: :py:class:`~pyrogis.kitchen.menu.custom_filling.CustomFilling`
+
+.. _resize:
+
 resize
-~~~~~~~~~
+~~~~~~
 *change the size of an image with options to maintain aspect ratio*
 
 .. code-block:: console
@@ -97,7 +111,7 @@ if ``scale`` is a whole number
 See `PIL documentation <https://pillow.readthedocs.io/en/stable/handbook/concepts.html#concept-filters>`_
 on filters.
 
-When used in a ``custom`` recipe, scaling down at the beginning of a recipe
+When used in a :ref:`custom` recipe, scaling down at the beginning of a recipe
 and up at the end can lead to cool (and faster) results.
 
 ===================== ===================================== ============= =======
@@ -109,8 +123,12 @@ arg                   description                           default       valid
 ``--resample-filter`` a filter to be used with resizing     ``'nearest'`` ``str``
 ===================== ===================================== ============= =======
 
+See: :py:class:`~pyrogis.kitchen.menu.resize_filling.ResizeFilling`
+
+.. _sort:
+
 sort
-~~~~~~~~~~~~
+~~~~
 *sort pixels along an axis*
 
 .. code-block:: console
@@ -144,8 +162,12 @@ arg                           description                                       
                               counter-clockwise instead
 ============================= =================================================== ========= =========
 
+See: :py:class:`~pyrogis.kitchen.menu.sort_filling.SortFilling`
+
+.. _threshold:
+
 threshold
-~~~~~~~~~~~
+~~~~~~~~~
 
 *pixels included or excluded based on brightness*
 
@@ -163,7 +185,7 @@ Pixels with brightness outside of the thresholds provided become "included".
 Pixels within the thresholds become "excluded" (greater than lower, but less than upper).
 By default, included means replaced with white, excluded with black.
 
-``sort`` uses this under the hood.
+:ref:`sort` uses this under the hood.
 
 ============================= =================================================== ============ =========
 arg                           description                                         default      valid
@@ -174,8 +196,12 @@ arg                           description                                       
 ``--exclude``                 hex color to substitute for black                   ``'000000'`` flag
 ============================= =================================================== ============ =========
 
+See: :py:class:`~pyrogis.kitchen.menu.threshold_filling.ThresholdFilling`
+
+.. _rotate:
+
 rotate
-~~~~~~~~~~~~
+~~~~~~
 *rotate pixels a given amount of 90 degree turns*
 
 .. code-block:: console
@@ -191,6 +217,8 @@ rotate
 Use ``-t`` to indicate the number of turns.
 Use ``--ccw`` to turn counterclockwise instead.
 
+:ref:`sort` uses this under the hood.
+
 ============================= =================================================== ========= =========
 arg                           description                                         default   valid
 ============================= =================================================== ========= =========
@@ -198,3 +226,5 @@ arg                           description                                       
 ``--ccw``                     if provided, ``turns`` will be applied              ``False`` flag
                               counter-clockwise instead
 ============================= =================================================== ========= =========
+
+See: :py:class:`~pyrogis.kitchen.menu.rotate_filling.RotateFilling`

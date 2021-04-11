@@ -1,13 +1,11 @@
 # generated
 *.pyc
-*.egg-info
-/dist/
-/build/
-/.eggs/
-/cooked*
-/tests/cooked*
+dist
+*build
+*.egg*
+cooked
 *.so
-_build
+docs/source
 
 # venv
 venv
@@ -17,5 +15,4 @@ venv
 .idea
 
 # rust
-/target
-/build
+target

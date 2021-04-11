@@ -20,7 +20,6 @@ class Pierogi(Ingredient):
     - video file with a frame index
     - image file
     - PIL image
-    -
 
     unless pixels are provided explicitly ( Pierogi(pixels=pixels) ),
     the pixels member is a property that is lazy loaded

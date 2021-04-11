@@ -9,13 +9,28 @@ pierogis
 
    \- a wise man
 
-Pixel arrays can be cooked with ``Ingredients`` such as ``sort``, ``quantize``, and ``resize``.
-``Dishes`` can be made with ``Recipes`` of several ``Ingredients`` describing a pipeline to be applied to an image or frame.
-``Courses`` can be made from a set of ``Dishes`` to compile an animation.
+.. currentmodule:: pyrogis.ingredients
 
-A cli wraps these operations and their parameterization in ``Fillings`` as listed on the ``menu``.
+Pixel arrays (like images) stored as a :py:class:`~pierogi.Pierogi` object can be cooked
+with an :py:class:`~ingredient.Ingredient`
+such as :py:class:`~sort.Sort`, :py:class:`~quantize.Quantize`,
+and :py:class:`~resize.Resize`.
 
-In this realm, a single ``Pierogi`` is a pixel, many ``Pierogi`` is an image, and ``Pierogis`` is many images.
+A :py:class:`~dish.Dish` can be made with a :py:class:`~recipe.Recipe` containing
+several :py:class:`~ingredient.Ingredient` objects describing a pipeline
+to be applied to a :py:class:`~pierogi.Pierogi`.
+
+A :py:class:`~pyrogis.course.Course` can be made to cook a set of
+:py:class:`~dish.Dish` objects representing frames
+that compile to a cooked animation.
+
+.. currentmodule:: pyrogis.kitchen.menu
+
+A :doc:`rich <rich:introduction>` cli uses :py:class:`~filling.Filling`
+objects to parse orders into cook tasks as a :py:class:`~pyrogis.restaurant.Restaurant`.
+These can be found on the :doc:`menu`.
+
+In this realm, a single `pierogi` means a pixel, many `pierogi` means an image, and `pierogis` means many images.
 
 .. toctree::
    :maxdepth: 3
@@ -30,4 +45,4 @@ In this realm, a single ``Pierogi`` is a pixel, many ``Pierogi`` is an image, an
    :maxdepth: 3
    :caption: api
 
-   api/modules
+   source/modules

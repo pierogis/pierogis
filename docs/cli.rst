@@ -7,12 +7,13 @@ All of the cli commands look like this.
 
    $ pyrogis {filling/subcommand} {path} [-o output] [..common options] [..order options] [..togo options]
 
-A ``filling`` is a set of ingredients that will be used to cook. Often it just represents the named ``Ingredient``.
+A ``filling`` is a set of ingredients that will be used to cook.
+Often it just represents the named :py:class:`~pyrogis.ingredients.ingredient.Ingredient`.
 A directory can be used for ``path``, in which case the program will try to cook each file in the directory.
 If an ``output`` filename or dir is provided, it should match the expected output.
 
 The following options are common to each ``filling``.
-In addition, each ``filling`` or has its own set of options, seen in ``menu``.
+In addition, each ``filling`` or has its own set of options, seen in :doc:`menu`.
 
 .. toctree::
 
@@ -34,6 +35,10 @@ arg                  description                                   default    va
 ``--processes``      number of processes to use for pool^          ``None``   ``int``
 ==================== ============================================= ========== =======
 
+If the input file is a directory or a movie file (anything animated),
+the output will be an animation as well. Artifact "cooked" folder will contain frames.
+If you don't understand what output type to expect from your command, don't provide ``output``.
+
 ``presave`` will be ignored if dir ``path``.
 If ``processes`` is provided, ``async`` is set to ``True``.
 If ``async`` is provided without ``processes``, ``processes`` wil be ``os.cpu_count()``
@@ -52,11 +57,9 @@ arg                  description                                   default    va
                      the gif is not optimized using gifsicle       ``False``  ``float``
 ==================== ============================================= ========== =======
 
-Togo options apply when cooking an animation and when directly bundling frames with ``togo`` subcommand (below).
+Togo options apply when cooking an animation and when directly bundling frames with :ref:`togo` subcommand.
 
-If the input file is a directory or a movie file (anything animated),
-the output will be an animation as well. Artifact "cooked" folder will contain frames.
-If you don't understand what output type to expect from your command, don't provide `output`.
+.. _togo:
 
 togo
 ~~~~
