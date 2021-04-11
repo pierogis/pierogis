@@ -22,7 +22,7 @@ setup(
         'imageio>=2.9.0',
         'imageio-ffmpeg>=0.4.3',
         'natsort>=7.1.1',
-        'rich>=9.11.0'
+        'rich>=10.1.0'
     ],
     extra_requires={
         'dev': [

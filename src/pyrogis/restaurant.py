@@ -5,7 +5,7 @@ define objects for running the program with rich terminal feedback
 import os
 import time
 from datetime import timedelta
-from typing import Callable, Iterable
+from typing import Callable, Iterable, List
 
 from rich.align import Align
 from rich.console import RenderGroup, Console
@@ -55,7 +55,7 @@ class TreeColumn(ProgressColumn):
         branches = task.fields.get('branches')
 
         for path in branches:
-            tree.add(os.path.basename(path))
+            tree.add(os.path.basename(path), style='bold red')
 
         return tree
 
@@ -166,10 +166,11 @@ class Restaurant:
 
     def _report(
             self, order: Order, status: str = None,
-            completed: int = None, advance: int = None, total: int = None
+            completed: int = None, advance: int = None,
+            total: int = None, branches: List[str] = None
     ):
         self._update_server(order, status)
-        self._update_kitchen(order, completed, total, advance)
+        self._update_kitchen(order, completed, total, advance, branches)
 
     def _update_server(
             self,
@@ -195,7 +196,7 @@ class Restaurant:
             if status == 'done':
                 self.server_progress.update(server_task, total=0)
 
-    def _update_kitchen(self, order, completed, total, advance):
+    def _update_kitchen(self, order: Order, completed: int, total: int, advance: int, branches: List[str]):
         order_name = self._get_order_name(order)
 
         kitchen_task = self.kitchen_tasks.get(order_name)
@@ -207,5 +208,5 @@ class Restaurant:
             self.kitchen_progress.update(kitchen_task, total=total)
         if advance is not None:
             self.kitchen_progress.update(kitchen_task, advance=advance)
-
-        self.kitchen_progress.update(kitchen_task, branches=[])
+        if branches is not None:
+            self.kitchen_progress.update(kitchen_task, branches=branches)

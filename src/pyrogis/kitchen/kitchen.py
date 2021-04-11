@@ -10,9 +10,9 @@ from typing import Callable, List, Dict
 
 import imageio
 
+from . import menu
 from .chef import Cooker
 from .menu import Filling
-from . import menu
 from .order import Order
 from .ticket import Ticket
 from ..course import Course
@@ -82,9 +82,7 @@ class Kitchen:
     ) -> None:
         """cook a ticket with a thread pool"""
         dish = cooker.assemble_ticket(ticket, cls.menu)
-
         cooked_dish = cooker.cook_dish(dish)
-
         cooked_dish.pierogi.save(ticket.output_path)
 
     def _presave_ticket(self, frame, ticket: Ticket):
@@ -154,7 +152,13 @@ class Kitchen:
                 for ticket in next_tickets:
                     frame = order.reader.get_next_data()
                     self._presave_ticket(frame, ticket)
-                    results.append(self.pool.apply_async(self.cook_ticket, (self.cooker, ticket)))
+
+                    def error_callback(exception: Exception):
+                        order.failures.put((exception, ticket))
+
+                    results.append(self.pool.apply_async(
+                        self.cook_ticket, (self.cooker, ticket), error_callback=error_callback
+                    ))
 
                 for result in results:
                     result.wait()
@@ -176,7 +180,12 @@ class Kitchen:
                     if self.pool is None:
                         self._start_pool()
 
-                    results.append(self.pool.apply_async(self.cook_ticket, (self.cooker, ticket)))
+                    def error_callback(exception: Exception):
+                        order.failures.put((exception, ticket))
+
+                    results.append(self.pool.apply_async(
+                        self.cook_ticket, (self.cooker, ticket), error_callback=error_callback
+                    ))
 
                 for result in results:
                     result.wait()
@@ -190,7 +199,7 @@ class Kitchen:
 
         return next_tickets
 
-    def queue_order(self, order: Order, start_callback: Callable, report_status: Callable):
+    def _set_output_paths(self, order: Order):
         frames = len(order.tickets)
 
         digits = math.floor(math.log(frames, 10)) + 1
@@ -250,6 +259,12 @@ class Kitchen:
                 ticket.output_path = output_path
                 frame_index += 1
 
+    def queue_order(
+            self, order: Order, start_callback: Callable, report_status: Callable
+    ):
+        self._set_output_paths(order)
+        self.processes = order.processes
+
         start_callback()
 
         report_status(order, status='preprocessing')
@@ -273,23 +288,21 @@ class Kitchen:
                 if self.pool is None:
                     self._start_pool()
 
+                def error_callback(exception: Exception):
+                    order.failures.put((exception, ticket))
+
                 self.pool.apply_async(
                     func=self.cook_ticket,
-                    args=(self.cooker, ticket)
+                    args=(self.cooker, ticket),
+                    error_callback=error_callback
                 )
 
             else:
                 self.cook_ticket(self.cooker, ticket)
 
         if self.pool is not None:
-            def close_callback():
-                self.pool.close()
-                self.pool.join()
-        else:
-            def close_callback():
-                pass
-
-        return close_callback
+            self.pool.close()
+            self.pool.join()
 
     def plate(
             self,

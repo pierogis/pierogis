@@ -66,7 +66,7 @@ def test_write_tickets_animation(server, animation_order: Order, parsed_vars):
 
 def test_check_cooked(server: Server, image_order: Order, image_path: str):
     image_order.tickets = [Ticket(output_path=image_path)]
-    server.check_order(order=image_order)
+    server._check_order(order=image_order)
 
 
 # take_order
@@ -161,7 +161,11 @@ def test_take_order_resize_options(server, kitchen, image_path):
         "--processes", "4"
     ]
 
-    run_take_order(server, kitchen, args)
+    order = run_take_order(server, kitchen, args)
+
+    assert kitchen.processes == 4
+    assert order.cook_async
+    assert order.presave
 
 
 def test_take_order_presave_async_processes(server, kitchen, image_path):

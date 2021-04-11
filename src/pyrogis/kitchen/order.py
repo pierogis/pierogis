@@ -1,6 +1,7 @@
 import os
+from multiprocessing import Queue
 from pathlib import Path
-from typing import List, Union
+from typing import List, Union, Tuple
 
 import imageio
 
@@ -10,6 +11,7 @@ from .ticket import Ticket
 class Order:
     order_name: str
     tickets: List[Ticket]
+    failures: "Queue[Tuple[Exception, Ticket]]"
     output_path: str
     fps: float
     resume: bool = False
@@ -82,6 +84,7 @@ class Order:
         self._order_name = order_name
         self.input_path = input_path
         self.tickets = []
+        self.failures = Queue()
         self._output_path = output_path
         self.fps = fps
         self.duration = duration
