@@ -3,7 +3,7 @@ import sys
 
 from setuptools_scm import get_version
 
-sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(0, os.path.abspath('../src'))
 
 # Project --------------------------------------------------------------
 
@@ -26,6 +26,7 @@ intersphinx_mapping = {
     "rich": ("https://rich.readthedocs.io/en/stable/", None),
     "imageio": ("https://imageio.readthedocs.io/en/stable/", None),
     "Pillow": ("https://pillow.readthedocs.io/en/stable/", None),
+    'python': ('https://docs.python.org/3', None),
 }
 issues_github_path = "pierogis/pierogis"
 apidoc_module_dir = '../src/pyrogis'

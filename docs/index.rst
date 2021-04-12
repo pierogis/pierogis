@@ -38,7 +38,6 @@ In this realm, a single `pierogi` means a pixel, many `pierogi` means an image, 
 
    cli
    ingredients
-   examples
    kitchen
 
 .. toctree::
@@ -46,3 +45,5 @@ In this realm, a single `pierogi` means a pixel, many `pierogi` means an image, 
    :caption: api
 
    source/modules
+
+* :ref:`modindex`

@@ -1,29 +1,32 @@
 ingredients
 ===========
 
+.. currentmodule:: pyrogis.ingredients
+
 .. code-block:: python
 
    from pyrogis.ingredients import Pierogi, SpatialQuantize, Sort, Threshold, Dish, Recipe...
 
-A processing factory, called an ``Ingredient``,
-has a ``prep`` method for receiving parameters,
-and a ``cook`` method for operating
+A processing factory, called an :py:class:`~ingredient.Ingredient`,
+has a :py:meth:`~ingredient.Ingredient.prep` method for receiving parameters,
+and a :py:meth:`~ingredient.Ingredient.cook` method for operating
 on a numpy array to produce a programmatic output.
 
 These two methods are usually called implicitly,
-``prep`` on ``__init__`` and ``cook`` obfuscated in the typical usage flow.
+``prep`` through :py:meth:`~ingredient.Ingredient`
+and ``cook`` obfuscated in the typical usage flow.
 ``prep`` can be seen as parameterizing the manipulation
 while ``cook`` applies it (to an array).
 
-Here are some examples of ``Ingredient`` types.
+Here are some examples of :py:class:`~ingredient.Ingredient` subtypes.
 
 pierogi
 -------
 
-``Pierogi`` is one of the simplest ``Ingredient`` types.
+:py:class:`~ingredient.Ingredient` is one of the simplest :py:class:`~ingredient.Ingredient` types.
 It stores pixels, usually loaded from an image.
 
-``Pierogi`` is unique in that the array it returns from its cook function
+:py:class:`~pierogi.Pierogi` is unique in that the array it returns from its ``cook`` function
 is not based on the input
 
 .. code-block:: python
@@ -36,11 +39,11 @@ is not based on the input
 quantize
 --------
 
-``Quantize`` is another ``Ingredient``.
+:py:class:`~quantize.Quantize` is another :py:class:`~ingredient.Ingredient`.
 When cooked, it will process an incoming numpy array and return an array
 where every pixel has been quantized to the closest color in the ``palette``.
 
-There is also the ``SpatialQuantize`` variant which is used for the cli tool.
+There is also the :py:class:`~quantize.SpatialQuantize` variant which is used by the cli tool.
 
 .. code-block:: python
 
@@ -55,20 +58,22 @@ There is also the ``SpatialQuantize`` variant which is used for the cli tool.
 
 This should produce a pixel for pixel quantized version of the input array.
 
-As you can see above, an ``Pierogi`` has a ``pixels`` member.
-This is the internal numpy pixel array of that ``Pierogi``
+As you can see above, a :py:class:`~pierogi.Pierogi` has a ``pixels`` member.
+This is the internal numpy pixel array of that `Pierogi`
 with shape ``(width, height, 3)``.
 
-Some other ``Ingredient`` types include: ``Threshold``, ``Flip``, and ``Rotate``.
+Some other :py:class:`~ingredient.Ingredient` types include:
+:py:class:`~threshold.Threshold`, :py:class:`~flip.Flip`, and :py:class:`~rotate.Rotate`.
 
 recipe
 ------
 
-A typical flow allows you to create a pipeline of ``Ingredient`` types
+A typical flow allows you to create a pipeline of :py:class:`~ingredient.Ingredient` types
 that sequentially apply their ``cook`` method on to
 the previous array of pixels.
 
-A pipeline in ``pierogis`` is called a ``Recipe``. It is an ``Ingredient`` itself.
+A pipeline in ``pierogis`` is called a :py:class:`~recipe.Recipe`.
+It is an :py:class:`~ingredient.Ingredient` itself.
 
 .. code-block:: python
 
@@ -87,8 +92,8 @@ dish
 
     - a wiser man
 
-We could also use a ``Dish`` to serve this recipe.
-This is the recommended way to use ``Recipe``.
+We could also use a :py:class:`~dish.Dish` to serve this recipe.
+This is the recommended way to use :py:class:`~recipe.Recipe`.
 
 .. code-block:: python
 
@@ -113,7 +118,7 @@ to other ingredients that affect the pixels they act on.
    # season sort with threshold
    sort.season(threshold)
 
-``Threshold.cook`` outputs a black and white array.
+:py:meth:`~threshold.Threshold.cook` outputs a black and white array.
 Now that ``sort`` is seasoned with the ``Threshold``,
 it will only sort pixels that have been "colored"
 white by the ``Threshold``.
@@ -121,9 +126,9 @@ white by the ``Threshold``.
 extending
 ~~~~~~~~~
 
-To create a custom ``Ingredient`` type,
-it must subclass ``Ingredient`` and override the ``cook`` and ``prep``
-methods.
+To create a custom :py:class:`~ingredient.Ingredient` type,
+it must subclass ``Ingredient`` and override the
+:py:meth:`~ingredient.Ingredient.cook` and :py:meth:`~ingredient.Ingredient.prep` methods.
 
 .. code-block:: python
 
@@ -157,7 +162,7 @@ cook
 
 This is the function that you acts on an input pixel grid.
 More specifically, this function receives
-a `(width, height, 3)` `ndarray`
+a ``(width, height, 3)`` ``ndarray``
 and should return a 3d array that is also size 3 in the last dimension.
 
 .. code-block:: python
