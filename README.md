@@ -20,10 +20,6 @@ quantize -c 000000 ffffff 668a61 cbb8a2 b6d655 434d1f 5fb7d2 6d8ab9 3876c1 515b5
 resize -s 4;
 ```
 
-![terminal program](https://raw.githubusercontent.com/pierogis/pierogis/main/demo/out/terminal.png)
-
-[Docs](https://docs.pierogis.live/) for cli and package use.
-
 ![sorted and quantized teton](https://raw.githubusercontent.com/pierogis/pierogis/develop/demo/out/teton.png)
 
 - [install](#install)
@@ -61,6 +57,14 @@ pip install .
 - **Lazy Rendering** - Render a manipulation after constructing your pipeline (see [package](#package))
 - **Numpy or Rust backend** - Image processing functions use Numpy for (python relative) fast operations. Some
   ingredients use compiled `Rust` for more speed.
+
+[Docs](https://docs.pierogis.live/) for cli and package use.
+  
+![terminal program](https://raw.githubusercontent.com/pierogis/pierogis/develop/demo/terminal.png)
+
+![wires recipe](https://raw.githubusercontent.com/pierogis/pierogis/develop/demo/recipe.png)
+
+![wires gif](https://raw.githubusercontent.com/pierogis/pierogis/develop/demo/out/wires.gif)
 
 <a name="acknowledgements"></a>
 ## acknowledgements

@@ -115,8 +115,9 @@ class Restaurant:
         # for displaying the stage of orders/kitchen
         self.server_progress = Progress(
             TextColumn(
-                "[bold][progress.description]{task.description}",
-                justify="center", table_column=Column(width=12)
+                "[progress.description]{task.description}",
+                justify="center", table_column=Column(width=12),
+                style='underline bold'
             ),
             TextColumn("|"),
             SpinnerColumn('arc', speed=1, finished_text='[bold]✓'),

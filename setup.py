@@ -6,7 +6,7 @@ readme = open("README.md").read()
 changelog = open("CHANGELOG.md").read()
 
 setup_requires = [
-    'setuptools-scm', 'setuptools-rust'
+    'setuptools-scm', 'setuptools-rust', 'pytest'
 ]
 
 setup(

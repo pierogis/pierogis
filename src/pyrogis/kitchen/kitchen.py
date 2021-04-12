@@ -149,6 +149,9 @@ class Kitchen:
 
                 results = []
 
+                if self.pool is None:
+                    self._start_pool()
+
                 for ticket in next_tickets:
                     frame = order.reader.get_next_data()
                     self._presave_ticket(frame, ticket)
@@ -176,10 +179,10 @@ class Kitchen:
 
                 results = []
 
-                for ticket in next_tickets:
-                    if self.pool is None:
-                        self._start_pool()
+                if self.pool is None:
+                    self._start_pool()
 
+                for ticket in next_tickets:
                     def error_callback(exception: Exception):
                         order.failures.put((exception, ticket))
 
