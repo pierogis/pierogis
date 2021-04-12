@@ -1,0 +1,230 @@
+menu
+----
+
+.. currentmodule:: pyrogis.ingredients
+
+Here lie a bunch of commands for creating à la carte recipes and a command for combining several.
+
+.. _quantize:
+
+quantize
+~~~~~~~~
+
+*quantize an image to a smaller set of colors*
+
+.. code-block:: console
+
+   $ pyrogis quantize input.jpg -c aaaaaa 43ad32 696969 --repeats 3 --iterations 3
+   $ # or
+   $ pyrogis quantize input.jpg -n 16 --repeats 3 --iterations 3
+
+.. figure:: https://raw.githubusercontent.com/pierogis/pierogis/master/demo/out/gnome_magic.png
+   :alt: quantized gnome
+   :align: center
+
+   *very chill.*
+
+Wraps `rscolorq <https://github.com/okaneco/rscolorq>`_ in python through pyo3 using :py:class:`~quantize.SpatialQuantize`.
+Thank you to the author of that package.
+
+========================== ==================================================== ========= =========
+arg                        description                                          default   valid
+========================== ==================================================== ========= =========
+``-c``, ``--colors``       hex colors to base palette on (palette size ignored) ``None``  ``int``
+``-n``, ``--palette-size`` number of colors in the palette to cluster for       ``8``     ``int``
+``--repeats``              number of times to repeat a temperature for DA       ``1``     ``int``
+``--iterations``           number of times to iterate a coarseness level        ``1``     ``int``
+``--initial-temp``         initial temp to use in DA for optimization           ``1``     ``float``
+``--final-temp``           final temp to use in DA for optimization             ``0.001`` ``float``
+``--dithering-level``      relative dithering level (use .5-1.5)                ``0.8``   ``float``
+========================== ==================================================== ========= =========
+
+See: :py:class:`~pyrogis.kitchen.menu.quantize_filling.QuantizeFilling`
+
+.. _custom:
+
+custom
+~~~~~~
+
+*parse text for a recipe*
+
+.. code-block:: console
+
+   $ pyrogis custom ./input.jpg "sort -u 100; quantize"
+   $ # or
+   $ pyrogis custom ./input.jpg recipe.txt
+
+*recipe.txt*
+
+.. code-block:: text
+
+   sort -u 100; quantize
+
+.. figure:: https://raw.githubusercontent.com/pierogis/pierogis/master/demo/out/gnome_sort_quantize.png
+   :alt: sorted and quantized gnome
+   :align: center
+
+   *very chill.*
+
+.txt files and quoted strings can describe a series of fillings, piped from one to the next.
+
+========== =========================================== ========== =====
+arg        description                                 default    valid
+========== =========================================== ========== =====
+``recipe`` path to json or txt file to use as a recipe recipe.txt `str`
+========== =========================================== ========== =====
+
+See: :py:class:`~pyrogis.kitchen.menu.custom_filling.CustomFilling`
+
+.. _resize:
+
+resize
+~~~~~~
+*change the size of an image with options to maintain aspect ratio*
+
+.. code-block:: console
+
+   $ pyrogis resize ./input.jpg --scale .25
+   $ pyrogis resize ./input.jpg --scale 4
+
+   $ # or using exact dimension (aspect ratio maintained)
+   $ pyrogis resize ./input.jpg --height 200
+   $ pyrogis resize ./input.jpg --height 800
+
+.. figure:: https://raw.githubusercontent.com/pierogis/pierogis/main/demo/out/gnome_resize.png
+   :alt: resized gnome
+   :align: center
+
+   *very chill.*
+
+Provide one of ``width`` or ``height`` and the other will scale appropriately.
+Use of both ``height`` and ``width`` is probably redundant
+and will stretch the image if the ratio is not the same.
+
+``scale`` can also be provided as an alternative or alongside ``height``/``width``.
+
+By default, a nearest neighbor scaling "filter" is used.
+When scaling up, nearest neighbor preserves the pixelated look
+if ``scale`` is a whole number
+(or ``width``/``height`` are provided as multiples of the current size).
+
+See `PIL documentation <https://pillow.readthedocs.io/en/stable/handbook/concepts.html#concept-filters>`_
+on filters.
+
+When used in a :ref:`custom` recipe, scaling down at the beginning of a recipe
+and up at the end can lead to cool (and faster) results.
+
+===================== ===================================== ============= =======
+arg                   description                           default       valid
+===================== ===================================== ============= =======
+``--width``           width to resize to                    ``None``      ``str``
+``--height``          height to resize to                   ``None``      ``str``
+``--scale``           scale multiplier for width and height ``1``         ``str``
+``--resample-filter`` a filter to be used with resizing     ``'nearest'`` ``str``
+===================== ===================================== ============= =======
+
+See: :py:class:`~pyrogis.kitchen.menu.resize_filling.ResizeFilling`
+
+.. _sort:
+
+sort
+~~~~
+*sort pixels along an axis*
+
+.. code-block:: console
+
+   $ pyrogis sort ./input.jpg -l 50 -u 180 -t 1
+
+.. figure:: https://raw.githubusercontent.com/pierogis/pierogis/main/demo/out/gnome_sort.png
+   :alt: sorted gnome
+   :align: center
+
+   *very chill.*
+
+Use ``-l`` and ``-u`` as lower and upper thresholds
+where contiguous groups of pixels
+with brightness outside of the thresholds are sorted.
+
+Use ``-t`` to provide the number of the sort direction should rotate
+where 0 turns sorts from bottom to top.
+
+If only ``lower`` is provided, ``upper`` is set to 255.
+If only ``upper`` is provided, ``lower`` is set to 0.
+
+============================= =================================================== ========= =========
+arg                           description                                         default   valid
+============================= =================================================== ========= =========
+``-l``, ``--lower-threshold`` pixels with intensity *below* this value are sorted ``64``    ``0-255``
+``-u``, ``--upper-threshold`` pixels with intensity *above* this value are sorted ``180``   ``0-255``
+``-t``, ``--turns``           number of clockwise turns from sorting              ``0``     ``0-3``
+                              bottom to top
+``--ccw``                     if provided, ``turns`` will be applied              ``False`` flag
+                              counter-clockwise instead
+============================= =================================================== ========= =========
+
+See: :py:class:`~pyrogis.kitchen.menu.sort_filling.SortFilling`
+
+.. _threshold:
+
+threshold
+~~~~~~~~~
+
+*pixels included or excluded based on brightness*
+
+.. code-block:: console
+
+   $ pyrogis threshold ./input.jpg -u 150 -l 20
+
+.. figure:: https://raw.githubusercontent.com/pierogis/pierogis/main/demo/out/gnome_threshold.png
+   :alt: thresholded gnome
+   :align: center
+
+   *very chill.*
+
+Pixels with brightness outside of the thresholds provided become "included".
+Pixels within the thresholds become "excluded" (greater than lower, but less than upper).
+By default, included means replaced with white, excluded with black.
+
+:ref:`sort` uses this under the hood.
+
+============================= =================================================== ============ =========
+arg                           description                                         default      valid
+============================= =================================================== ============ =========
+``-l``, ``--lower-threshold`` pixels with intensity *below* this value are sorted ``64``       ``0-255``
+``-u``, ``--upper-threshold`` pixels with intensity *above* this value are sorted ``180``      ``0-255``
+``--include``                 hex color to substitute for white                   ``'ffffff'`` ``0-3``
+``--exclude``                 hex color to substitute for black                   ``'000000'`` flag
+============================= =================================================== ============ =========
+
+See: :py:class:`~pyrogis.kitchen.menu.threshold_filling.ThresholdFilling`
+
+.. _rotate:
+
+rotate
+~~~~~~
+*rotate pixels a given amount of 90 degree turns*
+
+.. code-block:: console
+
+   $ pyrogis rotate ./input.jpg -t 1 --ccw
+
+.. figure:: https://raw.githubusercontent.com/pierogis/pierogis/main/demo/out/gnome_rotate.png
+   :alt: rotated gnome
+   :align: center
+
+   *very chill.*
+
+Use ``-t`` to indicate the number of turns.
+Use ``--ccw`` to turn counterclockwise instead.
+
+:ref:`sort` uses this under the hood.
+
+============================= =================================================== ========= =========
+arg                           description                                         default   valid
+============================= =================================================== ========= =========
+``-t``, ``--turns``           number of clockwise turns                           ``1``     ``0-3``
+``--ccw``                     if provided, ``turns`` will be applied              ``False`` flag
+                              counter-clockwise instead
+============================= =================================================== ========= =========
+
+See: :py:class:`~pyrogis.kitchen.menu.rotate_filling.RotateFilling`

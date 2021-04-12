@@ -2,7 +2,6 @@
 threshold ingredient(s)
 """
 import numpy as np
-from pierogis_rs import algorithms
 
 from .seasoning import Seasoning
 
@@ -19,8 +18,8 @@ class Threshold(Seasoning):
     a Threshold instance has a season method to work with or without a target
     """
 
-    LOWER_THRESHOLD = 64
-    UPPER_THRESHOLD = 180
+    LOWER_THRESHOLD = 100
+    UPPER_THRESHOLD = 150
 
     lower_threshold: int
     """pixels below are `True`"""
@@ -68,6 +67,8 @@ class Threshold(Seasoning):
         parallel computation in rust is 10x speedup
         """
         cooked_pixels = pixels.copy()
+
+        from pierogis_rs import algorithms
 
         # cook using the rust function
         cooked_pixels = algorithms.threshold(

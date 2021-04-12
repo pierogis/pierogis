@@ -679,9 +679,9 @@ checksum = "41cc0f7e4d5d4544e8861606a285bb08d3e70712ccc7d2b84d7c0ccfaf4b05ce"
 
 [[package]]
 name = "rscolorq"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "031b818310c971152b44897a5a0da47677950b2c53048646265a853db255ca0a"
+checksum = "cf06a03e7481a11c99568428957763e4f9fef4578dd2ebe5f68016754dfa638b"
 dependencies = [
  "image",
  "palette",

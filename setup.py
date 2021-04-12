@@ -5,9 +5,13 @@ from setuptools_rust import RustExtension, Binding
 readme = open("README.md").read()
 changelog = open("CHANGELOG.md").read()
 
+setup_requires = [
+    'setuptools-scm', 'setuptools-rust'
+]
+
 setup(
     name='pyrogis',
-    author="Kyle Moore",
+    author="pierogis-live",
     author_email="admin@pierogis.live",
     description="image processing framework",
     url="https://github.com/pierogis/pierogis",
@@ -21,9 +25,13 @@ setup(
         'numpy>=1.20.1',
         'imageio>=2.9.0',
         'imageio-ffmpeg>=0.4.3',
-        'pygifsicle>=1.0.2'
+        'natsort>=7.1.1',
+        'rich>=10.1.0'
     ],
-    setup_requires=['setuptools_scm'],
+    setup_requires=setup_requires,
+    extra_requires={
+        'dev': setup_requires
+    },
     rust_extensions=[
         RustExtension("pierogis_rs", binding=Binding.PyO3)
     ],
