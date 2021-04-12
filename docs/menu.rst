@@ -18,7 +18,7 @@ quantize
    $ # or
    $ pyrogis quantize input.jpg -n 16 --repeats 3 --iterations 3
 
-.. figure:: https://raw.githubusercontent.com/pierogis/pierogis/master/demo/out/gnome_magic.png
+.. figure:: https://media.githubusercontent.com/media/pierogis/pierogis/develop/demo/out/gnome_magic.png
    :alt: quantized gnome
    :align: center
 
@@ -60,7 +60,7 @@ custom
 
    sort -u 100; quantize
 
-.. figure:: https://raw.githubusercontent.com/pierogis/pierogis/master/demo/out/gnome_sort_quantize.png
+.. figure:: https://media.githubusercontent.com/media/pierogis/pierogis/develop/demo/out/gnome_sort_quantize.png
    :alt: sorted and quantized gnome
    :align: center
 
@@ -91,7 +91,7 @@ resize
    $ pyrogis resize ./input.jpg --height 200
    $ pyrogis resize ./input.jpg --height 800
 
-.. figure:: https://raw.githubusercontent.com/pierogis/pierogis/main/demo/out/gnome_resize.png
+.. figure:: https://media.githubusercontent.com/media/pierogis/pierogis/develop/demo/out/gnome_resize.png
    :alt: resized gnome
    :align: center
 
@@ -135,7 +135,7 @@ sort
 
    $ pyrogis sort ./input.jpg -l 50 -u 180 -t 1
 
-.. figure:: https://raw.githubusercontent.com/pierogis/pierogis/main/demo/out/gnome_sort.png
+.. figure:: https://media.githubusercontent.com/media/pierogis/pierogis/develop/demo/out/gnome_sort.png
    :alt: sorted gnome
    :align: center
 
@@ -175,7 +175,7 @@ threshold
 
    $ pyrogis threshold ./input.jpg -u 150 -l 20
 
-.. figure:: https://raw.githubusercontent.com/pierogis/pierogis/main/demo/out/gnome_threshold.png
+.. figure:: https://media.githubusercontent.com/media/pierogis/pierogis/develop/demo/out/gnome_threshold.png
    :alt: thresholded gnome
    :align: center
 
@@ -208,7 +208,7 @@ rotate
 
    $ pyrogis rotate ./input.jpg -t 1 --ccw
 
-.. figure:: https://raw.githubusercontent.com/pierogis/pierogis/main/demo/out/gnome_rotate.png
+.. figure:: https://media.githubusercontent.com/media/pierogis/pierogis/develop/demo/out/gnome_rotate.png
    :alt: rotated gnome
    :align: center
 

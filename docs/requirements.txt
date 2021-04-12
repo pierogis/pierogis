@@ -1,2 +1,4 @@
-sphinx
-sphinx-issues
+sphinx>=3.5.4
+sphinx-issues>=1.2.0
+setuptools-scm>=3.4
+sphinxcontrib-apidoc>=0.3.0

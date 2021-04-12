@@ -19,8 +19,9 @@ sort;
 quantize -c 000000 ffffff 668a61 cbb8a2 b6d655 434d1f 5fb7d2 6d8ab9 3876c1 515b5e a8725f d7b6aa 3c2329 f78693 637186 00407A;
 resize -s 4;
 ```
-
-![sorted and quantized teton](https://raw.githubusercontent.com/pierogis/pierogis/develop/demo/out/teton.png)
+<p align="center">
+  <img align="center" alt="sorted and quantized teton" src="https://media.githubusercontent.com/media/pierogis/pierogis/develop/demo/out/teton.png">
+</p>
 
 - [install](#install)
 - [features](#features)
@@ -53,18 +54,22 @@ pip install .
 
 - **CLI** - Use a `rich` cli to cook à la carte recipes, or provide a recipe in a document
 - **Animations** - Animations (gifs and movies) can be cooked in one command
-- **Extendable** - Easy to create custom manipulations (see [package](#package))
-- **Lazy Rendering** - Render a manipulation after constructing your pipeline (see [package](#package))
+- **Extendable** - Easy to create custom manipulations (see [docs](https://docs.pierogis.live/))
+- **Lazy Rendering** - Render a manipulation after constructing your pipeline (see [docs](https://docs.pierogis.live/))
 - **Numpy or Rust backend** - Image processing functions use Numpy for (python relative) fast operations. Some
   ingredients use compiled `Rust` for more speed.
-
-[Docs](https://docs.pierogis.live/) for cli and package use.
   
-![terminal program](https://raw.githubusercontent.com/pierogis/pierogis/develop/demo/terminal.png)
+<p align="center">
+  <img align="center" alt="terminal screen" src="https://media.githubusercontent.com/media/pierogis/pierogis/develop/demo/terminal.png">
+</p>
 
-![wires recipe](https://raw.githubusercontent.com/pierogis/pierogis/develop/demo/recipe.png)
+<p align="center">
+  <img align="center" alt="wires recipe" src="https://media.githubusercontent.com/media/pierogis/pierogis/develop/demo/recipe.png">
+</p>
 
-![wires gif](https://raw.githubusercontent.com/pierogis/pierogis/develop/demo/out/wires.gif)
+<p align="center">
+  <img align="center" src="https://media.githubusercontent.com/media/pierogis/pierogis/develop/demo/out/wires.gif">
+</p>
 
 <a name="acknowledgements"></a>
 ## acknowledgements
