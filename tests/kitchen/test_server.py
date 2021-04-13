@@ -204,6 +204,18 @@ def test_take_order_custom_txt(server, kitchen, image_path, recipe_path):
     run_take_order(server, kitchen, args)
 
 
+def test_take_order_crop(server, kitchen, image_path, recipe_path):
+    """test custom with a txt file as a recipe"""
+    args = [
+        "crop", image_path,
+        "--width", "1",
+        "--height", "1",
+    ]
+
+    run_take_order(server, kitchen, args)
+
+
+# non filling-related take_order tests
 def test_take_order_togo(server, kitchen, dir_path):
     """test togo"""
     args = ["togo", dir_path]

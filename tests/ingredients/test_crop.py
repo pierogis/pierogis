@@ -124,28 +124,30 @@ def test_crop_width_height_aspect(array):
     assert cooked_array.shape[1] == height
 
 
-def test_crop_origin(array):
+def test_crop_x_y(array):
     """
     provide origin
     """
-    origin = (1, 1)
+    x = 1
+    y = 1
 
-    crop = Crop(origin=origin)
+    crop = Crop(x=x, y=y)
     cooked_array = crop.cook(array)
 
-    assert cooked_array.shape[0] == array.shape[0] - origin[0]
-    assert cooked_array.shape[1] == array.shape[1] - origin[1]
+    assert cooked_array.shape[0] == array.shape[0] - x
+    assert cooked_array.shape[1] == array.shape[1] - y
 
-def test_crop_origin_height(array):
+
+def test_crop_x_y_height(array):
     """
     provide origin
     """
-    origin = (1, 1)
+    x = 1
+    y = 1
     height = 1
 
-    crop = Crop(origin=origin, height=height)
+    crop = Crop(x=x, y=y, height=height)
     cooked_array = crop.cook(array)
 
-    assert cooked_array.shape[0] == array.shape[0] - origin[0]
+    assert cooked_array.shape[0] == array.shape[0] - x
     assert cooked_array.shape[1] == height
-

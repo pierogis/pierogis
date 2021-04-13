@@ -1,5 +1,3 @@
-from typing import Tuple
-
 import numpy as np
 
 from .ingredient import Ingredient
@@ -8,30 +6,34 @@ from .ingredient import Ingredient
 class Crop(Ingredient):
     """
     crop starting from an origin and selecting an area in an ordinal direction
-
-    :param origin: (0, 0) = bottom left
-    :param width: width in pixels
-    :param height: height in pixels
-    :param aspect: aspect ratio to fill missing height/width from (width/height, 1 means square)
-
     """
-    origin: Tuple[int, int]
+    X = 0
+    Y = 0
+
+    x: int
+    y: int
     height: int
     width: int
     aspect: float
 
     def prep(
             self,
-            origin: Tuple[int, int] = (0, 0),
+            x: int = X,
+            y: int = Y,
             height: int = None,
             width: int = None,
             aspect: float = None,
             **kwargs
     ) -> None:
         """
-        asdasd
+        :param x: 0 = left
+        :param y: 0 = bottom
+        :param width: width in pixels
+        :param height: height in pixels
+        :param aspect: aspect ratio to fill missing height/width from (width/height, 1 means square)
         """
-        self.origin = origin
+        self.x = x
+        self.y = y
         self.height = height
         self.width = width
         self.aspect = aspect
@@ -63,6 +65,9 @@ class Crop(Ingredient):
 
             width = self.width
 
-        cooked_pixels = pixels[self.origin[0]: self.origin[0] + round(width), self.origin[1]: self.origin[1] + round(height)]
+        cooked_pixels = pixels[
+                        self.x: self.x + round(width),
+                        self.y: self.y + round(height)
+                        ]
 
         return cooked_pixels
