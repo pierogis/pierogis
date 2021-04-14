@@ -1,3 +1,4 @@
+import math
 from typing import Union, Tuple
 
 import numpy as np
@@ -180,19 +181,19 @@ class Rectangle(Seasoning):
                     else:
                         height = width / self.aspect
 
-        bl_x = int(origin.x - bl_x_multiplier * width)
+        bl_x = int(math.ceil(origin.x - bl_x_multiplier * width))
         if bl_x < 0:
             bl_x = 0
 
-        bl_y = int(origin.y - bl_y_multiplier * height)
+        bl_y = int(math.ceil(origin.y - bl_y_multiplier * height))
         if bl_y < 0:
             bl_y = 0
 
-        tr_x = int(origin.x + tr_x_multiplier * width)
+        tr_x = int(math.ceil(origin.x + tr_x_multiplier * width))
         if tr_x > bounding_width:
             tr_x = bounding_width
 
-        tr_y = int(origin.y + tr_y_multiplier * height)
+        tr_y = int(math.ceil(origin.y + tr_y_multiplier * height))
         if tr_y > bounding_height:
             tr_y = bounding_height
 

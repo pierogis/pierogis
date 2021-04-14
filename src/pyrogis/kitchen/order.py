@@ -62,6 +62,10 @@ class Order:
             else:
                 self._output_path = order_name + '.gif'
 
+        if self._output_path is not None:
+            self._output_path = os.path.expanduser(
+                os.path.abspath(self._output_path)
+            )
         return self._output_path
 
     @output_path.setter

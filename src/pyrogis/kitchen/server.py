@@ -220,7 +220,7 @@ class Server(OrderTaker):
 
         # need the path to use as input for some recipes
         # like opening files for ingredients
-        input_path = os.path.expanduser(parsed_vars.pop('path'))
+        input_path = os.path.expanduser(os.path.abspath(parsed_vars.pop('path')))
         order_name = parsed_vars.pop('order_name')
 
         output_path = parsed_togo_vars.pop('output_path')

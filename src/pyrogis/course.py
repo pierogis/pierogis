@@ -69,11 +69,15 @@ class Course:
             writer.close()
 
             if optimize and os.path.splitext(path)[1] == ".gif":
-                return_code = subprocess.call(
-                    ["gifsicle", '--optimize', path, "--output", path],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL
-                )
+                try:
+                    return_code = subprocess.call(
+                        ["gifsicle", '--optimize', path, "--output", path],
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL
+                    )
+                except:
+                    return_code = 1
+
                 if return_code != 0:
                     print("install gifsicle and ensure it's on PATH to optimize gif")
 

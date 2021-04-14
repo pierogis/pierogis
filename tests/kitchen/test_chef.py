@@ -31,8 +31,14 @@ def pierogi_desc(files_key) -> PierogiDesc:
 
 @pytest.fixture
 def array():
-    return np.asarray([[[200, 200, 200], [30, 30, 30]],
-                       [[130, 130, 130], [60, 60, 60]]]).astype(np.dtype('uint8'))
+    return np.asarray(
+        [
+            [[200, 200, 200], [30, 30, 30], [30, 30, 30]],
+            [[130, 130, 130], [60, 60, 60], [30, 30, 30]],
+            [[200, 200, 200], [30, 30, 30], [30, 30, 30]],
+            [[130, 130, 130], [60, 60, 60], [30, 30, 30]]
+        ]
+    ).astype(np.dtype('uint8'))
 
 
 @pytest.fixture

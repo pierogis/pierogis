@@ -234,7 +234,7 @@ def test_take_order_crop_options_float(server, kitchen, image_path, recipe_path)
         "--origin", "ne",
         "--width", "1",
         "--height", "1",
-        "-x", "0.5",
+        "-x", "-0.5",
         "--aspect", "0.5",
     ]
 

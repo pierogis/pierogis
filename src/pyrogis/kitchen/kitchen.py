@@ -330,10 +330,22 @@ class Kitchen:
         optimize = order.optimize
         frame_duration = order.duration
 
-        output_path = os.path.join(self.output_dir, order.output_path)
+        output_path = os.path.join(self.output_dir, os.path.basename(order.output_path))
+
+        dup_index = 1
+
+        dup_trial_path = output_path
+        base, ext = os.path.splitext(output_path)
+
+        while os.path.isfile(dup_trial_path):
+            dup_trial_path = base + '-' + str(dup_index) + ext
+
+            dup_index += 1
+
+        order.output_path = dup_trial_path
 
         course.save(
-            output_path,
+            order.output_path,
             optimize,
             duration=frame_duration,
             fps=fps
