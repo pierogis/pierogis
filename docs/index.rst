@@ -1,5 +1,5 @@
 pierogis
-================
+========
 
 *image and animation processing framework*
 

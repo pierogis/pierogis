@@ -1,46 +1,50 @@
 import numpy as np
 
-from pyrogis import (
+from pyrogis.ingredients import (
     Dish, Ingredient, Pierogi,
     Quantize, Recipe, Sort, Threshold
 )
 
-pierogi = Pierogi(file='gnome.jpg')
+pierogi = Pierogi.from_path('gnome.jpg')
 
 
-def threshold_example(self):
+def threshold_example():
     threshold = Threshold(upper_threshold=100)
 
     # pass in lists to be mixed
-    threshold_recipe = Recipe(ingredients=[pierogi, threshold])
+    threshold_recipe = Recipe(ingredients=[threshold])
     # recipe = Recipe(recipe)
 
     threshold_dish = Dish(
-        height=pierogi.height,
-        width=pierogi.width,
+        pierogi=pierogi,
         recipe=threshold_recipe
     )
 
     cooked_dish = threshold_dish.serve()
 
+    cooked_dish.pierogi.show()
 
-def swap_example(self):
+
+def swap_example():
     threshold = Threshold(target=pierogi, upper_threshold=200)
 
     swap_pixels = np.random.randint(0, 1, (10, 10, 3))
     swap = Ingredient(swap_pixels)
-    threshold.season(swap)
+    swap.season(threshold)
 
-    swap_recipe = Recipe(ingredients=[pierogi, swap])
+    swap_recipe = Recipe(ingredients=[swap])
 
     swap_dish = Dish(
+        pierogi=pierogi,
         recipe=swap_recipe
     )
 
     cooked_dish = swap_dish.serve()
 
+    cooked_dish.pierogi.show()
 
-def quantize_example(self):
+
+def quantize_example():
     palette = [
         [100, 210, 69],
         [45, 23, 180],
@@ -54,30 +58,38 @@ def quantize_example(self):
     quantize = Quantize(palette=palette)
 
     # pass in lists to be mixed
-    quantize_recipe = Recipe(ingredients=[pierogi, quantize])
+    quantize_recipe = Recipe(ingredients=[quantize])
 
     quantize_dish = Dish(
+        pierogi=pierogi,
         recipe=quantize_recipe
     )
 
     cooked_dish = quantize_dish.serve()
 
+    cooked_dish.pierogi.show()
 
-def sort_example(self):
+
+def sort_example():
     # threshold is a seasoning, which means it can be
     # used to add a mask to another Ingredient
     threshold = Threshold(target=pierogi, upper_threshold=80)
 
     sort = Sort()
     # apply a threshold mask to the sort
-    threshold.season(sort)
+    sort.season(threshold)
 
     sort_recipe = Recipe(ingredients=[pierogi, sort])
 
     sort_dish = Dish(
-        height=pierogi.height,
-        width=pierogi.width,
+        pierogi=pierogi,
         recipe=sort_recipe
     )
 
     cooked_dish = sort_dish.serve()
+
+    cooked_dish.pierogi.show()
+
+
+if __name__ == '__main__':
+    sort_example()

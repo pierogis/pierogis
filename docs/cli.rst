@@ -1,5 +1,5 @@
 cli
----
+===
 
 All of the cli commands look like this.
 
