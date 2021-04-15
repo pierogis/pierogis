@@ -1,7 +1,7 @@
 # generated
 *.py[cod]
 dist
-*build
+*build*
 *.egg*
 cooked
 *.so

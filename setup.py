@@ -6,7 +6,7 @@ readme = open("README.md").read()
 changelog = open("CHANGELOG.md").read()
 
 setup_requires = [
-    'setuptools-scm', 'setuptools-rust', 'pytest'
+    'setuptools-scm', 'setuptools-rust', 'wheel'
 ]
 
 setup(
@@ -29,8 +29,8 @@ setup(
         'rich>=10.1.0'
     ],
     setup_requires=setup_requires,
-    extra_requires={
-        'dev': setup_requires
+    extras_require={
+        'dev': setup_requires + ['pytest']
     },
     rust_extensions=[
         RustExtension("pierogis_rs", binding=Binding.PyO3)

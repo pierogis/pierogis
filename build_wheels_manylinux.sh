@@ -5,7 +5,7 @@ curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y
 export PATH="$HOME/.cargo/bin:$PATH"
 
 for PYBIN in /opt/python/cp{36,37,38,39}*/bin; do
-    "${PYBIN}/pip" install -U setuptools wheel setuptools-rust
+    "${PYBIN}/pip" install -r requirements.txt
     "${PYBIN}/python" setup.py bdist_wheel
 done
 
