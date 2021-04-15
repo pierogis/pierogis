@@ -8,8 +8,8 @@ cooked
 docs/source
 
 # venv
-venv
-.env
+*.env*
+*venv*
 
 # editor
 .vscode

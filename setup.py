@@ -7,7 +7,7 @@ readme = open("README.md").read()
 changelog = open("CHANGELOG.md").read()
 
 setup_requires = [
-    'setuptools-scm', 'setuptools-rust', 'wheel'
+    'setuptools-scm>=6.0.1', 'setuptools-rust', 'wheel'
 ]
 
 if not os.environ.get('READTHEDOCS'):
@@ -24,7 +24,7 @@ setup(
     name='pyrogis',
     author="pierogis-live",
     author_email="admin@pierogis.live",
-    description="image processing framework",
+    description="image and animation processing framework",
     url="https://github.com/pierogis/pierogis",
     long_description=readme + "\n\n" + changelog,
     long_description_content_type="text/markdown",
