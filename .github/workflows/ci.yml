@@ -92,10 +92,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-20.04, windows-2019, macOS-10.15, macOS-11.0 ]
         platform: [
           { os: "macOS-10.15", rust-target: "x86_64-apple-darwin" },
-          { os: "macOS-11.0", rust-target: "x86_64-apple-darwin" },
           { os: "windows-latest", rust-target: "x86_64-pc-windows-msvc" },
           { os: "windows-latest", rust-target: "i686-pc-windows-msvc" },
         ]
@@ -113,7 +111,6 @@ jobs:
         run: |
           pip install -r requirements.txt
           python -m pip install cibuildwheel==1.10.0
-          SETUPTOOLS_SCM_DEBUG=1 python setup.py -V
 
       - name: Install Visual C++ for Python 2.7
         if: runner.os == 'Windows'
@@ -147,6 +144,7 @@ jobs:
         run: |
           pip install -r requirements.txt
           python setup.py sdist
+          SETUPTOOLS_SCM_DEBUG=1 python setup.py -V
 
       - uses: actions/upload-artifact@v2
         with:
