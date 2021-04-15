@@ -1,7 +1,7 @@
 # generated
 *.py[cod]
-dist
-*build
+*dist*
+*build*
 *.egg*
 cooked
 *.so
@@ -9,6 +9,7 @@ docs/source
 
 # venv
 venv
+.env
 
 # editor
 .vscode

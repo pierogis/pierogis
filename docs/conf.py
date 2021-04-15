@@ -1,7 +1,7 @@
 import os
 import sys
 
-from setuptools_scm import get_version
+from importlib_metadata import version
 
 sys.path.insert(0, os.path.abspath('../src'))
 
@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath('../src'))
 project = "pierogis"
 copyright = "2021 pierogis"
 author = "pierogis-live"
-version = get_version(root='..', relative_to=__file__)
+version = version('pyrogis')
 
 # General --------------------------------------------------------------
 

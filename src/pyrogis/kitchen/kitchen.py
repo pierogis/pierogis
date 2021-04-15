@@ -119,6 +119,7 @@ class Kitchen:
         if order.presave is None:
             next_frame_index = frame_index + 2
             next_tickets = tickets[frame_index:next_frame_index]
+            order.reader.set_image_index(frame_index)
             frame_index = next_frame_index
             # sync cooking with presave frames
             presave_start = time.perf_counter()
@@ -144,13 +145,13 @@ class Kitchen:
                 next_tickets = tickets[frame_index:next_frame_index]
                 frame_index = next_frame_index
 
-                # async cooking with presave frames
-                par_presave_start = time.perf_counter()
-
                 results = []
 
                 if self.pool is None:
                     self._start_pool()
+
+                # async cooking with presave frames
+                par_presave_start = time.perf_counter()
 
                 for ticket in next_tickets:
                     frame = order.reader.get_next_data()

@@ -1,13 +1,24 @@
+import os
+
 from setuptools import find_packages
 from setuptools import setup
-from setuptools_rust import RustExtension, Binding
 
 readme = open("README.md").read()
 changelog = open("CHANGELOG.md").read()
 
 setup_requires = [
-    'setuptools-scm', 'setuptools-rust', 'pytest'
+    'setuptools-scm', 'setuptools-rust', 'wheel'
 ]
+
+if not os.environ.get('READTHEDOCS'):
+    from setuptools_rust import RustExtension, Binding
+
+    rust_extensions = [
+        RustExtension("pierogis_rs", binding=Binding.PyO3)
+    ]
+else:
+    # don't use RustExtensions
+    rust_extensions = None
 
 setup(
     name='pyrogis',
@@ -29,12 +40,10 @@ setup(
         'rich>=10.1.0'
     ],
     setup_requires=setup_requires,
-    extra_requires={
-        'dev': setup_requires
+    extras_require={
+        'dev': setup_requires + ['pytest']
     },
-    rust_extensions=[
-        RustExtension("pierogis_rs", binding=Binding.PyO3)
-    ],
+    rust_extensions=rust_extensions,
     entry_points={
         'console_scripts': [
             "pyrogis=pyrogis.__main__:main"
