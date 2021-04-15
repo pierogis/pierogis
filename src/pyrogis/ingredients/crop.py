@@ -7,12 +7,7 @@ from .seasonings.rectangle import Rectangle
 
 class Crop(Ingredient):
     """
-    crop starting from an origin and selecting an area in an ordinal direction
-
-    For a 500x500 image, this table shows the constructed selection rectangle.
-    `None` means that no value is provided through the cli.
-
-
+    crop starting from an origin and selecting an area both defined as a compass direction
     """
     X = 0
     Y = 0

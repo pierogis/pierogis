@@ -233,7 +233,7 @@ See: :py:class:`~pyrogis.kitchen.menu.rotate_filling.RotateFilling`
 
 crop
 ~~~~
-*crop pixels with options to define a selection box*
+*crop pixels by defining a selection box*
 
 .. code-block:: console
 
@@ -283,8 +283,6 @@ it will preserve one dimension and reduce another so as to not increase in size.
 
 Pixel coordinates within the rectangle but without the input image will be ignored.
 
-See :py:class:`~pyrogis.ingredients.crop.Crop`
-documentation for a table of examples and their generated rectangles' bottom left and top right coordinates.
 
 ============ ========================================================= ========= ====================
 arg          description                                               default   valid
@@ -296,5 +294,16 @@ arg          description                                               default  
 ``--height`` width to capture; decimal for relative to input height    ``None``  ``float``, ``int``
 ``--aspect`` aspect ratio; ignored if ``height`` and ``width`` present ``None``  ``float``
 ============ ========================================================= ========= ====================
+
+The following table explains the x,y coordinates (the last 4 columns)
+of the cropped output's bottom left and top right corners for each set of inputs.
+
+0,0 corresponds to the left,bottom of an image
+and a larger x,y coordinate indicates toward the right,top of the image.
+If you are reading this you are a champion.
+
+.. csv-table:: Crop Examples
+   :file: crop_table.csv
+   :header-rows: 1
 
 See: :py:class:`~pyrogis.kitchen.menu.crop_filling.CropFilling`

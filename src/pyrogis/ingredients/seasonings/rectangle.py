@@ -24,6 +24,14 @@ class Rectangle(Seasoning):
             aspect: float = None, origin: Direction = ORIGIN,
             **kwargs
     ):
+        """
+        :param x: 0 = left
+        :param y: 0 = bottom
+        :param width: width in pixels
+        :param height: height in pixels
+        :param aspect: aspect ratio to fill missing height or width (width/height, 1 means square)
+        :param origin: location of origin for direction of crop select
+        """
         super().prep(**kwargs)
 
         self.width = width
