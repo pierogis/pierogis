@@ -21,8 +21,8 @@ jobs:
         env:
           GIT_LFS_SKIP_SMUDGE: 1
       - run: |
-        git fetch --prune --unshallow
-        git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+          git fetch --prune --unshallow
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
       - name: install python
         uses: actions/setup-python@v2
@@ -107,8 +107,8 @@ jobs:
         env:
           GIT_LFS_SKIP_SMUDGE: 1
       - run: |
-        git fetch --prune --unshallow
-        git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+          git fetch --prune --unshallow
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
       - uses: actions/setup-python@v2
 
@@ -144,8 +144,8 @@ jobs:
         env:
           GIT_LFS_SKIP_SMUDGE: 1
       - run: |
-        git fetch --prune --unshallow
-        git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+          git fetch --prune --unshallow
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
       - uses: actions/setup-python@v2
         name: Install Python
@@ -264,13 +264,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ wheel-build, test, sdist-build ]
     steps:
-      - uses: actions/checkout@v2
-        with:
-          lfs: false
-          fetch-depth: 0
-        env:
-          GIT_LFS_SKIP_SMUDGE: 1
-
       - name: install python
         uses: actions/setup-python@v2
 
