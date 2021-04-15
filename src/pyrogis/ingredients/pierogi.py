@@ -1,7 +1,8 @@
 """
 define an image wrapper ingredient
 """
-import os
+from pathlib import Path
+from typing import Callable, Union
 
 import imageio
 import numpy as np
@@ -14,13 +15,21 @@ class Pierogi(Ingredient):
     """
     image container for iterative pixel manipulation
 
-    uses PIL.Image to load to self.pixels
+    create a Pierogi from:
+    - pixel array
+    - video file with a frame index
+    - image file
+    - PIL image
+
+    unless pixels are provided explicitly ( Pierogi(pixels=pixels) ),
+    the pixels member is a property that is lazy loaded
+    (usually from a file) and cached
     """
 
     RESAMPLE = Image.NEAREST
     """default resize algorithm is nearest neighbor"""
 
-    pixels: np.ndarray
+    _pixels: np.ndarray = None
     """underlying numpy pixels array"""
 
     @property
@@ -48,37 +57,75 @@ class Pierogi(Ingredient):
     def prep(
             self,
             pixels: np.ndarray = None,
-            shape: tuple = (0, 0),
-            image: Image.Image = None,
-            file: str = None,
+            loader: Callable[[], np.ndarray] = None,
             **kwargs
     ) -> None:
         """
         provide the source image in a number of ways
 
         :param pixels: numpy array
-
-        :param shape: shape to make simple pixels array
-
-        :param image: PIL Image that has already been loaded
-
-        :param file: file path to load from
+        :param loader: function that produces a pixels array
         """
 
-        if pixels is None:
-            if image is not None:
-                # rotate the image array on receipt so that
-                # array dimensions are (width, height, 3)
-                pixels = np.rot90(np.array(image.convert('RGB')), axes=(1, 0))
-            elif file is not None:
-                self.file = file
-                pixels = np.rot90(np.array(imageio.imread(file)), axes=(1, 0))
-            elif shape is not None:
-                pixels = np.full((*shape, 3), self._default_pixel)
-            else:
-                raise Exception("one of image, file, or shape must be provided")
+        if pixels is not None:
+            self._pixels = pixels
+            self._loader = lambda: pixels
 
-        self.pixels = pixels
+        elif loader is not None:
+            self._loader = loader
+
+        else:
+            raise Exception("one of pixels or loader must be provided")
+
+    @classmethod
+    def from_path(cls, path: str, frame_index: int = 0) -> 'Pierogi':
+        """
+        :param path: file path to load from
+        :param frame_index: if path is a multiframe format (video),
+        use this specified frame
+        """
+
+        def loader():
+            reader = imageio.get_reader(path)
+            reader.set_image_index(frame_index)
+            return np.rot90(np.array(reader.get_next_data())[:, :, :3], axes=(1, 0))
+
+        return cls(loader=loader)
+
+    @classmethod
+    def from_shape(cls, shape: tuple) -> 'Pierogi':
+        """
+        :param shape: (width, height) to make default pixels array
+        """
+
+        def loader():
+            return np.full((*shape, 3), cls._default_pixel)
+
+        return cls(loader=loader)
+
+    @classmethod
+    def from_pil_image(cls, image: Image.Image):
+        """
+        :param image: PIL Image that has already been loaded
+        """
+
+        def loader():
+            return np.rot90(np.array(image.convert('RGB')), axes=(1, 0))
+
+        return cls(loader=loader)
+
+    @property
+    def pixels(self) -> np.ndarray:
+        if self._pixels is None:
+            self.load()
+
+        return self._pixels
+
+    def load(self) -> None:
+        """
+        use the loader return the contained pixels one time
+        """
+        self._pixels = self._loader()
 
     def cook(self, pixels: np.ndarray) -> np.ndarray:
         """
@@ -92,16 +139,12 @@ class Pierogi(Ingredient):
         """
         self.image.show()
 
-    def save(self, path: str, optimize: bool =False) -> None:
+    def save(self, path: Union[str, Path], optimize: bool = False) -> None:
         """
         save the image to the given path
         """
 
         output_filename = path
-        if os.path.isdir(path):
-            output_filename = os.path.join(
-                path, os.path.split(self.file)[1]
-            )
 
         self.image.save(output_filename, optimize=optimize)
 
@@ -124,10 +167,11 @@ class Pierogi(Ingredient):
         >    If omitted, or if the image has mode “1” or “P”, it is set PIL.Image.NEAREST."
         """
 
-        self.pixels = np.array(
-            Image.fromarray(
-                self.pixels
-            ).resize(
-                (height, width), resample
+        if height != self.height and width != self.width:
+            self._pixels = np.array(
+                Image.fromarray(
+                    self.pixels
+                ).resize(
+                    (height, width), resample
+                )
             )
-        )

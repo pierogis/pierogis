@@ -19,4 +19,4 @@ version = "0.13"
 features = ["extension-module"]
 
 [dependencies.rscolorq]
-version = "0.1.1"
+version = "0.2.0"

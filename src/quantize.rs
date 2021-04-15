@@ -72,7 +72,7 @@ pub fn cook(
             .collect::<Vec<Rgb>>();
 
         // use this Vec in the conditions for dithering
-        conditions.palette(colors);
+        conditions.palette(colors).unwrap();
     }
 
     // also create a palette for the outcome of the algorithm
@@ -101,6 +101,7 @@ pub fn cook(
 
     imgbuf
 }
+
 
 // NOTES on spatial quantization
 

@@ -1,6 +1,5 @@
 import numpy as np
 from PIL import ImageColor
-from pierogis_rs import algorithms
 
 from .ingredient import Ingredient
 
@@ -133,6 +132,8 @@ class SpatialQuantize(Quantize):
         use the binding to the rscolorq package in rust
         to perform an optimization in quantizing and dithering
         """
+
+        from pierogis_rs import algorithms
 
         # rotating and unrotating because different orientation is expected
         cooked_pixels = np.rot90(algorithms.quantize(

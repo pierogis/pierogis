@@ -65,16 +65,15 @@ class Resize(Ingredient):
         if self.width is not None and self.height is not None:
             width = self.width
             height = self.height
-        else:
-            if self.width is not None or self.height is not None:
-                aspect = width / height
+        elif self.width is not None or self.height is not None:
+            aspect = width / height
 
-                if self.width is None:
-                    width = self.height * aspect
-                    height = self.height
-                elif self.height is None:
-                    height = self.width / aspect
-                    width = self.width
+            if self.width is None:
+                width = self.height * aspect
+                height = self.height
+            elif self.height is None:
+                height = self.width / aspect
+                width = self.width
 
         width *= self.scale
         height *= self.scale

@@ -1,4 +1,4 @@
-resize -s .5;
+resize -s .25;
 sort;
-quantize;
-resize -s 2;
+quantize -c 7C7861 433F35 37332A 28231E 0B0A08 171513 54554D 989683 --dithering-level .6;
+resize --height 600

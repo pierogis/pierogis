@@ -76,22 +76,11 @@ class Seasoning(Ingredient):
             pixels == self.include_pixel, axis=2
         )
 
+        boolean_array = np.expand_dims(boolean_array, 2)
+
         # replace True with include_pixel and False with exclude_pixel
         binary_pixels = np.where(
             boolean_array, self.include_pixel, self.exclude_pixel
         )
 
         return binary_pixels
-
-    # def season(self, recipient: Ingredient):
-    #     """
-    #     Set the input ingredient's mask to the output of a cook.
-    #
-    #     If self.target is none,
-    #     recipient will be the pixels that are cooked as well.
-    #
-    #     :param recipient: ingredient which will have its mask set
-    #     """
-    #     recipient.mask = self.cook(self.pierogi.pixels)
-    #
-    #     return recipient
