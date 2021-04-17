@@ -180,10 +180,10 @@ def test_take_order_presave_async_processes(server, kitchen, image_path):
     run_take_order(server, kitchen, args)
 
 
-def test_take_order_resume(server, kitchen, image_path):
+def test_take_order_resume(server, kitchen, animation_path):
     """test resume flag"""
     args = [
-        "resize", image_path,
+        "resize", animation_path,
         "--resume"
     ]
 

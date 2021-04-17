@@ -101,6 +101,9 @@ class Kitchen:
         """test some frames in the animation"""
         tickets = [ticket for ticket in order.tickets if not ticket.skip]
 
+        if len(tickets) == 0:
+            return []
+
         # test with 5% of the frames, within 2 and 10
         seq_pilot_frames = 2
 
@@ -119,7 +122,7 @@ class Kitchen:
         if order.presave is None:
             next_frame_index = frame_index + 2
             next_tickets = tickets[frame_index:next_frame_index]
-            order.reader.set_image_index(frame_index)
+            order.reader.set_image_index(next_tickets[0].pierogis[next_tickets[0].base].frame_index)
             frame_index = next_frame_index
             # sync cooking with presave frames
             presave_start = time.perf_counter()
@@ -285,6 +288,10 @@ class Kitchen:
 
         for ticket in next_tickets:
             if order.presave:
+                next_frame_index = next_tickets[0].pierogis[next_tickets[0].base].frame_index
+                if next_frame_index > 0:
+                    order.reader.set_frame_index(next_frame_index)
+
                 frame = order.reader.get_next_data()
                 self._presave_ticket(frame, ticket)
 

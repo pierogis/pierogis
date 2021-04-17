@@ -32,12 +32,22 @@ class TimeElapsedMsColumn(ProgressColumn):
         """Show time remaining."""
         elapsed = task.finished_time if task.finished else task.elapsed
         if elapsed is None:
-            return Text("-:--:--.---", style="progress.elapsed")
-        delta = timedelta(milliseconds=elapsed * 1000)
-        split = str(delta).split('.')
-        rate_string = "{}.{}".format(split[0], split[1][:self.decimal_places])
+            clock = '-:--:--'
+            decimal = '-' * self.decimal_places
+        else:
+            delta = timedelta(milliseconds=elapsed * 1000)
+            split_time = str(delta).split('.')
 
-        return Text(rate_string, style="progress.elapsed")
+            if len(split_time) > 0:
+                clock = split_time[0]
+                decimal = split_time[1]
+            else:
+                clock = '-:--:--'
+                decimal = '-' * self.decimal_places
+
+        elapsed_string = "{}.{}".format(clock, decimal[:self.decimal_places])
+
+        return Text(elapsed_string, style="progress.elapsed")
 
 
 class TreeColumn(ProgressColumn):
