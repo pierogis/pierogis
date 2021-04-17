@@ -4,7 +4,6 @@ from setuptools import find_packages
 from setuptools import setup
 
 readme = open("README.md").read()
-changelog = open("CHANGELOG.md").read()
 
 setup_requires = [
     'setuptools-scm>=6.0.1', 'setuptools-rust', 'wheel'
@@ -26,7 +25,7 @@ setup(
     author_email="admin@pierogis.live",
     description="image and animation processing framework",
     url="https://github.com/pierogis/pierogis",
-    long_description=readme + "\n\n" + changelog,
+    long_description=readme,
     long_description_content_type="text/markdown",
     packages=find_packages('src'),
     package_dir={'': 'src'},
