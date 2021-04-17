@@ -20,7 +20,7 @@ class SortFilling(Filling):
 
         ThresholdFilling.add_parser_arguments(parser)
 
-        parser.set_defaults(turns=0)
+        parser.set_defaults(angle=0)
 
     @classmethod
     def generate_ticket(
@@ -37,13 +37,17 @@ class SortFilling(Filling):
 
         turns = kwargs.pop('turns')
         clockwise = kwargs.pop('clockwise')
+        angle = kwargs.pop('angle')
+        resample = kwargs.pop('resample')
 
         # create rotate description
         rotate_desc = IngredientDesc(
             type_name='rotate',
             kwargs={
                 'turns': turns,
+                'angle': angle,
                 'clockwise': clockwise,
+                'resample': resample
             }
         )
         rotate_uuid = ticket.add_ingredient_desc(rotate_desc)

@@ -21,7 +21,7 @@ class Rectangle(Seasoning):
             self,
             width: Union[int, float] = None, height: Union[int, float] = None,
             x: Union[int, float] = 0, y: Union[int, float] = 0,
-            aspect: float = None, origin: Direction = ORIGIN,
+            aspect: float = None, origin: Union[str, Direction] = ORIGIN,
             **kwargs
     ):
         """
@@ -39,6 +39,9 @@ class Rectangle(Seasoning):
         self.x = x
         self.y = y
         self.aspect = aspect
+
+        if isinstance(origin, str):
+            origin = Direction(origin)
         self.origin = origin
 
     def cook(self, pixels: np.ndarray):

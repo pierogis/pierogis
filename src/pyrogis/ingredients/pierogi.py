@@ -26,8 +26,10 @@ class Pierogi(Ingredient):
     (usually from a file) and cached
     """
 
-    RESAMPLE = Image.NEAREST
+    RESIZE_RESAMPLE = Image.NEAREST
     """default resize algorithm is nearest neighbor"""
+    ROTATE_RESAMPLE = Image.NEAREST
+    """default rotate algorithm is nearest neighbor"""
 
     _pixels: np.ndarray = None
     """underlying numpy pixels array"""
@@ -88,7 +90,7 @@ class Pierogi(Ingredient):
         def loader():
             reader = imageio.get_reader(path)
             reader.set_image_index(frame_index)
-            return np.rot90(np.array(reader.get_next_data())[:, :, :3], axes=(1, 0))
+            return np.rot90(np.array(reader.get_next_data(), dtype='uint8')[:, :, :3], axes=(1, 0))
 
         return cls(loader=loader)
 
@@ -99,7 +101,7 @@ class Pierogi(Ingredient):
         """
 
         def loader():
-            return np.full((*shape, 3), cls._default_pixel)
+            return np.full((*shape, 3), cls._default_pixel, dtype='uint8')
 
         return cls(loader=loader)
 
@@ -110,7 +112,7 @@ class Pierogi(Ingredient):
         """
 
         def loader():
-            return np.rot90(np.array(image.convert('RGB')), axes=(1, 0))
+            return np.rot90(np.array(image.convert('RGB'), dtype='uint8'), axes=(1, 0))
 
         return cls(loader=loader)
 
@@ -148,7 +150,7 @@ class Pierogi(Ingredient):
 
         self.image.save(output_filename, optimize=optimize)
 
-    def resize(self, width: int, height: int, resample: int = RESAMPLE):
+    def resize(self, width: int, height: int, resample: int = RESIZE_RESAMPLE):
         """
         resize pixels to new width and height
 
@@ -174,4 +176,25 @@ class Pierogi(Ingredient):
                 ).resize(
                     (height, width), resample
                 )
+            )
+
+    def rotate(self, angle: float, resample: int = RESIZE_RESAMPLE):
+        """
+        rotate underlying pixel array by an angle
+
+        :param angle: angle to rotate
+        :param resample: resample method to use in Image.resize.
+        PIL documentation:
+
+        >    "An optional resampling filter.
+        >    This can be one of PIL.Image.NEAREST (use nearest neighbour),
+        >    PIL.Image.BILINEAR (linear interpolation),
+        >    PIL.Image.BICUBIC (cubic spline interpolation),
+        >    or PIL.Image.LANCZOS (a high-quality downsampling filter).
+        >    If omitted, or if the image has mode “1” or “P”, it is set PIL.Image.NEAREST."
+        """
+
+        if angle != 0:
+            self._pixels = np.array(
+                Image.fromarray(self.pixels).rotate(-angle, resample=resample, expand=True, fillcolor=0)
             )

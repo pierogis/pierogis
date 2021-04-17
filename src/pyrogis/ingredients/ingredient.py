@@ -21,8 +21,8 @@ class Ingredient:
     """
 
     # used to fill in empty spots when cooked
-    _black_pixel = np.array([0, 0, 0])
-    _white_pixel = np.array([255, 255, 255])
+    _black_pixel = np.array([0, 0, 0], dtype='uint8')
+    _white_pixel = np.array([255, 255, 255], dtype='uint8')
 
     _default_pixel = _white_pixel
 

@@ -1,3 +1,5 @@
+from typing import Union
+
 import numpy as np
 
 from .ingredient import Ingredient
@@ -17,6 +19,7 @@ class Crop(Ingredient):
     height: int
     width: int
     aspect: float
+    origin: Direction
 
     def prep(
             self,
@@ -25,7 +28,7 @@ class Crop(Ingredient):
             height: int = None,
             width: int = None,
             aspect: float = None,
-            origin: Direction = Rectangle.ORIGIN,
+            origin: Union[str, Direction] = Rectangle.ORIGIN,
             **kwargs
     ) -> None:
         """

@@ -1,2 +1,4 @@
-*.gif filter=lfs diff=lfs merge=lfs -text
-*.mp4 filter=lfs diff=lfs merge=lfs -text
+demo/*.gif filter=lfs diff=lfs merge=lfs -text
+demo/*.mp4 filter=lfs diff=lfs merge=lfs -text
+demo/*.png filter=lfs diff=lfs merge=lfs -text
+demo/*.jpg filter=lfs diff=lfs merge=lfs -text

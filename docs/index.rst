@@ -28,7 +28,7 @@ that compile to a cooked animation.
 
 A :doc:`rich <rich:introduction>` cli uses :py:class:`~filling.Filling`
 objects to parse orders into cook tasks as a :py:class:`~pyrogis.restaurant.Restaurant`.
-These can be found on the :doc:`menu`.
+These can be found on the :doc:`menu/index`.
 
 In this realm, a single `pierogi` means a pixel, many `pierogi` means an image, and `pierogis` means many images.
 

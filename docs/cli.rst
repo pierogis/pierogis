@@ -13,11 +13,11 @@ A directory can be used for ``path``, in which case the program will try to cook
 If an ``output`` filename or dir is provided, it should match the expected output.
 
 The following options are common to each ``filling``.
-In addition, each ``filling`` or has its own set of options, seen in :doc:`menu`.
+In addition, each ``filling`` or has its own set of options, seen in :doc:`menu/index`.
 
 .. toctree::
 
-    menu
+    menu/index
 
 *common options*
 ~~~~~~~~~~~~~~~~

@@ -1,11 +1,8 @@
-from typing import List
-
 import numpy as np
 
+from .crop import Crop
 from .ingredient import Ingredient
-from .pierogi import Pierogi
 from .rotate import Rotate
-from .seasonings import Seasoning, Threshold
 
 
 class Sort(Ingredient):
@@ -90,5 +87,10 @@ class Sort(Ingredient):
         # unrotate sorted_pixels to return to correct orientation
         unrotate = Rotate.unrotate(rotate)
         sorted_pixels = unrotate.cook(sorted_pixels)
+
+        width, height = pixels.shape[:2]
+        crop = Crop(origin='c', width=width, height=height)
+
+        sorted_pixels = crop.cook(sorted_pixels)
 
         return sorted_pixels

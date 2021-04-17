@@ -15,8 +15,16 @@ class RotateFilling(Filling):
 
         # add palette and palette size
         parser.add_argument('-t', '--turns', default=1, type=int)
+        parser.add_argument('-a', '--angle', default=90, type=int)
         parser.add_argument(
             '--ccw',
             dest='clockwise',
             action='store_false'
+        )
+        parser.add_argument(
+            '--resample-filter',
+            dest='resample',
+            default=Rotate.FILTERS['default'],
+            choices=Rotate.FILTERS.keys(),
+            help='resample filter for resize'
         )

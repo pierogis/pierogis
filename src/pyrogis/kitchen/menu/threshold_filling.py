@@ -13,13 +13,13 @@ class ThresholdFilling(Filling):
         """
         parser.add_argument(
             '-l', '--lower-threshold',
-            default=Threshold.LOWER_THRESHOLD, type=int,
+            type=int,
             help="Pixels with lightness below"
                  "this threshold are included"
         )
         parser.add_argument(
             '-u', '--upper-threshold',
-            default=Threshold.UPPER_THRESHOLD, type=int,
+            type=int,
             help="Pixels with lightness above"
                  "this threshold are included"
         )

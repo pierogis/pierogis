@@ -1,42 +1,62 @@
+from typing import Union
+
 import numpy as np
+from PIL import Image
 
 from .ingredient import Ingredient
+from .pierogi import Pierogi
 
 
 class Rotate(Ingredient):
-    """
-    rotate a pixel array
-    """
+    """rotate a pixel array"""
+    FILTERS = {
+        'default': Image.NEAREST,
+        'nearest': Image.NEAREST,
+        'box': Image.BOX,
+        'bicubic': Image.BICUBIC,
+        'bilinear': Image.BILINEAR,
+        'hamming': Image.HAMMING,
+        'lanczos': Image.LANCZOS,
+    }
 
-    def prep(self, clockwise: bool = True, turns: int = 1, **kwargs):
+    def prep(
+            self,
+            clockwise: bool = True, turns: int = 1, angle: int = 90,
+            resample: Union[int, str] = FILTERS['default'],
+            **kwargs
+    ):
         """
         provide a given number of turns in a specified direction
 
-        :param clockwise if True, top left pixel becomes top right
-        :param turns number of 90 degree turns to make
+        :param clockwise: if True, top left pixel becomes top right
+        :param turns: number of "angle" degree turns to make
+        :param angle: distance to turn
+        :param resample: resample filter to use
         """
+        self.angle = angle
         self.clockwise = clockwise
         self.turns = turns
+        self.resample = resample
 
     def cook(self, pixels: np.ndarray):
-        """
-        rotate the pixels according to parameters
-        """
-        rotated_pixels = pixels
-        # determine axes of rotation from clockwise or not
-        rotation_axes = (1, 0) if self.clockwise else (0, 1)
+        """rotate the pixels according to angle"""
+        pierogi = Pierogi(pixels=pixels)
 
-        # turn turns number of times
-        for i in range(self.turns):
-            rotated_pixels = np.rot90(rotated_pixels, axes=rotation_axes)
+        angle = self.turns * self.angle
+        if self.clockwise:
+            angle *= -1
 
-        return rotated_pixels
+        pierogi.rotate(angle, self.resample)
+
+        return pierogi.pixels
 
     @classmethod
     def unrotate(cls, rotate: 'Rotate'):
         """
         return a Rotate that will reverse the given Rotate
 
-        :param rotate the rotate to reverse
+        :param rotate: the rotate to reverse
         """
-        return cls(clockwise=not rotate.clockwise, turns=rotate.turns)
+        return cls(
+            angle=rotate.angle, clockwise=not rotate.clockwise, turns=rotate.turns, resample=rotate.resample
+        )
