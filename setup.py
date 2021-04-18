@@ -40,7 +40,8 @@ setup(
     ],
     setup_requires=setup_requires,
     extras_require={
-        'dev': setup_requires + ['pytest']
+        'dev': setup_requires + ['pytest'],
+        'style': ['tensorflow', 'tensorflow_hub']
     },
     rust_extensions=rust_extensions,
     entry_points={

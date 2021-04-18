@@ -1,6 +1,7 @@
 """
 define an image wrapper ingredient
 """
+import os
 from pathlib import Path
 from typing import Callable, Union
 
@@ -86,6 +87,8 @@ class Pierogi(Ingredient):
         :param frame_index: if path is a multiframe format (video),
         use this specified frame
         """
+
+        assert os.path.isfile(path)
 
         def loader():
             reader = imageio.get_reader(path)
