@@ -1,13 +1,7 @@
 #!/bin/bash
 #set -ex
 
-# only 3.9 on arm with pyenv
 for PYBIN in ~/.pyenv/versions/{3.8,3.9}*/bin; do
     "${PYBIN}/pip" install -r requirements.txt
-    "${PYBIN}/python" setup.py bdist_wheel
+    "${PYBIN}/pip" wheel . -w dist --no-deps
 done
-
-# upload wheels
-~/.pyenv/versions/3.9*/bin/pip install -U awscli
-export DIST_DIR=$(~/.pyenv/versions/3.9*/bin/python setup.py -V)
-~/.pyenv/versions/3.9*/bin/python -m awscli s3 sync --exact-timestamps ./dist "s3://pierogis/dist/$DIST_DIR"
