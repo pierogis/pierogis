@@ -34,7 +34,7 @@ def test_plate_gif(kitchen: Kitchen, order: Order, gif_output_path: str):
 
 
 def test_plate_mp4(kitchen: Kitchen, order: Order, mp4_output_path: str):
-    order.output_path = mp4_output_path
+    order._output_path = mp4_output_path
 
     output_path = kitchen.plate(
         order

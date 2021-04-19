@@ -145,8 +145,6 @@ class Server(OrderTaker):
             raise FileNotFoundError(input_path)
 
     def _handle_togo(self, order: Order):
-        self._report_status(order, status='boxing')
-
         if os.path.isdir(order.input_path):
             # debug here
             filenames = [
@@ -187,20 +185,16 @@ class Server(OrderTaker):
         frames = len(order.tickets)
         self._report_status(order, total=frames)
 
-        # the Server splits off part of their consciousness into a new thread
-        check_thread = Thread(target=self._check_order, args=[order])
-        check_thread.daemon = True
-
         # don't start the checker thread until the kitchen is ready
-        def start_callback():
-            check_thread.start()
 
         self._report_status(order, status='cooking')
 
-        kitchen.queue_order(order, start_callback, self._report_status)
-        check_thread.join()
+        queue_thread = Thread(target=kitchen.queue_order, args=[order, self._report_status], daemon=True)
+        queue_thread.start()
 
-        self._report_status(order, status='boxing')
+        # the Server splits off part of their consciousness into a new thread
+        self._check_order(order)
+        queue_thread.join()
 
     def take_order(
             self, args: List[str], kitchen: Kitchen
@@ -246,6 +240,8 @@ class Server(OrderTaker):
         else:
             self._handle_filling(order, parsed_vars, kitchen)
 
+        self._report_status(order, status='boxing')
+
         kitchen.plate(
             order=order
         )
@@ -258,7 +254,7 @@ class Server(OrderTaker):
     def _count_cooked_tickets(order: Order) -> int:
         cooked_tickets = 0
         for filename in order.ticket_output_paths:
-            if os.path.exists(os.path.join(filename)):
+            if filename is not None and os.path.exists(os.path.join(filename)):
                 cooked_tickets += 1
 
         return cooked_tickets
@@ -270,7 +266,7 @@ class Server(OrderTaker):
         """check and report how many tickets from an Order have been cooked"""
         total = len(order.tickets)
 
-        wait_time = .1
+        wait_time = .01
 
         failed_output_paths = []
 

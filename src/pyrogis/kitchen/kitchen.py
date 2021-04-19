@@ -30,15 +30,14 @@ class Kitchen:
 
     _pool: mp.Pool
 
-    def _start_pool(self):
-        self.pool = mp.Pool(self.processes, initializer=initializer)
+    def _start_pool(self, processes: int):
+        self.pool = mp.Pool(processes, initializer=initializer)
 
     def __init__(
             self,
             cooker: Cooker,
-            processes: int = None,
             cooked_dir: str = 'cooked',
-            output_dir: str = '',
+            output_dir: str = None,
             raw_dir: str = None
     ):
         """
@@ -46,7 +45,7 @@ class Kitchen:
         :param cooker:
                 Chef-like object to cook with - can be anything that implements the base Chef's methods
         :param processes:
-                number of cpus to use (defaults to os.cpu_count)
+                number of cpus to use (defaults to os.cpu_count / 2)
         :param cooked_dir:
                 to output cooked frames
         :param output_dir:
@@ -55,9 +54,6 @@ class Kitchen:
                 dir to store raw input files if necessary (defaults to tempfile.mkdtemp)
         """
         self.cooker = cooker
-        if processes is None:
-            processes = os.cpu_count()
-        self.processes = processes
         self.pool = None
         self.cooked_dir = cooked_dir
         self.output_dir = output_dir
@@ -151,7 +147,7 @@ class Kitchen:
                 results = []
 
                 if self.pool is None:
-                    self._start_pool()
+                    self._start_pool(order.processes)
 
                 # async cooking with presave frames
                 par_presave_start = time.perf_counter()
@@ -184,7 +180,7 @@ class Kitchen:
                 results = []
 
                 if self.pool is None:
-                    self._start_pool()
+                    self._start_pool(order.processes)
 
                 for ticket in next_tickets:
                     def error_callback(exception: Exception):
@@ -267,12 +263,9 @@ class Kitchen:
                 frame_index += 1
 
     def queue_order(
-            self, order: Order, start_callback: Callable, report_status: Callable
+            self, order: Order, report_status: Callable
     ):
         self._set_output_paths(order)
-        self.processes = order.processes
-
-        start_callback()
 
         report_status(order, status='preprocessing')
 
@@ -297,7 +290,7 @@ class Kitchen:
 
             if order.cook_async:
                 if self.pool is None:
-                    self._start_pool()
+                    self._start_pool(order.processes)
 
                 def error_callback(exception: Exception):
                     order.failures.put((exception, ticket))
@@ -338,22 +331,25 @@ class Kitchen:
         optimize = order.optimize
         frame_duration = order.duration
 
-        output_path = os.path.join(self.output_dir, os.path.basename(order.output_path))
+        if self.output_dir is not None:
+            output_path = os.path.join(self.output_dir, os.path.basename(order.output_path))
 
-        dup_index = 1
+            dup_index = 1
 
-        dup_trial_path = output_path
-        base, ext = os.path.splitext(output_path)
+            base, ext = os.path.splitext(output_path)
 
-        while os.path.isfile(dup_trial_path):
-            dup_trial_path = base + '-' + str(dup_index) + ext
+            while os.path.isfile(output_path):
+                output_path = base + '-' + str(dup_index) + ext
 
-            dup_index += 1
+                dup_index += 1
 
-        order.output_path = dup_trial_path
+                output_path = os.path.join(output_path, output_path)
+
+        else:
+            output_path = order.output_path
 
         course.save(
-            order.output_path,
+            output_path,
             optimize,
             duration=frame_duration,
             fps=fps

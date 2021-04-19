@@ -3,6 +3,7 @@ define objects for running the program with rich terminal feedback
 """
 
 import os
+import sys
 import time
 from datetime import timedelta
 from typing import Callable, Iterable, List
@@ -38,12 +39,12 @@ class TimeElapsedMsColumn(ProgressColumn):
             delta = timedelta(milliseconds=elapsed * 1000)
             split_time = str(delta).split('.')
 
-            if len(split_time) > 0:
-                clock = split_time[0]
+            clock = split_time[0]
+
+            if len(split_time) > 1:
                 decimal = split_time[1]
             else:
-                clock = '-:--:--'
-                decimal = '-' * self.decimal_places
+                decimal = '0' * self.decimal_places
 
         elapsed_string = "{}.{}".format(clock, decimal[:self.decimal_places])
 
@@ -119,7 +120,8 @@ class Restaurant:
             BarColumn(),
             " [progress.percentage]{task.percentage:>3.0f}% ",
             TimeElapsedMsColumn(),
-            SmoothRateColumn()
+            SmoothRateColumn(),
+            console=self.console
         )
 
         # for displaying the stage of orders/kitchen
@@ -133,7 +135,8 @@ class Restaurant:
             SpinnerColumn('arc', speed=1, finished_text='[bold]✓'),
             TextColumn("{task.fields[input_path]}"),
             TextColumn("[bold blue]->"),
-            TextColumn("{task.fields[output_path]}")
+            TextColumn("{task.fields[output_path]}"),
+            console=self.console
         )
 
     def add_kitchen_task(self, order_name: str, input_paths: Iterable[str]):
@@ -161,7 +164,7 @@ class Restaurant:
             try:
                 run(report_callback=self._report)
             except KeyboardInterrupt:
-                pass
+                sys.exit()
 
     @staticmethod
     def _get_order_name(order: Order) -> str:
@@ -201,23 +204,23 @@ class Restaurant:
         if server_task is None:
             server_task = self.add_server_task(order_name, input_path, output_path)
         if status is not None:
-            self.server_progress.update(server_task, description=status)
-            self.server_progress.update(server_task, input_path=input_path)
-            self.server_progress.update(server_task, output_path=output_path)
+            self.server_progress.update(
+                server_task, description=status, input_path=input_path, output_path=output_path, refresh=True
+            )
             if status == 'done':
                 self.server_progress.update(server_task, total=0)
 
-    def _update_kitchen(self, order: Order, completed: int, total: int, advance: int, branches: List[str]):
+    def _update_kitchen(self, order: Order, completed: int = None, total: int = None, advance: int = None,
+                        branches: List[str] = None):
         order_name = self._get_order_name(order)
 
         kitchen_task = self.kitchen_tasks.get(order_name)
         if kitchen_task is None:
             kitchen_task = self.add_kitchen_task(order_name, [])
-        if completed is not None:
-            self.kitchen_progress.update(kitchen_task, completed=completed)
-        if total is not None:
-            self.kitchen_progress.update(kitchen_task, total=total)
-        if advance is not None:
-            self.kitchen_progress.update(kitchen_task, advance=advance)
-        if branches is not None:
-            self.kitchen_progress.update(kitchen_task, branches=branches)
+
+        if branches is None:
+            branches = []
+
+        self.kitchen_progress.update(
+            kitchen_task, completed=completed, total=total, advance=advance, branches=branches, refresh=True
+        )

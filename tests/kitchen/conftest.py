@@ -25,7 +25,7 @@ def order_name():
 
 @pytest.fixture
 def image_path(array: np.ndarray, tmp_path):
-    output_path = tmp_path / 'output.png'
+    output_path = tmp_path / 'input.png'
     imageio.imwrite(output_path, array)
 
     return str(output_path)
@@ -33,7 +33,7 @@ def image_path(array: np.ndarray, tmp_path):
 
 @pytest.fixture
 def animation_path(array, tmp_path) -> str:
-    output_path = tmp_path / 'output.mp4'
+    output_path = tmp_path / 'input.mp4'
     imageio.mimwrite(output_path, ims=[array, array])
 
     return str(output_path)

@@ -56,21 +56,20 @@ class Order:
             if order_name is None:
                 order_name = os.path.splitext(os.path.basename(self.input_path))[0]
             if self.frames == 1:
-                self._output_path = order_name + '.png'
+                output_path = order_name + '.png'
             elif self.frames == 0:
-                pass
+                return None
             else:
-                self._output_path = order_name + '.gif'
+                output_path = order_name + '.gif'
+
+            self._output_path = output_path
 
         if self._output_path is not None:
             self._output_path = os.path.expanduser(
                 os.path.abspath(self._output_path)
             )
-        return self._output_path
 
-    @output_path.setter
-    def output_path(self, value: str) -> None:
-        self._output_path = value
+        return self._output_path
 
     def __init__(
             self,
@@ -95,6 +94,9 @@ class Order:
         self.optimize = optimize
         self.presave = presave
         self.cook_async = cook_async
+
+        if processes is None:
+            processes = os.cpu_count()
         self.processes = processes
         self.resume = resume
 

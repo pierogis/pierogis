@@ -12,7 +12,6 @@ def run(args=None, report_callback: Callable = None):
 
     server = Server(report_callback)
 
-    mp.set_start_method('spawn', force=True)
     kitchen = Kitchen(Chef())
 
     server.take_order(

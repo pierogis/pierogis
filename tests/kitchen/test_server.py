@@ -163,7 +163,7 @@ def test_take_order_resize_options(server, kitchen, image_path):
 
     order = run_take_order(server, kitchen, args)
 
-    assert kitchen.processes == 4
+    assert order.processes == 4
     assert order.cook_async
     assert order.presave
 
