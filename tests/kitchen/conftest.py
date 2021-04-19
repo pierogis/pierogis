@@ -15,7 +15,7 @@ def array():
 
 @pytest.fixture
 def kitchen(tmp_path) -> Kitchen:
-    return Kitchen(Chef, cooked_dir=str(tmp_path / 'cooked'), output_dir=str(tmp_path))
+    return Kitchen(Chef, cooked_dir=str(tmp_path / 'cooked'))
 
 
 @pytest.fixture

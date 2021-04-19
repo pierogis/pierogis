@@ -9,8 +9,8 @@ from pyrogis.kitchen.order import Order
 
 
 @pytest.fixture
-def server() -> Server:
-    return Server()
+def server(tmp_path) -> Server:
+    return Server(output_dir=str(tmp_path))
 
 
 @pytest.fixture

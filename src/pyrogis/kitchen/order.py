@@ -62,11 +62,20 @@ class Order:
             else:
                 output_path = order_name + '.gif'
 
-            self._output_path = output_path
+            if self._output_dir is not None:
+                output_path = os.path.join(self._output_dir, os.path.basename(output_path))
 
-        if self._output_path is not None:
+            dup_index = 1
+
+            base, ext = os.path.splitext(output_path)
+
+            while os.path.isfile(output_path):
+                output_path = base + '-' + str(dup_index) + ext
+
+                dup_index += 1
+
             self._output_path = os.path.expanduser(
-                os.path.abspath(self._output_path)
+                os.path.abspath(output_path)
             )
 
         return self._output_path
@@ -76,6 +85,7 @@ class Order:
             order_name: str,
             input_path: str,
             output_path: Union[str, Path] = None,
+            output_dir: Union[str, Path] = None,
             fps: float = None,
             duration: int = None,
             optimize: bool = None,
@@ -89,6 +99,7 @@ class Order:
         self.tickets = []
         self.failures = Queue()
         self._output_path = output_path
+        self._output_dir = output_dir
         self.fps = fps
         self.duration = duration
         self.optimize = optimize

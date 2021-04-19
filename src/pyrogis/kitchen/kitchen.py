@@ -37,7 +37,6 @@ class Kitchen:
             self,
             cooker: Cooker,
             cooked_dir: str = 'cooked',
-            output_dir: str = None,
             raw_dir: str = None
     ):
         """
@@ -56,7 +55,6 @@ class Kitchen:
         self.cooker = cooker
         self.pool = None
         self.cooked_dir = cooked_dir
-        self.output_dir = output_dir
 
         if raw_dir is None:
             raw_dir = tempfile.mkdtemp(suffix='raw')
@@ -275,7 +273,7 @@ class Kitchen:
         if len(order.tickets) > 8 and (order.presave is None or order.cook_async is None):
             next_tickets = self._auto_pilot(order)
         else:
-            next_tickets = order.tickets
+            next_tickets = [ticket for ticket in order.tickets if not ticket.skip]
 
         report_status(order, status='cooking')
 
@@ -331,28 +329,11 @@ class Kitchen:
         optimize = order.optimize
         frame_duration = order.duration
 
-        if self.output_dir is not None:
-            output_path = os.path.join(self.output_dir, os.path.basename(order.output_path))
-
-            dup_index = 1
-
-            base, ext = os.path.splitext(output_path)
-
-            while os.path.isfile(output_path):
-                output_path = base + '-' + str(dup_index) + ext
-
-                dup_index += 1
-
-                output_path = os.path.join(output_path, output_path)
-
-        else:
-            output_path = order.output_path
-
         course.save(
-            output_path,
-            optimize,
+            order.output_path,
+            optimize=optimize,
             duration=frame_duration,
             fps=fps
         )
 
-        return output_path
+        return order.output_path

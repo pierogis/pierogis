@@ -24,7 +24,7 @@ def order(order_name: str, dir_path: str):
 
 
 def test_plate_gif(kitchen: Kitchen, order: Order, gif_output_path: str):
-    order.output_name = gif_output_path
+    order._output_path = gif_output_path
 
     output_path = kitchen.plate(
         order

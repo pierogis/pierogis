@@ -3,6 +3,7 @@ import subprocess
 from typing import List
 
 import imageio
+import imageio_ffmpeg
 import numpy as np
 
 from .ingredients.dish import Dish
@@ -58,17 +59,41 @@ class Course:
                 else:
                     fps = self._fps
 
-            writer = imageio.get_writer(
-                path,
-                fps=fps
-            )
+            ext = os.path.splitext(path)[1]
 
-            for dish in self.dishes:
-                writer.append_data(np.asarray(dish.pierogi.image))
+            if ext == ".gif":
+                writer = imageio.get_writer(
+                    path,
+                    fps=fps
+                )
+
+                for dish in self.dishes:
+                    writer.append_data(np.asarray(dish.pierogi.image))
+
+            else:
+                if ext == ".webm":
+                    writer = imageio_ffmpeg.write_frames(
+                        path,
+                        size=self.dishes[0].pierogi.pixels.shape[:2],
+                        fps=fps
+                    )
+                else:
+                    # 30/60 fps is impossible for gif because maximum decimal precision is 2
+                    # (duration .03 rounds to 25fps)
+                    writer = imageio_ffmpeg.write_frames(
+                        path,
+                        size=self.dishes[0].pierogi.pixels.shape[:2],
+                        fps=fps
+                    )
+
+                writer.send(None)
+
+                for dish in self.dishes:
+                    writer.send(np.asarray(dish.pierogi.image))
 
             writer.close()
 
-            if optimize and os.path.splitext(path)[1] == ".gif":
+            if optimize and ext == ".gif":
                 try:
                     return_code = subprocess.call(
                         ["gifsicle", '--optimize', path, "--output", path],

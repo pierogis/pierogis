@@ -17,6 +17,7 @@ if not os.environ.get('READTHEDOCS'):
     ]
 else:
     # don't use RustExtensions
+    print('skipping rust build')
     rust_extensions = None
 
 setup(

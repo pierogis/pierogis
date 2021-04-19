@@ -5,10 +5,12 @@ import argparse
 import os
 import time
 from abc import abstractmethod
+from pathlib import Path
 from threading import Thread
-from typing import List, Callable, Protocol
+from typing import List, Callable, Protocol, Union
 
 import imageio
+from natsort import natsorted
 
 from .kitchen import Kitchen
 from .order import Order
@@ -31,8 +33,10 @@ class Server(OrderTaker):
     def __init__(
             self,
             report_callback: Callable = None,
+            output_dir: Union[Path, str] = None,
     ):
         self._report_callback = report_callback
+        self.output_dir = output_dir
 
     def _create_parser(self, menu):
         # create top level parser
@@ -80,12 +84,12 @@ class Server(OrderTaker):
         )
         togo_parser.add_argument(
             '--frame-duration',
-            type=int,
+            type=float,
             help="frame duration in ms"
         )
         togo_parser.add_argument(
             '--fps',
-            type=int,
+            type=float,
             help="frames per second"
         )
         togo_parser.add_argument(
@@ -129,7 +133,7 @@ class Server(OrderTaker):
                 in os.listdir(input_path)
                 if filename != ".DS_Store"
             ]
-            for filename in sorted(filenames):
+            for filename in natsorted(filenames):
                 if order_name is None or filename.startswith(order_name):
                     ticket_input_path = os.path.join(
                         input_path,
@@ -153,7 +157,7 @@ class Server(OrderTaker):
                 in os.listdir(order.input_path)
                 if filename != ".DS_Store"
             ]
-            for filename in sorted(filenames):
+            for filename in natsorted(filenames):
                 if order.order_name is None or filename.startswith(order.order_name):
                     frame_path = os.path.join(order.input_path, filename)
                     ticket = Ticket(output_path=frame_path)
@@ -225,6 +229,7 @@ class Server(OrderTaker):
         order = Order(
             order_name, input_path,
             output_path=output_path,
+            output_dir=self.output_dir,
             fps=fps,
             duration=frame_duration,
             optimize=optimize
