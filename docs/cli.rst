@@ -33,6 +33,7 @@ arg                  description                                   default    va
 ``--async``          flag to indicate frames should be cooked      ``False``  flag
                      in an async process pool
 ``--processes``      number of processes to use for pool^          ``None``   ``int``
+``--resume``         skip cooked frames to finish a cook task      ``False``  flag
 ==================== ============================================= ========== =======
 
 If the input file is a directory or a movie file (anything animated),
@@ -41,7 +42,16 @@ If you don't understand what output type to expect from your command, don't prov
 
 ``presave`` will be ignored if dir ``path``.
 If ``processes`` is provided, ``async`` is set to ``True``.
-If ``async`` is provided without ``processes``, ``processes`` wil be ``os.cpu_count()``
+If ``async`` is provided without ``processes``, ``processes`` wil be ``os.cpu_count()``.
+
+With ``resume`` present, frames that are already in the cooked directory
+and generated from the given input filename
+will not be overwritten by the outputs of this command.
+
+Three uses:
+- "Pause" the program with Ctrl-c and resume with the same command
+- Change the ``filling`` in the animation for any frames that weren't finished
+- Recover errors if a frame failed to cook.
 
 *togo options*
 ~~~~~~~~~~~~~~
