@@ -9,27 +9,25 @@ from .seasoning import Seasoning
 class Threshold(Seasoning):
     """
     a seasoning that compares the brightness value of each pixel
-    in the :param target pixel array.
+    in the :param target pixel array and sets corresponding colors based on
+    if it is "included" or not
 
-    when used in a mix, the threshold will target the pixel array below it
-    if it has not been initialized with target.
-
-    as it is a subclass of seasoning,
-    a Threshold instance has a season method to work with or without a target
+    brightness = r * 0.299 + g * 0.587 + b * 0.114
     """
 
-    LOWER_THRESHOLD = 100
-    UPPER_THRESHOLD = 150
+    LOWER_THRESHOLD = 60
+    UPPER_THRESHOLD = 190
 
     lower_threshold: int
-    """pixels below are `True`"""
     upper_threshold: int
-    """pixels above are `True`"""
+    inner: bool
+    """if True, pixels between lower and upper are included"""
 
     def prep(
             self,
             lower_threshold: int = None,
             upper_threshold: int = None,
+            inner: bool = False,
             **kwargs
     ):
         """
@@ -40,6 +38,9 @@ class Threshold(Seasoning):
         pixels lower than lower_threshold
         or higher that upper_threshold
         are true (include_pixel)
+
+        pixels with brightness >= upper_threshold
+            or <= lower_threshold are replaced by include pixel (white)
         """
         # set include/exclude_pixel and target, if provided
         super().prep(**kwargs)
@@ -56,35 +57,23 @@ class Threshold(Seasoning):
 
         self.lower_threshold = lower_threshold
         self.upper_threshold = upper_threshold
+        self.inner = inner
 
     def cook(self, pixels: np.ndarray):
         """
-        pixels with brightness >= upper_threshold
-        or <= lower_threshold are replaced by include pixel (white)
-
-        brightness = r * 0.299 + g * 0.587 + b * 0.114
-
         parallel computation in rust is 10x speedup
         """
-        cooked_pixels = pixels.copy()
+        input_pixels = pixels.copy()
 
-        from pierogis_rs import algorithms
-
-        # cook using the rust function
-        cooked_pixels = algorithms.threshold(
-            cooked_pixels.astype(np.dtype('uint8')),
-            self.lower_threshold, self.upper_threshold,
-            self.include_pixel.astype(np.dtype('uint8')),
-            self.exclude_pixel.astype(np.dtype('uint8'))
-        )
+        try:
+            cooked_pixels = self.cook_rs(input_pixels)
+        except:
+            cooked_pixels = self.cook_np(input_pixels)
 
         return cooked_pixels
 
     def cook_np(self, pixels: np.ndarray):
-        """
-        perform the same operation as Threshold.cook, but only in numpy
-        """
-
+        # perform the same operation as Threshold.cook, but only in numpy
         include_pixels = np.resize(self.include_pixel, pixels.shape)
         exclude_pixels = np.resize(self.exclude_pixel, pixels.shape)
 
@@ -94,13 +83,37 @@ class Threshold(Seasoning):
         intensities_array = np.sum(
             pixels * np.asarray([0.299, 0.587, 0.114]), axis=2
         )
-        # if intensity <= lower or >= upper, True
-        boolean_array = np.logical_or(
-            intensities_array >= self.upper_threshold,
-            intensities_array <= self.lower_threshold
-        )
+        if self.inner:
+            # if intensity >= lower and <= upper, include
+            boolean_array = np.logical_and(
+                intensities_array <= self.upper_threshold,
+                intensities_array >= self.lower_threshold
+            )
+        else:
+            # if intensity <= lower or >= upper, include
+            boolean_array = np.logical_or(
+                intensities_array >= self.upper_threshold,
+                intensities_array <= self.lower_threshold
+            )
 
         # set True values in boolean_array to include_pixel
         cooked_pixels[boolean_array] = include_pixels[boolean_array]
+
+        return cooked_pixels
+
+    def cook_rs(self, pixels: np.ndarray):
+        from pierogis_rs import algorithms
+
+        include_pixel = self.include_pixel.astype(np.dtype('uint8'))
+        exclude_pixel = self.exclude_pixel.astype(np.dtype('uint8'))
+
+        # cook using the rust function
+        cooked_pixels = algorithms.threshold(
+            pixels.astype(np.dtype('uint8')),
+            self.lower_threshold, self.upper_threshold,
+            include_pixel,
+            exclude_pixel,
+            self.inner
+        )
 
         return cooked_pixels

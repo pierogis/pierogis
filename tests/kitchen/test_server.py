@@ -92,7 +92,12 @@ def test_take_order_sort(server, kitchen, image_path):
 
 def test_take_order_sort_options(server, kitchen, image_path):
     """test sort order with options"""
-    args = ["sort", image_path, "-u", "120", "-l", "20", "-t", "2", "--ccw"]
+    args = [
+        "sort", image_path,
+        "-u", "120", "-l", "20",
+        "--inner",
+        "-t", "2", "--ccw"
+    ]
 
     run_take_order(server, kitchen, args)
 
@@ -131,6 +136,7 @@ def test_take_order_threshold_options(server, kitchen, image_path):
         "threshold", image_path,
         "-u", "200",
         "-l", "20",
+        "--inner",
         "--include", "abaabb",
         "--exclude", "333433"
     ]

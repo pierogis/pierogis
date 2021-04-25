@@ -481,7 +481,7 @@ checksum = "c5d65c4d95931acda4498f675e332fcbdc9a06705cd07086c510e9b6009cd1c1"
 
 [[package]]
 name = "pierogis_rs"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "image",
  "ndarray",

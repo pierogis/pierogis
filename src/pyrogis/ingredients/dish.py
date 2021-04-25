@@ -21,10 +21,8 @@ class Dish(Ingredient):
         """
         set the recipe to cook for this dish
 
-        :param recipe: something callable that returns a
-        cook(pixels) method.
-        Any Ingredient (including recipe) is an example of this
-
+        :param recipe: something callable that returns a cook(pixels) method.
+            Any Ingredient (including Recipe) is an example of this
         :param pierogis: a list of Pierogi to cook
         """
         self.pierogi = pierogi

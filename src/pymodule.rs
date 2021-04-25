@@ -65,6 +65,7 @@ fn pierogis_rs(py: Python<'_>, m: &PyModule) -> PyResult<()> {
         upper_threshold: u8,
         include_pixel: PyReadonlyArray<u8, Ix1>,
         exclude_pixel: PyReadonlyArray<u8, Ix1>,
+        inner: bool,
     ) -> PyResult<&'py PyArray<u8, Ix3>> {
         let pixels = unsafe { pixels_py_array.as_slice_mut() }?;
         let include_pixel = include_pixel.as_slice()?;
@@ -76,16 +77,21 @@ fn pierogis_rs(py: Python<'_>, m: &PyModule) -> PyResult<()> {
             let pixel_value = (pixel_array[0] as f64) * 0.299
                 + (pixel_array[1] as f64) * 0.587
                 + (pixel_array[2] as f64) * 0.114;
+
             // get with the correct pixel based on if it is outside a threshold
-            let replacement = match (pixel_value >= upper_threshold as f64)
-                | (pixel_value <= lower_threshold as f64)
+            let included: bool = if inner {
+                (pixel_value <= upper_threshold as f64)
+                    & (pixel_value >= lower_threshold as f64)
+            } else {
+                (pixel_value >= upper_threshold as f64)
+                    | (pixel_value <= lower_threshold as f64)
+            };
+
+            let replacement = match included
             {
                 true => &include_pixel,
                 false => &exclude_pixel,
             };
-
-            // pixel.brightness() >= upper_threshold
-            // pixel.replace(replacement)
 
             // replace rgb on the current chunk
             pixel_array[0] = replacement[0] as u8;

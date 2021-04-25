@@ -35,16 +35,28 @@ if ``--scale`` is a whole number
 See `PIL documentation <https://pillow.readthedocs.io/en/stable/handbook/concepts.html#concept-filters>`_
 on filters.
 
+.. code-block:: python
+
+   choices = {
+       'default': Image.NEAREST,
+       'nearest': Image.NEAREST,
+       'box': Image.BOX,
+       'bicubic': Image.BICUBIC,
+       'bilinear': Image.BILINEAR,
+       'hamming': Image.HAMMING,
+       'lanczos': Image.LANCZOS,
+   }
+
 When used in a :ref:`custom` recipe, scaling down at the beginning of a recipe
 and up at the end can lead to cool (and faster) results.
 
-===================== ===================================== ============= =======
+===================== ===================================== ============= =====================
 arg                   description                           default       valid
-===================== ===================================== ============= =======
+===================== ===================================== ============= =====================
 ``--width``           width to resize to                    ``None``      ``str``
 ``--height``          height to resize to                   ``None``      ``str``
 ``--scale``           scale multiplier for width and height ``1``         ``str``
-``--resample-filter`` a filter to be used with resizing     ``'nearest'`` ``str``
-===================== ===================================== ============= =======
+``--resample-filter`` a filter to be used with resizing     ``'nearest'`` see ``choices`` above
+===================== ===================================== ============= =====================
 
 See: :py:class:`~pyrogis.kitchen.menu.resize_filling.ResizeFilling`
