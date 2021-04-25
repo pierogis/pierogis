@@ -142,7 +142,7 @@ jobs:
           git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
       - name: build wheels
-        run: 'arch -arm64 sh build_wheels_mac_arm.sh'
+        run: 'zsh ./build_wheels_mac_arm.sh'
 
       - uses: actions/upload-artifact@v2
         with:
