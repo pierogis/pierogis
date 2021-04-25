@@ -41,26 +41,13 @@ def test_plate_mp4(kitchen: Kitchen, order: Order, mp4_output_path: str):
     )
 
     assert os.path.isfile(output_path)
-#
-#
-# def test_plate_dir(kitchen: Kitchen, resource_dir: str, tmp_path):
-#     input_path = os.path.join(resource_dir, 'frames')
-#     output_path = tmp_path / 'output.mp4'
-#     optimize = True
-#
-#     order = Order(
-#         'octo',
-#         input_path,
-#         output_path=output_path,
-#         fps=25,
-#         optimize=optimize
-#     )
-#
-#     order.tickets = [
-#         Ticket(output_path=os.path.join(input_path, 'octo-01.png')),
-#         Ticket(output_path=os.path.join(input_path, 'octo-02.png'))
-#     ]
-#
-#     kitchen.plate(order)
-#
-#     assert os.path.isfile(output_path)
+
+
+def test_plate_webm(kitchen: Kitchen, order: Order, webm_output_path: str):
+    order._output_path = webm_output_path
+
+    output_path = kitchen.plate(
+        order
+    )
+
+    assert os.path.isfile(output_path)

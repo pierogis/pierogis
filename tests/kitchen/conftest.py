@@ -63,3 +63,7 @@ def gif_output_path(tmp_path):
 @pytest.fixture
 def mp4_output_path(tmp_path):
     return str(tmp_path / 'output.mp4')
+
+@pytest.fixture
+def webm_output_path(tmp_path):
+    return str(tmp_path / 'output.webm')

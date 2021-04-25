@@ -75,7 +75,10 @@ class Course:
                     writer = imageio_ffmpeg.write_frames(
                         path,
                         size=self.dishes[0].pierogi.pixels.shape[:2],
-                        fps=fps
+                        fps=fps,
+                        codec='libvpx-vp9',
+                        bitrate='0',
+                        output_params=['-crf', '30']
                     )
                 else:
                     # 30/60 fps is impossible for gif because maximum decimal precision is 2
