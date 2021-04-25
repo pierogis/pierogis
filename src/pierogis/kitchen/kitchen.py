@@ -326,12 +326,14 @@ class Kitchen:
         fps = order.fps
         optimize = order.optimize
         frame_duration = order.duration
+        audio_path = order.audio_path
 
         course.save(
             order.output_path,
             optimize=optimize,
             duration=frame_duration,
-            fps=fps
+            fps=fps,
+            audio_path=audio_path
         )
 
         return order.output_path

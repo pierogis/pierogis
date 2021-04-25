@@ -35,7 +35,7 @@ setup(
         'Pillow>=8.0.1',
         'numpy>=1.20.1',
         'imageio>=2.9.0',
-        'imageio-ffmpeg>=0.4.3',
+        'imageio-ffmpeg @ git+git://github.com/pierogis/imageio-ffmpeg@audio',
         'natsort>=7.1.1',
         'rich>=10.1.0'
     ],

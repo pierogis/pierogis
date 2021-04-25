@@ -1,3 +1,4 @@
+import functools
 import os
 from multiprocessing import Queue
 from pathlib import Path
@@ -60,7 +61,7 @@ class Order:
             elif self.frames == 0:
                 return None
             else:
-                output_path = order_name + '.gif'
+                output_path = order_name + '.mp4'
 
             if self._output_dir is not None:
                 output_path = os.path.join(self._output_dir, os.path.basename(output_path))
@@ -80,6 +81,25 @@ class Order:
 
         return self._output_path
 
+    @property
+    @functools.lru_cache
+    def audio_path(self):
+        # if --audio is provided as 'path', use input file
+        # if --audio is provided with a path, use that
+        # if --audio is not provided, return None
+        audio_path = self._audio_path
+
+        if audio_path == 'path':
+            if os.path.isfile(self.input_path):
+                ext = os.path.splitext(self.input_path)[1]
+
+                if os.path.isfile(self.input_path) and self.frames > 1 and ext != 'gif':
+                    audio_path = self.input_path
+            else:
+                audio_path = None
+
+        return audio_path
+
     def __init__(
             self,
             order_name: str,
@@ -94,6 +114,7 @@ class Order:
             processes: int = None,
             resume: bool = None,
             frames_filter: str = None,
+            audio_path: Union[Path, str] = None,
     ):
         self._order_name = order_name
         self.input_path = input_path
@@ -112,6 +133,7 @@ class Order:
         self.processes = processes
         self.resume = resume
         self._frames_filter = frames_filter
+        self._audio_path = audio_path
 
     def add_ticket(self, ticket: Ticket):
         self.tickets.append(ticket)

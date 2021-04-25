@@ -107,6 +107,17 @@ class Server(OrderTaker):
             action='store_false',
             help="duration in ms"
         )
+        togo_parser.add_argument(
+            '--audio',
+            nargs='?',
+            default=None,
+            const='path',
+            dest='audio_path',
+            help="path to audio file ~"
+                 "provide as flag to use the input file,"
+                 "leave out to not include audio,"
+                 "or provide an audio path to use as the audio stream"
+        )
 
         return togo_parser
 
@@ -238,8 +249,8 @@ class Server(OrderTaker):
         parsed = parser.parse_args(unknown)
         parsed_vars = vars(parsed)
 
-        # need the path to use as input for some recipes
-        # like opening files for ingredients
+        # get all of the arguments not related to parameterizing
+        # the cooking operation and put them into a shared Order object
         input_path = os.path.expanduser(os.path.abspath(parsed_vars.pop('path')))
         order_name = parsed_vars.pop('order_name')
         frames_filter = parsed_vars.pop('frames_filter')
@@ -248,6 +259,7 @@ class Server(OrderTaker):
         fps = parsed_togo_vars.pop('fps')
         optimize = parsed_togo_vars.pop('optimize')
         frame_duration = parsed_togo_vars.pop('frame_duration')
+        audio_path = parsed_togo_vars.pop('audio_path')
 
         order = Order(
             order_name, input_path,
@@ -257,6 +269,7 @@ class Server(OrderTaker):
             duration=frame_duration,
             optimize=optimize,
             frames_filter=frames_filter,
+            audio_path=audio_path
         )
 
         if order.fps is None:
@@ -270,13 +283,9 @@ class Server(OrderTaker):
             self._handle_filling(order, parsed_vars, kitchen)
 
         self._report_status(order, status='boxing')
-
-        kitchen.plate(
-            order=order
-        )
+        kitchen.plate(order=order)
 
         self._report_status(order, status='done')
-
         return order
 
     @staticmethod

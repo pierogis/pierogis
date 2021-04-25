@@ -56,6 +56,7 @@ arg                  description                                   default    va
                      in an async process pool
 ``--processes``      number of processes to use for pool^          ``None``   ``int``
 ``--resume``         skip cooked frames to finish a cook task      ``False``  flag
+``--audio``          encode with an audio file path                ``path``  ``str``
 ==================== ============================================= ========== =======
 
 These don't apply to ``togo``.

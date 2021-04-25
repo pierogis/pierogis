@@ -151,7 +151,6 @@ def test_take_order_resize(server, kitchen, image_path):
     order = run_take_order(server, kitchen, args)
 
     assert len(order.tickets) == 1
-    print(order.tickets[0].output_path)
 
 
 def test_take_order_resize_options(server, kitchen, image_path):

@@ -1,6 +1,7 @@
 import os
 import subprocess
-from typing import List
+from pathlib import Path
+from typing import List, Union
 
 import imageio
 import imageio_ffmpeg
@@ -44,10 +45,17 @@ class Course:
             path: str,
             optimize: bool = True,
             duration: float = None,
-            fps: float = None
+            fps: float = None,
+            audio_path: Union[str, Path] = None,
+            audio_codec: str = None,
     ) -> None:
         """
-        :param duration: ms duration between frames
+        :param path: path to save output
+        :param optimize: whether or not to try to optimize a gif output with gifsicle
+        :param duration: ms duration between frames (gets converted into fps)
+        :param fps: frames per second for image
+        :param audio_path: audio input file path
+        :param audio_codec: ffmpeg audio codec
         """
         if len(self.dishes) > 1:
             if duration is not None:
@@ -62,6 +70,8 @@ class Course:
             ext = os.path.splitext(path)[1]
 
             if ext == ".gif":
+                # 30/60 fps is impossible for gif because maximum decimal precision is 2
+                # (duration .03 rounds to 25fps)
                 writer = imageio.get_writer(
                     path,
                     fps=fps
@@ -72,21 +82,26 @@ class Course:
 
             else:
                 if ext == ".webm":
+                    if audio_codec is None:
+                        audio_codec = 'libvorbis'
                     writer = imageio_ffmpeg.write_frames(
                         path,
                         size=self.dishes[0].pierogi.pixels.shape[:2],
                         fps=fps,
                         codec='libvpx-vp9',
                         bitrate='0',
-                        output_params=['-crf', '30']
+                        output_params=['-crf', '30'],
+                        input_params=['-thread_queue_size', '128'],
+                        audio_path=audio_path,
+                        audio_codec=audio_codec
                     )
                 else:
-                    # 30/60 fps is impossible for gif because maximum decimal precision is 2
-                    # (duration .03 rounds to 25fps)
                     writer = imageio_ffmpeg.write_frames(
                         path,
                         size=self.dishes[0].pierogi.pixels.shape[:2],
-                        fps=fps
+                        fps=fps,
+                        audio_path=audio_path,
+                        audio_codec=audio_codec
                     )
 
                 writer.send(None)
@@ -96,10 +111,10 @@ class Course:
 
             writer.close()
 
-            if optimize and ext == ".gif":
+            if optimize and ext == '.gif':
                 try:
                     return_code = subprocess.call(
-                        ["gifsicle", '--optimize', path, "--output", path],
+                        ['gifsicle', '--optimize', path, '--output', path],
                         stdout=subprocess.DEVNULL,
                         stderr=subprocess.DEVNULL
                     )
@@ -110,7 +125,7 @@ class Course:
                     print("install gifsicle and ensure it's on PATH to optimize gif")
 
         elif len(self.dishes) == 1:
-            self.dishes[0].pierogi.save(path)
+            self.dishes[0].pierogi.save(path, optimize=optimize)
 
         else:
             raise Exception("Dish has no pierogis")
