@@ -1,6 +1,6 @@
 .. _custom:
 
-.. currentmodule:: pyrogis.ingredients
+.. py:currentmodule:: pyrogis.ingredients
 
 custom
 ~~~~~~

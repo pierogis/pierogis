@@ -34,15 +34,35 @@ arg                  description                                   default    va
                      in an async process pool
 ``--processes``      number of processes to use for pool^          ``None``   ``int``
 ``--resume``         skip cooked frames to finish a cook task      ``False``  flag
+``--frames-filter``  provide a python expression to identify       ``True``   ``bool``
+                     frames to be cooked
 ==================== ============================================= ========== =======
 
 If the input file is a directory or a movie file (anything animated),
 the output will be an animation as well. Artifact "cooked" folder will contain frames.
 If you don't understand what output type to expect from your command, don't provide ``output``.
 
+auto pilot
+""""""""""
+
+There is an "auto pilot" preprocessing step where the program will try to determine an
+effective way to cook the order.
+By default, it will cook a batch of frames using ``multiprocessing``
+and a batch where each frame is first saved as it's own png for input to cooking.
+It compares the time these batches took to the time it took to cook without tricks.
+
+Usually, animations will find multiprocessing to be beneficial.
+In some cases, presave is used;
+the file has to take a long time to open for it to be worth presaving frames
+
+``presave``, and ``async`` skip their respective tests.
+
 ``presave`` will be ignored if dir ``path``.
 If ``processes`` is provided, ``async`` is set to ``True``.
 If ``async`` is provided without ``processes``, ``processes`` wil be ``os.cpu_count()``.
+
+resume
+""""""
 
 With ``resume`` present, frames that are already in the cooked directory
 and generated from the given input filename
@@ -52,6 +72,27 @@ Three uses:
 - "Pause" the program with Ctrl-c and resume with the same command
 - Change the ``filling`` in the animation for any frames that weren't finished
 - Recover errors if a frame failed to cook.
+
+frames filtering
+""""""""""""""""
+
+The variables ``i`` and ``frames`` can be used in the ``frames-filter`` expression.
+They represent the **index** of the frame in question and the total number of frames.
+They should evaluate to ``True`` or ``False``.
+Where ``True`` means the frame in question will be cooked
+
+.. code-block:: python
+
+   # only the frame with index 5
+   i==5
+   # frames indices greater than 50
+   i>50
+   # only even indexed frames
+   i%2==0
+   # frames beyond the halfway point
+   i>=frames/2
+
+Keep in mind python is 0 indexed -> frame index 5 is the 6 frame in the sequence.
 
 *togo options*
 ~~~~~~~~~~~~~~

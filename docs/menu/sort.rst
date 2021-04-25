@@ -1,6 +1,6 @@
 .. _sort:
 
-.. currentmodule:: pyrogis.ingredients
+.. py:currentmodule:: pyrogis.ingredients
 
 sort
 ~~~~

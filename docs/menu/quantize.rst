@@ -1,6 +1,6 @@
 .. _quantize:
 
-.. currentmodule:: pyrogis.ingredients
+.. py:currentmodule:: pyrogis.ingredients
 
 quantize
 ~~~~~~~~

@@ -93,6 +93,7 @@ class Order:
             cook_async: bool = None,
             processes: int = None,
             resume: bool = None,
+            frames_filter: str = None,
     ):
         self._order_name = order_name
         self.input_path = input_path
@@ -110,6 +111,13 @@ class Order:
             processes = os.cpu_count()
         self.processes = processes
         self.resume = resume
+        self._frames_filter = frames_filter
 
     def add_ticket(self, ticket: Ticket):
         self.tickets.append(ticket)
+
+    def frames_filter(self, i: int, frames: int) -> bool:
+        if self._frames_filter is not None:
+            return eval(self._frames_filter)
+        else:
+            return True

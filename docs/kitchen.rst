@@ -9,10 +9,7 @@ kitchen
 
    -- weezy
 
-.. py:currentmodule::
-
-   pyrogis.kitchen
-
+.. py:currentmodule:: pyrogis.kitchen
 
 This submodule defines a model of a kitchen for cooking en masse.
 The goal of this is to create an idiom for distributing cooking tasks.

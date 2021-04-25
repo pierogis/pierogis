@@ -1,6 +1,6 @@
 .. _resize:
 
-.. currentmodule:: pyrogis.ingredients
+.. py:currentmodule:: pyrogis.ingredients
 
 resize
 ~~~~~~

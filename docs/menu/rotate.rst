@@ -1,6 +1,6 @@
 .. _rotate:
 
-.. currentmodule:: pyrogis.ingredients
+.. py:currentmodule:: pyrogis.ingredients
 
 rotate
 ~~~~~~

@@ -9,7 +9,7 @@ pierogis
 
    \- a wise man
 
-.. currentmodule:: pyrogis.ingredients
+.. py:currentmodule:: pyrogis.ingredients
 
 Pixel arrays (like images) stored as a :py:class:`~pierogi.Pierogi` object can be cooked
 with an :py:class:`~ingredient.Ingredient`
@@ -24,7 +24,7 @@ A :py:class:`~pyrogis.course.Course` can be made to cook a set of
 :py:class:`~dish.Dish` objects representing frames
 that compile to a cooked animation.
 
-.. currentmodule:: pyrogis.kitchen.menu
+.. py:currentmodule:: pyrogis.kitchen.menu
 
 A :doc:`rich <rich:introduction>` cli uses :py:class:`~filling.Filling`
 objects to parse orders into cook tasks as a :py:class:`~pyrogis.restaurant.Restaurant`.

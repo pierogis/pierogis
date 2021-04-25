@@ -1,6 +1,6 @@
 .. _threshold:
 
-.. currentmodule:: pyrogis.ingredients
+.. py:currentmodule:: pyrogis.ingredients
 
 threshold
 ~~~~~~~~~

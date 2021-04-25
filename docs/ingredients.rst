@@ -1,7 +1,7 @@
 ingredients
 ===========
 
-.. currentmodule:: pyrogis.ingredients
+.. py:currentmodule:: pyrogis.ingredients
 
 .. code-block:: python
 

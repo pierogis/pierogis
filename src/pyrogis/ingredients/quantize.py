@@ -15,7 +15,7 @@ class Quantize(Ingredient):
         parameters for spatial color quantization
 
         :param colors: colors to use. can be a list of str
-        or pixel array likes
+            or pixel array likes
         """
 
         if colors is None:

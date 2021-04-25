@@ -1,6 +1,6 @@
 .. _crop:
 
-.. currentmodule:: pyrogis.ingredients
+.. py:currentmodule:: pyrogis.ingredients
 
 crop
 ~~~~
