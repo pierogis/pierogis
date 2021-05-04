@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from pyrogis.ingredients import Threshold
+from pierogis.ingredients import Threshold
 
 
 @pytest.fixture

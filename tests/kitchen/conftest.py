@@ -4,7 +4,7 @@ import imageio
 import numpy as np
 import pytest
 
-from pyrogis.kitchen import Kitchen, Chef
+from pierogis.kitchen import Kitchen, Chef
 
 
 @pytest.fixture

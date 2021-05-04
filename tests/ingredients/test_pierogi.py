@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from pyrogis.ingredients import Pierogi
+from pierogis.ingredients import Pierogi
 
 
 @pytest.fixture

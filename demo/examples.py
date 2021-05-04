@@ -1,6 +1,6 @@
 import numpy as np
 
-from pyrogis.ingredients import (
+from pierogis.ingredients import (
     Dish, Ingredient, Pierogi,
     Quantize, Recipe, Sort, Threshold
 )

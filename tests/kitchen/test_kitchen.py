@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from pyrogis.kitchen import Order, Kitchen, Ticket
+from pierogis.kitchen import Order, Kitchen, Ticket
 
 
 @pytest.fixture

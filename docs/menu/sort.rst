@@ -1,6 +1,6 @@
 .. _sort:
 
-.. py:currentmodule:: pyrogis.ingredients
+.. py:currentmodule:: pierogis.ingredients
 
 sort
 ~~~~
@@ -8,7 +8,7 @@ sort
 
 .. code-block:: console
 
-   $ pyrogis sort ./input.jpg -l 50 -u 180 --inner -t 1
+   $ pierogis sort ./input.jpg -l 50 -u 180 --inner -t 1
 
 .. figure:: https://media.githubusercontent.com/media/pierogis/pierogis/develop/demo/out/gnome_sort.png
    :alt: sorted gnome
@@ -43,6 +43,6 @@ arg                           description                                       
 ``--resample-filter``         a filter to be used with rotating                   ``'nearest'`` ``str``
 ============================= =================================================== ============= =========
 
-See: :py:class:`~pyrogis.kitchen.menu.sort_filling.SortFilling`,
-:py:class:`~pyrogis.kitchen.menu.rotate_filling.RotateFilling`,
-:py:class:`~pyrogis.kitchen.menu.threshold_filling.ThresholdFilling`
+See: :py:class:`~pierogis.kitchen.menu.sort_filling.SortFilling`,
+:py:class:`~pierogis.kitchen.menu.rotate_filling.RotateFilling`,
+:py:class:`~pierogis.kitchen.menu.threshold_filling.ThresholdFilling`

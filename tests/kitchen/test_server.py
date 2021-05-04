@@ -3,9 +3,9 @@ from typing import List
 
 import pytest
 
-from pyrogis.kitchen import Kitchen, Server, Ticket
-from pyrogis.kitchen.menu import ResizeFilling
-from pyrogis.kitchen.order import Order
+from pierogis.kitchen import Kitchen, Server, Ticket
+from pierogis.kitchen.menu import ResizeFilling
+from pierogis.kitchen.order import Order
 
 
 @pytest.fixture

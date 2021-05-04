@@ -1,6 +1,6 @@
 .. _threshold:
 
-.. py:currentmodule:: pyrogis.ingredients
+.. py:currentmodule:: pierogis.ingredients
 
 threshold
 ~~~~~~~~~
@@ -9,7 +9,7 @@ threshold
 
 .. code-block:: console
 
-   $ pyrogis threshold ./input.jpg -u 150 -l 20
+   $ pierogis threshold ./input.jpg -u 150 -l 20
 
 .. figure:: https://media.githubusercontent.com/media/pierogis/pierogis/develop/demo/out/gnome_threshold.png
    :alt: thresholded gnome
@@ -36,4 +36,4 @@ arg                           description                                       
 ``--exclude``                 hex color to substitute for black                   ``'000000'`` ``0-3``
 ============================= =================================================== ============ =========
 
-See: :py:class:`~pyrogis.kitchen.menu.threshold_filling.ThresholdFilling`
+See: :py:class:`~pierogis.kitchen.menu.threshold_filling.ThresholdFilling`

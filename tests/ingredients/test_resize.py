@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from pyrogis.ingredients import Resize
+from pierogis.ingredients import Resize
 
 
 @pytest.fixture

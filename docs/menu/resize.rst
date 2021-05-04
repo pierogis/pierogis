@@ -1,6 +1,6 @@
 .. _resize:
 
-.. py:currentmodule:: pyrogis.ingredients
+.. py:currentmodule:: pierogis.ingredients
 
 resize
 ~~~~~~
@@ -8,12 +8,12 @@ resize
 
 .. code-block:: console
 
-   $ pyrogis resize ./input.jpg --scale .25
-   $ pyrogis resize ./input.jpg --scale 4
+   $ pierogis resize ./input.jpg --scale .25
+   $ pierogis resize ./input.jpg --scale 4
 
    $ # or using exact dimension (aspect ratio maintained)
-   $ pyrogis resize ./input.jpg --height 200
-   $ pyrogis resize ./input.jpg --height 800
+   $ pierogis resize ./input.jpg --height 200
+   $ pierogis resize ./input.jpg --height 800
 
 .. figure:: https://media.githubusercontent.com/media/pierogis/pierogis/develop/demo/out/gnome_resize.png
    :alt: resized gnome
@@ -59,4 +59,4 @@ arg                   description                           default       valid
 ``--resample-filter`` a filter to be used with resizing     ``'nearest'`` see ``choices`` above
 ===================== ===================================== ============= =====================
 
-See: :py:class:`~pyrogis.kitchen.menu.resize_filling.ResizeFilling`
+See: :py:class:`~pierogis.kitchen.menu.resize_filling.ResizeFilling`

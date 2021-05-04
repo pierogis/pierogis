@@ -133,10 +133,10 @@ class SpatialQuantize(Quantize):
         to perform an optimization in quantizing and dithering
         """
 
-        from pierogis_rs import algorithms
+        from ..algorithms import quantize
 
         # rotating and unrotating because different orientation is expected
-        cooked_pixels = np.rot90(algorithms.quantize(
+        cooked_pixels = np.rot90(quantize(
             np.ascontiguousarray(np.rot90(pixels), dtype=np.dtype('uint8')),
             self.palette,
             palette_size=self.palette_size,

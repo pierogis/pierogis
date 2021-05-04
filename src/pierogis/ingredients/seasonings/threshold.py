@@ -102,13 +102,13 @@ class Threshold(Seasoning):
         return cooked_pixels
 
     def cook_rs(self, pixels: np.ndarray):
-        from pierogis_rs import algorithms
+        from ...algorithms import threshold
 
         include_pixel = self.include_pixel.astype(np.dtype('uint8'))
         exclude_pixel = self.exclude_pixel.astype(np.dtype('uint8'))
 
         # cook using the rust function
-        cooked_pixels = algorithms.threshold(
+        cooked_pixels = threshold(
             pixels.astype(np.dtype('uint8')),
             self.lower_threshold, self.upper_threshold,
             include_pixel,

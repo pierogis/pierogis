@@ -1,6 +1,6 @@
 .. _rotate:
 
-.. py:currentmodule:: pyrogis.ingredients
+.. py:currentmodule:: pierogis.ingredients
 
 rotate
 ~~~~~~
@@ -8,7 +8,7 @@ rotate
 
 .. code-block:: console
 
-   $ pyrogis rotate ./input.jpg -t 1 --ccw
+   $ pierogis rotate ./input.jpg -t 1 --ccw
 
 .. figure:: https://media.githubusercontent.com/media/pierogis/pierogis/develop/demo/out/gnome_rotate.png
    :alt: rotated gnome
@@ -52,4 +52,4 @@ arg                   description                            default       valid
 ``--resample-filter`` a filter to be used with resizing      ``'nearest'`` ``str``
 ===================== ====================================== ============= =======
 
-See: :py:class:`~pyrogis.kitchen.menu.rotate_filling.RotateFilling`
+See: :py:class:`~pierogis.kitchen.menu.rotate_filling.RotateFilling`

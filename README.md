@@ -1,15 +1,19 @@
 # pierogis
 
+[![version](https://img.shields.io/pypi/v/pierogis)](https://pypi.org/project/pierogis/)
+[![docs](https://img.shields.io/readthedocs/pierogis/stable)](https://docs.pierogis.live)
+
+[![discord](https://img.shields.io/discord/805113908150009864.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/9XpEjMw3Rx)
+[![twitter](https://img.shields.io/twitter/follow/pierogis_chef?&label=&style=flat)](https://twitter.com/pierogis_chef)
+
 `pierogis` is a framework for image and animation processing. Ingredients that describe image processing functions can be assembled
 into recipes and used to cook an image or animation.
 
-`pyrogis` is a python library and cli tool implementing this framework.
-
 ```bash
-pip install pyrogis
-pyrogis chef teton.png "resize --width 768 --height 768; sort; quantize; resize --scale 4" -o output.png
+pip install pierogis
+pierogis custom teton.png "resize --width 768 --height 768; sort; quantize; resize --scale 4" -o output.png
 # or
-pyrogis chef teton.png recipe.txt -o output.png
+pierogis custom teton.png recipe.txt -o output.png
 ```
 
 *recipe.txt*
@@ -34,7 +38,7 @@ resize -s 4;
 **install from a wheel with pip**
 
 ```sh
-pip install pyrogis
+pip install pierogis
 ```
 
 Depends on `numpy` and `PIL`. PIL requires some external C libraries for handling image files. You probably don't have
@@ -52,9 +56,9 @@ pip install .
 <a name="features"></a>
 ## features
 
-- **CLI** - Use a `rich` cli to cook à la carte recipes, or provide a recipe in a document
+- **CLI** - Use a `rich` cli to cook à la carte recipes, or provide a recipe in a document (see [docs](https://docs.pierogis.live/en/stable/cli.html))
 - **Animations** - Animations (gifs and movies) can be cooked in one command
-- **Extendable** - Easy to create custom manipulations (see [docs](https://docs.pierogis.live/))
+- **Extendable** - Easy to create custom manipulations (see [docs](https://docs.pierogis.live/en/stable/ingredients.html#extending))
 - **Lazy Rendering** - Render a manipulation after constructing your pipeline (see [docs](https://docs.pierogis.live/))
 - **Numpy or Rust backend** - Image processing functions use Numpy for (python relative) fast operations. Some
   ingredients use compiled `Rust` for more speed.
@@ -88,9 +92,9 @@ Spatial Color Quantization.
 When you encounter an error, there are some guidelines that will make it easier to help you:
 
 - Ensure that you are using the latest version of the package. It's early days so errors and updates will be frequent.
-  Use `pip uninstall pyrogis` then `pip install pyrogis --no-cache-dir` to reinstall.
-- Provide the version of `pyrogis` that you are using in issues to rule that out.
-  `pip list` -> pyrogis \_.\_.\_
+  Use `pip uninstall pierogis` then `pip install pierogis --no-cache-dir` to reinstall.
+- Provide the version of `pierogis` that you are using in issues to rule that out.
+  `pip list` -> pierogis \_.\_.\_
 - Provide the traceback or error message if relevant.
 - Provide your os and any other specific information about how you are trying to use the package.
 - Provide the code or the cli command that triggered the error.
@@ -138,7 +142,4 @@ at least modules related to this package.
 If your paid derivative work adds marginal value to what is included in this package,
 the author reserves the right to go to great lengths to make a free (and better) alternative to your derivative work.
 
-Please think twice about minting NFTs for works made with this package, especially if they are ugly.
-Consider that you do
-[communal damage](https://memoakten.medium.com/the-unreasonable-ecological-cost-of-cryptoart-2221d3eb2053)
-by trying to profit individually.
+The python implementation of this package was never called or published to pypi as `pyrogis`; that didn't happen.

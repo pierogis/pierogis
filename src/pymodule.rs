@@ -7,15 +7,12 @@ use rayon::prelude::*;
 use crate::quantize;
 
 #[pymodule]
-fn pierogis_rs(py: Python<'_>, m: &PyModule) -> PyResult<()> {
-    let module = PyModule::new(py, "algorithms")?;
-    m.add_submodule(module)?;
-
+fn algorithms(py: Python<'_>, m: &PyModule) -> PyResult<()> {
     /// quantize(py_array, palette_size, /)
     /// --
     ///
     /// This function adds two unsigned 64-bit integers.
-    #[pyfn(module, "quantize")]
+    #[pyfn(m, "quantize")]
     #[allow(clippy::too_many_arguments)]
     fn py_quantize<'py>(
         py: Python<'py>,
@@ -56,7 +53,7 @@ fn pierogis_rs(py: Python<'_>, m: &PyModule) -> PyResult<()> {
         PyArray::from_vec(py, cooked_array).reshape((width, height, 3))
     }
 
-    #[pyfn(module, "threshold")]
+    #[pyfn(m, "threshold")]
     #[allow(clippy::too_many_arguments)]
     fn py_threshold<'py>(
         py: Python<'py>,

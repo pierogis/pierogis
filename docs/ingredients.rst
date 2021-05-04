@@ -1,11 +1,11 @@
 ingredients
 ===========
 
-.. py:currentmodule:: pyrogis.ingredients
+.. py:currentmodule:: pierogis.ingredients
 
 .. code-block:: python
 
-   from pyrogis.ingredients import Pierogi, SpatialQuantize, Sort, Threshold, Dish, Recipe...
+   from pierogis.ingredients import Pierogi, SpatialQuantize, Sort, Threshold, Dish, Recipe...
 
 A processing factory, called an :py:class:`~ingredient.Ingredient`,
 has a :py:meth:`~ingredient.Ingredient.prep` method for receiving parameters,
@@ -104,7 +104,7 @@ The recipe gets cooked sequentially for each pierogi in ``pierogis``.
 The output ``cooked_dish`` has ``pierogi`` member set with cooked pixels.
 
 seasoning
-~~~~~~~~~
+---------
 
 There is also a concept of seasonings.
 They can be used to apply something like a mask
@@ -119,12 +119,13 @@ to other ingredients that affect the pixels they act on.
    sort.season(threshold)
 
 :py:meth:`~threshold.Threshold.cook` outputs a black and white array.
+That's what makes it a seasoning.
 Now that ``sort`` is seasoned with the ``Threshold``,
 it will only sort pixels that have been "colored"
 white by the ``Threshold``.
 
 extending
-~~~~~~~~~
+---------
 
 To create a custom :py:class:`~ingredient.Ingredient` type,
 it must subclass ``Ingredient`` and override the
@@ -140,7 +141,7 @@ it must subclass ``Ingredient`` and override the
            return (self.pixels + self.brighten) /*self.scale
 
 prep
-----
+~~~~
 
 *Override to parameterize your manipulation*
 
@@ -156,7 +157,7 @@ quantization.
        self.scale = scale
 
 cook
-----
+~~~~
 
 *Override to perform the manipulation*
 
