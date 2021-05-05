@@ -1,7 +1,6 @@
 import os
 import subprocess
-from pathlib import Path
-from typing import List, Union
+from typing import List
 
 import imageio
 import imageio_ffmpeg
@@ -45,17 +44,13 @@ class Course:
             path: str,
             optimize: bool = True,
             duration: float = None,
-            fps: float = None,
-            audio_path: Union[str, Path] = None,
-            audio_codec: str = None,
+            fps: float = None
     ) -> None:
         """
         :param path: path to save output
         :param optimize: whether or not to try to optimize a gif output with gifsicle
         :param duration: ms duration between frames (gets converted into fps)
         :param fps: frames per second for image
-        :param audio_path: audio input file path
-        :param audio_codec: ffmpeg audio codec
         """
         if len(self.dishes) > 1:
             if duration is not None:
@@ -82,8 +77,6 @@ class Course:
 
             else:
                 if ext == ".webm":
-                    if audio_codec is None:
-                        audio_codec = 'libvorbis'
                     writer = imageio_ffmpeg.write_frames(
                         path,
                         size=self.dishes[0].pierogi.pixels.shape[:2],
@@ -92,16 +85,12 @@ class Course:
                         bitrate='0',
                         output_params=['-crf', '30'],
                         input_params=['-thread_queue_size', '128'],
-                        audio_path=audio_path,
-                        audio_codec=audio_codec
                     )
                 else:
                     writer = imageio_ffmpeg.write_frames(
                         path,
                         size=self.dishes[0].pierogi.pixels.shape[:2],
-                        fps=fps,
-                        audio_path=audio_path,
-                        audio_codec=audio_codec
+                        fps=fps
                     )
 
                 writer.send(None)

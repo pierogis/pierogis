@@ -1,7 +1,7 @@
 Pillow>=8.0.1
 numpy>=1.19.4
 imageio>=2.9.0
-git+git://github.com/pierogis/imageio-ffmpeg@audio
+imageio-ffmpeg>=0.4.3
 natsort>=7.1.1
 rich>=10.1.0
 
