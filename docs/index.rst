@@ -1,15 +1,14 @@
 pierogis
 ========
 
-*image and animation processing framework*
+**image and animation processing framework**
 
-   "``pierogis`` *is the name of the framework;*
-
-   ``pyrogis`` *is the name of the python package and cli tool"*
+   *"ingredients that describe image processing functions can be assembled
+   into recipes and used to cook an image or animation."*
 
    \- a wise man
 
-.. currentmodule:: pyrogis.ingredients
+.. py:currentmodule:: pierogis.ingredients
 
 Pixel arrays (like images) stored as a :py:class:`~pierogi.Pierogi` object can be cooked
 with an :py:class:`~ingredient.Ingredient`
@@ -20,14 +19,14 @@ A :py:class:`~dish.Dish` can be made with a :py:class:`~recipe.Recipe` containin
 several :py:class:`~ingredient.Ingredient` objects describing a pipeline
 to be applied to a :py:class:`~pierogi.Pierogi`.
 
-A :py:class:`~pyrogis.course.Course` can be made to cook a set of
+A :py:class:`~pierogis.course.Course` can be made to cook a set of
 :py:class:`~dish.Dish` objects representing frames
 that compile to a cooked animation.
 
-.. currentmodule:: pyrogis.kitchen.menu
+.. py:currentmodule:: pierogis.kitchen.menu
 
 A :doc:`rich <rich:introduction>` cli uses :py:class:`~filling.Filling`
-objects to parse orders into cook tasks as a :py:class:`~pyrogis.restaurant.Restaurant`.
+objects to parse orders into cook tasks as a :py:class:`~pierogis.restaurant.Restaurant`.
 These can be found on the :doc:`menu/index`.
 
 In this realm, a single `pierogi` means a pixel, many `pierogi` means an image, and `pierogis` means many images.

@@ -3,14 +3,14 @@ from typing import List
 
 import pytest
 
-from pyrogis.kitchen import Kitchen, Server, Ticket
-from pyrogis.kitchen.menu import ResizeFilling
-from pyrogis.kitchen.order import Order
+from pierogis.kitchen import Kitchen, Server, Ticket
+from pierogis.kitchen.menu import ResizeFilling
+from pierogis.kitchen.order import Order
 
 
 @pytest.fixture
-def server() -> Server:
-    return Server()
+def server(tmp_path) -> Server:
+    return Server(output_dir=str(tmp_path))
 
 
 @pytest.fixture
@@ -92,7 +92,12 @@ def test_take_order_sort(server, kitchen, image_path):
 
 def test_take_order_sort_options(server, kitchen, image_path):
     """test sort order with options"""
-    args = ["sort", image_path, "-u", "120", "-l", "20", "-t", "2", "--ccw"]
+    args = [
+        "sort", image_path,
+        "-u", "120", "-l", "20",
+        "--inner",
+        "-t", "2", "--ccw"
+    ]
 
     run_take_order(server, kitchen, args)
 
@@ -131,6 +136,7 @@ def test_take_order_threshold_options(server, kitchen, image_path):
         "threshold", image_path,
         "-u", "200",
         "-l", "20",
+        "--inner",
         "--include", "abaabb",
         "--exclude", "333433"
     ]
@@ -145,7 +151,6 @@ def test_take_order_resize(server, kitchen, image_path):
     order = run_take_order(server, kitchen, args)
 
     assert len(order.tickets) == 1
-    print(order.tickets[0].output_path)
 
 
 def test_take_order_resize_options(server, kitchen, image_path):
@@ -204,7 +209,7 @@ def test_take_order_custom_txt(server, kitchen, image_path, recipe_path):
     run_take_order(server, kitchen, args)
 
 
-def test_take_order_crop(server, kitchen, image_path, recipe_path):
+def test_take_order_crop(server, kitchen, image_path):
     """test custom with a txt file as a recipe"""
     args = [
         "crop", image_path,
@@ -215,7 +220,7 @@ def test_take_order_crop(server, kitchen, image_path, recipe_path):
     run_take_order(server, kitchen, args)
 
 
-def test_take_order_crop_options(server, kitchen, image_path, recipe_path):
+def test_take_order_crop_options(server, kitchen, image_path):
     """test custom with a txt file as a recipe"""
     args = [
         "crop", image_path,
@@ -227,7 +232,7 @@ def test_take_order_crop_options(server, kitchen, image_path, recipe_path):
     run_take_order(server, kitchen, args)
 
 
-def test_take_order_crop_options_float(server, kitchen, image_path, recipe_path):
+def test_take_order_crop_options_float(server, kitchen, image_path):
     """test custom with a txt file as a recipe"""
     args = [
         "crop", image_path,
@@ -236,6 +241,15 @@ def test_take_order_crop_options_float(server, kitchen, image_path, recipe_path)
         "--height", "1",
         "-x", "-0.5",
         "--aspect", "0.5",
+    ]
+
+    run_take_order(server, kitchen, args)
+
+
+def test_take_order_mmpx(server, kitchen, image_path):
+    """test custom with a txt file as a recipe"""
+    args = [
+        "mmpx", image_path
     ]
 
     run_take_order(server, kitchen, args)

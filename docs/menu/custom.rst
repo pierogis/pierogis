@@ -1,6 +1,6 @@
 .. _custom:
 
-.. currentmodule:: pyrogis.ingredients
+.. py:currentmodule:: pierogis.ingredients
 
 custom
 ~~~~~~
@@ -9,9 +9,9 @@ custom
 
 .. code-block:: console
 
-   $ pyrogis custom ./input.jpg "sort -u 100; quantize"
+   $ pierogis custom ./input.jpg "sort -u 100; quantize"
    $ # or
-   $ pyrogis custom ./input.jpg recipe.txt
+   $ pierogis custom ./input.jpg recipe.txt
 
 *recipe.txt*
 
@@ -33,4 +33,4 @@ arg        description                                 default    valid
 ``recipe`` path to json or txt file to use as a recipe recipe.txt `str`
 ========== =========================================== ========== =====
 
-See: :py:class:`~pyrogis.kitchen.menu.custom_filling.CustomFilling`
+See: :py:class:`~pierogis.kitchen.menu.custom_filling.CustomFilling`

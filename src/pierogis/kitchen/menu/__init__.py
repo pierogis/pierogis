@@ -6,6 +6,7 @@ from .rotate_filling import RotateFilling
 from .sort_filling import SortFilling
 from .threshold_filling import ThresholdFilling
 from .crop_filling import CropFilling
+from .mmpx_filling import MMPXFilling
 
 menu = {
     SortFilling.type_name: SortFilling,
@@ -13,6 +14,7 @@ menu = {
     'custom': CustomFilling,
     ThresholdFilling.type_name: ThresholdFilling,
     ResizeFilling.type_name: ResizeFilling,
-    'rotate': RotateFilling,
-    'crop': CropFilling
+    RotateFilling.type_name: RotateFilling,
+    CropFilling.type_name: CropFilling,
+    MMPXFilling.type_name: MMPXFilling,
 }

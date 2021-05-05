@@ -84,7 +84,7 @@ class Pierogi(Ingredient):
         """
         :param path: file path to load from
         :param frame_index: if path is a multiframe format (video),
-        use this specified frame
+            use this specified frame
         """
 
         def loader():
@@ -155,10 +155,9 @@ class Pierogi(Ingredient):
         resize pixels to new width and height
 
         :param width: width to resize to
-
         :param height: height to resize to
-
         :param resample: resample method to use in Image.resize.
+
         PIL documentation:
 
         >    "An optional resampling filter.
@@ -178,12 +177,13 @@ class Pierogi(Ingredient):
                 )
             )
 
-    def rotate(self, angle: float, resample: int = RESIZE_RESAMPLE):
+    def rotate(self, angle: float, resample: int = ROTATE_RESAMPLE):
         """
         rotate underlying pixel array by an angle
 
         :param angle: angle to rotate
         :param resample: resample method to use in Image.resize.
+
         PIL documentation:
 
         >    "An optional resampling filter.

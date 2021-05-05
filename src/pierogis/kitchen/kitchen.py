@@ -37,7 +37,6 @@ class Kitchen:
             self,
             cooker: Cooker,
             cooked_dir: str = 'cooked',
-            output_dir: str = None,
             raw_dir: str = None
     ):
         """
@@ -56,7 +55,6 @@ class Kitchen:
         self.cooker = cooker
         self.pool = None
         self.cooked_dir = cooked_dir
-        self.output_dir = output_dir
 
         if raw_dir is None:
             raw_dir = tempfile.mkdtemp(suffix='raw')
@@ -97,108 +95,109 @@ class Kitchen:
         """test some frames in the animation"""
         tickets = [ticket for ticket in order.tickets if not ticket.skip]
 
-        if len(tickets) == 0:
-            return []
+        if len(order.tickets) > 8 and (order.presave is None or order.cook_async is None):
+            # test with 5% of the frames, within 2 and 10
+            seq_pilot_frames = 2
 
-        # test with 5% of the frames, within 2 and 10
-        seq_pilot_frames = 2
+            frame_index = 0
 
-        frame_index = 0
-
-        next_frame_index = frame_index + seq_pilot_frames
-        next_tickets = tickets[frame_index:next_frame_index]
-        frame_index = next_frame_index
-
-        # sync cooking
-        start = time.perf_counter()
-        for ticket in next_tickets:
-            self.cook_ticket(self.cooker, ticket)
-        seq_rate = seq_pilot_frames / (time.perf_counter() - start)
-
-        if order.presave is None:
-            next_frame_index = frame_index + 2
+            next_frame_index = frame_index + seq_pilot_frames
             next_tickets = tickets[frame_index:next_frame_index]
-            order.reader.set_image_index(next_tickets[0].pierogis[next_tickets[0].base].frame_index)
             frame_index = next_frame_index
-            # sync cooking with presave frames
-            presave_start = time.perf_counter()
 
+            # sync cooking
+            start = time.perf_counter()
             for ticket in next_tickets:
-                frame = order.reader.get_next_data()
-                self._presave_ticket(frame, ticket)
                 self.cook_ticket(self.cooker, ticket)
+            seq_rate = seq_pilot_frames / (time.perf_counter() - start)
 
-            presave_rate = seq_pilot_frames / (time.perf_counter() - presave_start)
-
-            if presave_rate > seq_rate:
-                order.presave = True
-                seq_rate = presave_rate
-            else:
-                order.presave = False
-
-        if order.cook_async is None:
-            par_pilot_frames = max(2, min(round(len(tickets) * .05), 10))
-
-            if order.presave:
-                next_frame_index = frame_index + par_pilot_frames
+            if order.presave is None:
+                next_frame_index = frame_index + 2
                 next_tickets = tickets[frame_index:next_frame_index]
+                order.reader.set_image_index(next_tickets[0].pierogis[next_tickets[0].base].frame_index)
                 frame_index = next_frame_index
-
-                results = []
-
-                if self.pool is None:
-                    self._start_pool(order.processes)
-
-                # async cooking with presave frames
-                par_presave_start = time.perf_counter()
+                # sync cooking with presave frames
+                presave_start = time.perf_counter()
 
                 for ticket in next_tickets:
                     frame = order.reader.get_next_data()
                     self._presave_ticket(frame, ticket)
+                    self.cook_ticket(self.cooker, ticket)
 
-                    def error_callback(exception: Exception):
-                        order.failures.put((exception, ticket))
+                presave_rate = seq_pilot_frames / (time.perf_counter() - presave_start)
 
-                    results.append(self.pool.apply_async(
-                        self.cook_ticket, (self.cooker, ticket), error_callback=error_callback
-                    ))
+                if presave_rate > seq_rate:
+                    order.presave = True
+                    seq_rate = presave_rate
+                else:
+                    order.presave = False
 
-                for result in results:
-                    result.wait()
+            if order.cook_async is None:
+                par_pilot_frames = max(2, min(round(len(tickets) * .05), 10))
 
-                par_rate = par_pilot_frames / (time.perf_counter() - par_presave_start)
+                if order.presave:
+                    next_frame_index = frame_index + par_pilot_frames
+                    next_tickets = tickets[frame_index:next_frame_index]
+                    frame_index = next_frame_index
 
-            else:
-                # parallel cooking
+                    results = []
 
-                next_frame_index = frame_index + par_pilot_frames
-                next_tickets = tickets[frame_index:next_frame_index]
-                frame_index = next_frame_index
+                    if self.pool is None:
+                        self._start_pool(order.processes)
 
-                par_start = time.perf_counter()
+                    # async cooking with presave frames
+                    par_presave_start = time.perf_counter()
 
-                results = []
+                    for ticket in next_tickets:
+                        frame = order.reader.get_next_data()
+                        self._presave_ticket(frame, ticket)
 
-                if self.pool is None:
-                    self._start_pool(order.processes)
+                        def error_callback(exception: Exception):
+                            order.failures.put((exception, ticket))
 
-                for ticket in next_tickets:
-                    def error_callback(exception: Exception):
-                        order.failures.put((exception, ticket))
+                        results.append(self.pool.apply_async(
+                            self.cook_ticket, (self.cooker, ticket), error_callback=error_callback
+                        ))
 
-                    results.append(self.pool.apply_async(
-                        self.cook_ticket, (self.cooker, ticket), error_callback=error_callback
-                    ))
+                    for result in results:
+                        result.wait()
 
-                for result in results:
-                    result.wait()
+                    par_rate = par_pilot_frames / (time.perf_counter() - par_presave_start)
 
-                par_rate = par_pilot_frames / (time.perf_counter() - par_start)
+                else:
+                    # parallel cooking
 
-            if par_rate > seq_rate:
-                order.cook_async = True
+                    next_frame_index = frame_index + par_pilot_frames
+                    next_tickets = tickets[frame_index:next_frame_index]
+                    frame_index = next_frame_index
 
-        next_tickets = tickets[frame_index:]
+                    par_start = time.perf_counter()
+
+                    results = []
+
+                    if self.pool is None:
+                        self._start_pool(order.processes)
+
+                    for ticket in next_tickets:
+                        def error_callback(exception: Exception):
+                            order.failures.put((exception, ticket))
+
+                        results.append(self.pool.apply_async(
+                            self.cook_ticket, (self.cooker, ticket), error_callback=error_callback
+                        ))
+
+                    for result in results:
+                        result.wait()
+
+                    par_rate = par_pilot_frames / (time.perf_counter() - par_start)
+
+                if par_rate > seq_rate:
+                    order.cook_async = True
+
+            next_tickets = tickets[frame_index:]
+
+        else:
+            next_tickets = tickets
 
         return next_tickets
 
@@ -272,10 +271,7 @@ class Kitchen:
         if not os.path.isfile(order.input_path):
             order.presave = False
 
-        if len(order.tickets) > 8 and (order.presave is None or order.cook_async is None):
-            next_tickets = self._auto_pilot(order)
-        else:
-            next_tickets = order.tickets
+        next_tickets = self._auto_pilot(order)
 
         report_status(order, status='cooking')
 
@@ -331,28 +327,11 @@ class Kitchen:
         optimize = order.optimize
         frame_duration = order.duration
 
-        if self.output_dir is not None:
-            output_path = os.path.join(self.output_dir, os.path.basename(order.output_path))
-
-            dup_index = 1
-
-            base, ext = os.path.splitext(output_path)
-
-            while os.path.isfile(output_path):
-                output_path = base + '-' + str(dup_index) + ext
-
-                dup_index += 1
-
-                output_path = os.path.join(output_path, output_path)
-
-        else:
-            output_path = order.output_path
-
         course.save(
-            output_path,
-            optimize,
+            order.output_path,
+            optimize=optimize,
             duration=frame_duration,
             fps=fps
         )
 
-        return output_path
+        return order.output_path

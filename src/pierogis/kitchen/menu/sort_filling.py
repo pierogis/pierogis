@@ -55,6 +55,7 @@ class SortFilling(Filling):
         # check for implied threshold
         lower_threshold = kwargs.pop('lower_threshold')
         upper_threshold = kwargs.pop('upper_threshold')
+        inner = kwargs.pop('inner')
 
         # create threshold desc
         threshold_desc = IngredientDesc(
@@ -62,6 +63,7 @@ class SortFilling(Filling):
             kwargs={
                 'lower_threshold': lower_threshold,
                 'upper_threshold': upper_threshold,
+                'inner': inner,
                 'pierogi': target_pierogi_uuid
             }
         )

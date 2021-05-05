@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from pyrogis.ingredients.seasonings import Rectangle
-from pyrogis.ingredients.seasonings.rectangle import Direction
+from pierogis.ingredients.seasonings import Rectangle
+from pierogis.ingredients.seasonings.rectangle import Direction
 
 
 @pytest.fixture

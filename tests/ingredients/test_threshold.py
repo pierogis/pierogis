@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from pyrogis.ingredients import Threshold
+from pierogis.ingredients import Threshold
 
 
 @pytest.fixture
@@ -19,6 +19,18 @@ def test_cook(array):
     assert np.all(cooked_array[0, 0] == 255)
     assert np.all(cooked_array[0, 1] == 255)
     assert np.all(cooked_array[1, 0] == 0)
+    assert np.all(cooked_array[1, 1] == 255)
+
+
+def test_cook_inner(array):
+    """default cook parameters"""
+    threshold = Threshold(inner=True)
+
+    cooked_array = threshold.cook(array)
+
+    assert np.all(cooked_array[0, 0] == 0)
+    assert np.all(cooked_array[0, 1] == 0)
+    assert np.all(cooked_array[1, 0] == 255)
     assert np.all(cooked_array[1, 1] == 255)
 
 
@@ -87,11 +99,21 @@ def test_cook_include_exclude(array):
     assert np.all(cooked_array[1, 1] == 100)
 
 
-def test_cook_cook_np(array):
+def test_cook_np_rs(array):
     """test cook and cook_np method return the same array"""
     threshold = Threshold()
 
-    cooked_array = threshold.cook(array)
-    np_cooked_array = threshold.cook(array)
+    rs_cooked_array = threshold.cook_rs(array)
+    np_cooked_array = threshold.cook_np(array)
 
-    assert np.all(cooked_array == np_cooked_array)
+    assert np.all(rs_cooked_array == np_cooked_array)
+
+
+def test_cook_np_rs_inner(array):
+    """test cook and cook_np method return the same array"""
+    threshold = Threshold(inner=True)
+
+    rs_cooked_array = threshold.cook_rs(array)
+    np_cooked_array = threshold.cook_np(array)
+
+    assert np.all(rs_cooked_array == np_cooked_array)

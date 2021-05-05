@@ -76,6 +76,5 @@ class Filling(ABC):
         return parser
 
     @classmethod
-    @abstractmethod
     def add_parser_arguments(cls, parser):
         pass

@@ -12,3 +12,4 @@ Here lie a bunch of commands for creating à la carte recipes and a command for 
     custom
     threshold
     rotate
+    mmpx

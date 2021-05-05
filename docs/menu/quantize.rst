@@ -1,6 +1,6 @@
 .. _quantize:
 
-.. currentmodule:: pyrogis.ingredients
+.. py:currentmodule:: pierogis.ingredients
 
 quantize
 ~~~~~~~~
@@ -9,9 +9,9 @@ quantize
 
 .. code-block:: console
 
-   $ pyrogis quantize input.jpg -c aaaaaa 43ad32 696969 --repeats 3 --iterations 3
+   $ pierogis quantize input.jpg -c aaaaaa 43ad32 696969 --repeats 3 --iterations 3
    $ # or
-   $ pyrogis quantize input.jpg -n 16 --repeats 3 --iterations 3
+   $ pierogis quantize input.jpg -n 16 --repeats 3 --iterations 3
 
 .. figure:: https://media.githubusercontent.com/media/pierogis/pierogis/develop/demo/out/gnome_magic.png
    :alt: quantized gnome
@@ -34,4 +34,4 @@ arg                        description                                          
 ``--dithering-level``      relative dithering level (use .5-1.5)                ``0.8``   ``float``
 ========================== ==================================================== ========= =========
 
-See: :py:class:`~pyrogis.kitchen.menu.quantize_filling.QuantizeFilling`
+See: :py:class:`~pierogis.kitchen.menu.quantize_filling.QuantizeFilling`

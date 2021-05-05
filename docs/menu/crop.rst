@@ -1,6 +1,6 @@
 .. _crop:
 
-.. currentmodule:: pyrogis.ingredients
+.. py:currentmodule:: pierogis.ingredients
 
 crop
 ~~~~
@@ -8,7 +8,7 @@ crop
 
 .. code-block:: console
 
-   $ pyrogis crop ./input.jpg -x 20 --height 400 --aspect 1 --origin c
+   $ pierogis crop ./input.jpg -x 20 --height 400 --aspect 1 --origin c
 
 .. figure:: https://media.githubusercontent.com/media/pierogis/pierogis/develop/demo/out/gnome_crop.png
    :alt: cropped gnome
@@ -47,8 +47,8 @@ and the direction of the selection
 
 ``--aspect`` will crop the image to the given aspect ratio.
 It achieves this in different ways depending on the other options provided.
-- If neither ``--width`` or ``--height`` are provided,
-it will preserve one dimension and reduce another so as to not increase in size. Same treatment as resize.
+
+- If neither ``--width`` nor ``--height`` are provided, it will preserve one dimension and reduce another so as to not increase in size. Same treatment as resize.
 - If both ``--width`` and ``--height`` are provided, the ``--aspect`` is ignored.
 - If one of ``--width`` or ``--height`` are provided, the ``--aspect`` is applied to the missing dimension.
 
@@ -77,4 +77,4 @@ If you are reading this you are a champion.
    :file: crop_table.csv
    :header-rows: 1
 
-See: :py:class:`~pyrogis.kitchen.menu.crop_filling.CropFilling`
+See: :py:class:`~pierogis.kitchen.menu.crop_filling.CropFilling`, :py:class:`~crop.Crop`

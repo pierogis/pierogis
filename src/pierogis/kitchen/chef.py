@@ -55,7 +55,7 @@ class Chef(Cooker):
         from an ingredient description and a lookup for file paths
 
         :param ingredient_descs: map of uuid keys to inner dict
-        with type, args, and kwargs keys
+            with type, args, and kwargs keys
         :param pierogis: map of uuid keys created Pierogi
         """
         ingredients: Dict[str, Ingredient] = {}

@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from pyrogis.ingredients import Rotate
+from pierogis.ingredients import Rotate
 
 
 @pytest.fixture

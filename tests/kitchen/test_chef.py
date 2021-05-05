@@ -4,9 +4,9 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from pyrogis.ingredients import Dish, Pierogi
-from pyrogis.kitchen import Chef, menu
-from pyrogis.kitchen.ticket import Ticket, PierogiDesc, IngredientDesc
+from pierogis.ingredients import Dish, Pierogi
+from pierogis.kitchen import Chef, menu
+from pierogis.kitchen.ticket import Ticket, PierogiDesc, IngredientDesc
 
 
 @pytest.fixture

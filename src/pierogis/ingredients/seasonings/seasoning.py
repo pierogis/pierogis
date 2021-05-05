@@ -5,7 +5,7 @@ seasoning base ingredient
 import numpy as np
 from PIL import ImageColor
 
-from pyrogis.ingredients.ingredient import Ingredient
+from pierogis.ingredients.ingredient import Ingredient
 
 
 class Seasoning(Ingredient):

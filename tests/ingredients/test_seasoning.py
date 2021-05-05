@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from pyrogis.ingredients.seasonings import Seasoning
+from pierogis.ingredients.seasonings import Seasoning
 
 
 @pytest.fixture

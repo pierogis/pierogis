@@ -1,18 +1,19 @@
 [package]
-name = "pierogis_rs"
+name = "pierogis"
 version = "0.1.0"
 authors = ["Kyle Moore <moore.kyle39@gmail.com>"]
 edition = "2018"
 
 [lib]
 name = "pierogis"
-crate-type = ["cdylib"]
+crate-type = ["lib", "cdylib"]
 
 [dependencies]
 numpy = "0.13"
 ndarray = { version = "0.14.0", features = ["rayon"] }
 rayon = "1.5"
 image = "0.23.12"
+mmpx = "0.1.0"
 
 [dependencies.pyo3]
 version = "0.13"

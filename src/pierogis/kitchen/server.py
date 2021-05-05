@@ -5,12 +5,15 @@ import argparse
 import os
 import time
 from abc import abstractmethod
+from pathlib import Path
 from threading import Thread
-from typing import List, Callable, Protocol
+from typing import List, Callable, Protocol, Union, Dict
 
 import imageio
+from natsort import natsorted
 
 from .kitchen import Kitchen
+from .menu import Filling
 from .order import Order
 from .ticket import Ticket
 
@@ -31,10 +34,12 @@ class Server(OrderTaker):
     def __init__(
             self,
             report_callback: Callable = None,
+            output_dir: Union[Path, str] = None,
     ):
         self._report_callback = report_callback
+        self.output_dir = output_dir
 
-    def _create_parser(self, menu):
+    def _create_parser(self, menu: Dict[str, Filling]):
         # create top level parser
         parser = argparse.ArgumentParser(
             description='** image processing pipelines **'
@@ -55,6 +60,13 @@ class Server(OrderTaker):
             help="""
             name of order for filename prefixes; used to identify files for output
             """
+        )
+        parser.add_argument(
+            '--frames-filter',
+            type=str,
+            default='True',
+            help="python expression to check a frame index against"
+                 "if true, the frame is cooked"
         )
 
         subparsers.add_parser('togo', parents=[base_parser], add_help=False)
@@ -80,12 +92,12 @@ class Server(OrderTaker):
         )
         togo_parser.add_argument(
             '--frame-duration',
-            type=int,
+            type=float,
             help="frame duration in ms"
         )
         togo_parser.add_argument(
             '--fps',
-            type=int,
+            type=float,
             help="frames per second"
         )
         togo_parser.add_argument(
@@ -119,7 +131,8 @@ class Server(OrderTaker):
                 ticket = Ticket()
                 ticket = generate_ticket(ticket, input_path, frame_index, **parsed_vars.copy())
 
-                order.add_ticket(ticket)
+                if order.frames_filter(frame_index, frames):
+                    order.add_ticket(ticket)
 
         elif os.path.isdir(input_path):
             # debug here
@@ -129,7 +142,9 @@ class Server(OrderTaker):
                 in os.listdir(input_path)
                 if filename != ".DS_Store"
             ]
-            for filename in sorted(filenames):
+            frame_index = 0
+            frames = len(filenames)
+            for filename in natsorted(filenames):
                 if order_name is None or filename.startswith(order_name):
                     ticket_input_path = os.path.join(
                         input_path,
@@ -139,7 +154,10 @@ class Server(OrderTaker):
                     ticket = Ticket()
                     ticket = generate_ticket(ticket, ticket_input_path, 0, **parsed_vars.copy())
 
-                    order.add_ticket(ticket)
+                    if order.frames_filter(frame_index, frames):
+                        order.add_ticket(ticket)
+
+                    frame_index += 1
 
         else:
             raise FileNotFoundError(input_path)
@@ -153,15 +171,23 @@ class Server(OrderTaker):
                 in os.listdir(order.input_path)
                 if filename != ".DS_Store"
             ]
-            for filename in sorted(filenames):
+            frame_index = 0
+            frames = len(filenames)
+            for filename in natsorted(filenames):
                 if order.order_name is None or filename.startswith(order.order_name):
                     frame_path = os.path.join(order.input_path, filename)
                     ticket = Ticket(output_path=frame_path)
-                    order.add_ticket(ticket)
+
+                    if order.frames_filter(frame_index, frames):
+                        order.add_ticket(ticket)
+
+                    frame_index += 1
         else:
-            for i in range(imageio.get_reader(order.input_path).count_frames()):
+            frames = imageio.get_reader(order.input_path).count_frames()
+            for frame_index in range(frames):
                 ticket = Ticket()
-                order.add_ticket(ticket)
+                if order.frames_filter(frame_index, frames):
+                    order.add_ticket(ticket)
 
         frames = len(order.tickets)
         self._report_status(order, total=frames)
@@ -212,10 +238,11 @@ class Server(OrderTaker):
         parsed = parser.parse_args(unknown)
         parsed_vars = vars(parsed)
 
-        # need the path to use as input for some recipes
-        # like opening files for ingredients
+        # get all of the arguments not related to parameterizing
+        # the cooking operation and put them into a shared Order object
         input_path = os.path.expanduser(os.path.abspath(parsed_vars.pop('path')))
         order_name = parsed_vars.pop('order_name')
+        frames_filter = parsed_vars.pop('frames_filter')
 
         output_path = parsed_togo_vars.pop('output_path')
         fps = parsed_togo_vars.pop('fps')
@@ -225,9 +252,11 @@ class Server(OrderTaker):
         order = Order(
             order_name, input_path,
             output_path=output_path,
+            output_dir=self.output_dir,
             fps=fps,
             duration=frame_duration,
-            optimize=optimize
+            optimize=optimize,
+            frames_filter=frames_filter,
         )
 
         if order.fps is None:
@@ -241,13 +270,9 @@ class Server(OrderTaker):
             self._handle_filling(order, parsed_vars, kitchen)
 
         self._report_status(order, status='boxing')
-
-        kitchen.plate(
-            order=order
-        )
+        kitchen.plate(order=order)
 
         self._report_status(order, status='done')
-
         return order
 
     @staticmethod

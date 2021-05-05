@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath('../src'))
 project = "pierogis"
 copyright = "2021 pierogis"
 author = "pierogis-live"
-version = version('pyrogis')
+version = version('pierogis')
 
 # General --------------------------------------------------------------
 
@@ -29,7 +29,7 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
 }
 issues_github_path = "pierogis/pierogis"
-apidoc_module_dir = '../src/pyrogis'
+apidoc_module_dir = '../src/pierogis'
 apidoc_output_dir = 'source'
 apidoc_separate_modules = True
 

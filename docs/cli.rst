@@ -5,10 +5,10 @@ All of the cli commands look like this.
 
 .. code-block:: console
 
-   $ pyrogis {filling/subcommand} {path} [-o output] [..common options] [..order options] [..togo options]
+   $ pierogis {filling/subcommand} {path} [-o output] [..common options] [..order options] [..togo options]
 
 A ``filling`` is a set of ingredients that will be used to cook.
-Often it just represents the named :py:class:`~pyrogis.ingredients.ingredient.Ingredient`.
+Often it just represents the named :py:class:`~pierogis.ingredients.ingredient.Ingredient`.
 A directory can be used for ``path``, in which case the program will try to cook each file in the directory.
 If an ``output`` filename or dir is provided, it should match the expected output.
 
@@ -28,6 +28,28 @@ arg                  description                                   default    va
 ``filling``          define filling/ingredients to cook with       required   see menu
 ``path``             path to input media                           required   dir, image, animation
 ``-o``, ``--output`` name of the output file                       depends    ``int``
+``--frames-filter``  provide a python expression to identify       ``True``   ``str``
+                     frames to be cooked
+==================== ============================================= ========== =======
+
+If the input file is a directory or a movie file (anything animated),
+the output will be an animation as well. Artifact "cooked" folder will contain frames.
+If you don't understand what output type to expect from your command, don't provide ``output``.
+
+frames filtering
+""""""""""""""""
+
+The variables ``i`` and ``frames`` can be used in the ``frames-filter`` expression.
+They represent the **index** of the frame in question and the total number of frames.
+The string provided to ``--frames-filter`` should evaluate to ``True`` or ``False``.
+Where ``True`` means the frame in question will be cooked
+
+*other options*
+~~~~~~~~~~~~~~~
+
+==================== ============================================= ========== =======
+arg                  description                                   default    valid
+==================== ============================================= ========== =======
 ``--presave``        flag to indicate frames should be saved from  ``False``  flag
                      animations
 ``--async``          flag to indicate frames should be cooked      ``False``  flag
@@ -36,13 +58,29 @@ arg                  description                                   default    va
 ``--resume``         skip cooked frames to finish a cook task      ``False``  flag
 ==================== ============================================= ========== =======
 
-If the input file is a directory or a movie file (anything animated),
-the output will be an animation as well. Artifact "cooked" folder will contain frames.
-If you don't understand what output type to expect from your command, don't provide ``output``.
+These don't apply to ``togo``.
+
+auto pilot
+""""""""""
+
+There is an "auto pilot" preprocessing step where the program will try to determine an
+effective way to cook the order.
+By default, it will cook a batch of frames using ``multiprocessing``
+and a batch where each frame is first saved as it's own png for input to cooking.
+It compares the time these batches took to the time it took to cook without tricks.
+
+Usually, animations will find multiprocessing to be beneficial.
+In some cases, presave is used;
+the file has to take a long time to open for it to be worth presaving frames
+
+Provide ``presave``, and/or ``async`` to skip their respective tests.
 
 ``presave`` will be ignored if dir ``path``.
 If ``processes`` is provided, ``async`` is set to ``True``.
 If ``async`` is provided without ``processes``, ``processes`` wil be ``os.cpu_count()``.
+
+resume
+""""""
 
 With ``resume`` present, frames that are already in the cooked directory
 and generated from the given input filename
@@ -52,6 +90,19 @@ Three uses:
 - "Pause" the program with Ctrl-c and resume with the same command
 - Change the ``filling`` in the animation for any frames that weren't finished
 - Recover errors if a frame failed to cook.
+
+.. code-block:: python
+
+   # only the frame with index 5
+   i==5
+   # frames indices greater than 50
+   i>50
+   # only even indexed frames
+   i%2==0
+   # frames beyond the halfway point
+   i>=frames/2
+
+Keep in mind python is 0 indexed -> frame index 5 is frame 6 in the sequence.
 
 *togo options*
 ~~~~~~~~~~~~~~
@@ -78,7 +129,7 @@ togo
 
 .. code-block:: console
 
-   $ pyrogis togo ./cooked --fps 50
+   $ pierogis togo ./cooked --fps 50
 
 ``togo`` can be used to take this input directory and compile into a movie file.
 This happens automatically for other subcommands

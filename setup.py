@@ -13,14 +13,15 @@ if not os.environ.get('READTHEDOCS'):
     from setuptools_rust import RustExtension, Binding
 
     rust_extensions = [
-        RustExtension("pierogis_rs", binding=Binding.PyO3)
+        RustExtension("pierogis.algorithms", binding=Binding.PyO3)
     ]
 else:
     # don't use RustExtensions
+    print('skipping rust build')
     rust_extensions = None
 
 setup(
-    name='pyrogis',
+    name='pierogis',
     author="pierogis-live",
     author_email="admin@pierogis.live",
     description="image and animation processing framework",
@@ -45,7 +46,7 @@ setup(
     rust_extensions=rust_extensions,
     entry_points={
         'console_scripts': [
-            "pyrogis=pyrogis.__main__:main"
+            "pierogis=pierogis.__main__:main"
         ]
     },
     zip_safe=False

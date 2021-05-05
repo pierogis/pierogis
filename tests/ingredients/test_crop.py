@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from pyrogis.ingredients.crop import Crop
+from pierogis.ingredients.crop import Crop
 
 
 @pytest.fixture

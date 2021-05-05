@@ -1,6 +1,6 @@
 .. _resize:
 
-.. currentmodule:: pyrogis.ingredients
+.. py:currentmodule:: pierogis.ingredients
 
 resize
 ~~~~~~
@@ -8,12 +8,12 @@ resize
 
 .. code-block:: console
 
-   $ pyrogis resize ./input.jpg --scale .25
-   $ pyrogis resize ./input.jpg --scale 4
+   $ pierogis resize ./input.jpg --scale .25
+   $ pierogis resize ./input.jpg --scale 4
 
    $ # or using exact dimension (aspect ratio maintained)
-   $ pyrogis resize ./input.jpg --height 200
-   $ pyrogis resize ./input.jpg --height 800
+   $ pierogis resize ./input.jpg --height 200
+   $ pierogis resize ./input.jpg --height 800
 
 .. figure:: https://media.githubusercontent.com/media/pierogis/pierogis/develop/demo/out/gnome_resize.png
    :alt: resized gnome
@@ -35,16 +35,30 @@ if ``--scale`` is a whole number
 See `PIL documentation <https://pillow.readthedocs.io/en/stable/handbook/concepts.html#concept-filters>`_
 on filters.
 
+.. code-block:: python
+
+   choices = {
+       'default': Image.NEAREST,
+       'nearest': Image.NEAREST,
+       'box': Image.BOX,
+       'bicubic': Image.BICUBIC,
+       'bilinear': Image.BILINEAR,
+       'hamming': Image.HAMMING,
+       'lanczos': Image.LANCZOS,
+   }
+
 When used in a :ref:`custom` recipe, scaling down at the beginning of a recipe
 and up at the end can lead to cool (and faster) results.
 
-===================== ===================================== ============= =======
+Check out :ref:`mmpx` for an alternative resizing algorithm (only 2x scale).
+
+===================== ===================================== ============= =====================
 arg                   description                           default       valid
-===================== ===================================== ============= =======
+===================== ===================================== ============= =====================
 ``--width``           width to resize to                    ``None``      ``str``
 ``--height``          height to resize to                   ``None``      ``str``
 ``--scale``           scale multiplier for width and height ``1``         ``str``
-``--resample-filter`` a filter to be used with resizing     ``'nearest'`` ``str``
-===================== ===================================== ============= =======
+``--resample-filter`` a filter to be used with resizing     ``'nearest'`` see ``choices`` above
+===================== ===================================== ============= =====================
 
-See: :py:class:`~pyrogis.kitchen.menu.resize_filling.ResizeFilling`
+See: :py:class:`~pierogis.kitchen.menu.resize_filling.ResizeFilling`, :py:class:`~resize.Resize`

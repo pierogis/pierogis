@@ -4,7 +4,7 @@ import imageio
 import numpy as np
 import pytest
 
-from pyrogis.kitchen import Kitchen, Chef
+from pierogis.kitchen import Kitchen, Chef
 
 
 @pytest.fixture
@@ -15,7 +15,7 @@ def array():
 
 @pytest.fixture
 def kitchen(tmp_path) -> Kitchen:
-    return Kitchen(Chef, cooked_dir=str(tmp_path / 'cooked'), output_dir=str(tmp_path))
+    return Kitchen(Chef, cooked_dir=str(tmp_path / 'cooked'))
 
 
 @pytest.fixture
@@ -63,3 +63,7 @@ def gif_output_path(tmp_path):
 @pytest.fixture
 def mp4_output_path(tmp_path):
     return str(tmp_path / 'output.mp4')
+
+@pytest.fixture
+def webm_output_path(tmp_path):
+    return str(tmp_path / 'output.webm')
