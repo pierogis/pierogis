@@ -3,8 +3,8 @@
 [![version](https://img.shields.io/pypi/v/pierogis)](https://pypi.org/project/pierogis/)
 [![docs](https://img.shields.io/readthedocs/pierogis/stable)](https://docs.pierogis.live)
 
-[![discord](https://img.shields.io/discord/805113908150009864.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/9XpEjMw3Rx)
-[![twitter](https://img.shields.io/twitter/follow/pierogis_chef?&label=&style=flat)](https://twitter.com/pierogis_chef)
+[![discord](https://img.shields.io/badge/discord-flat?label=&logo=discord&logoColor=ffffff&color=7389D8)](https://discord.gg/9XpEjMw3Rx)
+[![twitter](https://img.shields.io/badge/twitter-flat?&logo=twitter&logoColor=ffffff&color=1DA1F2)](https://twitter.com/pierogis_chef)
 
 `pierogis` is a framework for image and animation processing. Ingredients that describe image processing functions can be assembled
 into recipes and used to cook an image or animation.
@@ -53,13 +53,22 @@ pip install -r requirements.txt
 pip install .
 ```
 
+Note that the python package was previously called `pyrogis`.
+That was supposed to denote the difference between the package
+and the Rust algorithms (`pierogis_rs`) that it relied on.
+
+These two parts were combined into one namespace in the `0.4.0` release,
+and the split naming became redundant.
+
+Still, `pip install pyrogis==0.4.0` will install `pierogis`.
+
 <a name="features"></a>
 ## features
 
 - **CLI** - Use a `rich` cli to cook à la carte recipes, or provide a recipe in a document (see [docs](https://docs.pierogis.live/en/stable/cli.html))
 - **Animations** - Animations (gifs and movies) can be cooked in one command
 - **Extendable** - Easy to create custom manipulations (see [docs](https://docs.pierogis.live/en/stable/ingredients.html#extending))
-- **Lazy Rendering** - Render a manipulation after constructing your pipeline (see [docs](https://docs.pierogis.live/))
+- **Lazy Rendering** - Render a manipulation after constructing your pipeline (see [docs](https://docs.pierogis.live/en/stable/ingredients.html#dish))
 - **Numpy or Rust backend** - Image processing functions use Numpy for (python relative) fast operations. Some
   ingredients use compiled `Rust` for more speed.
   
@@ -83,8 +92,13 @@ underlying [algorithm](https://github.com/kimasendorf/ASDFPixelSort) of that pac
 supposed to be functionally the same, details of the implementation may differ.
 
 A quantization algorithm used in this package uses [`rscolorq`](https://github.com/okaneco/rscolorq), which
-is a port of [`scolorq`](http://people.eecs.berkeley.edu/~dcoetzee/downloads/scolorq/), itself an implementation of
-Spatial Color Quantization.
+is a Rust port of [`scolorq`](http://people.eecs.berkeley.edu/~dcoetzee/downloads/scolorq/),
+itself an implementation of Spatial Color Quantization.
+
+An algorithm called
+[`MMPX`](https://casual-effects.com/research/McGuire2021PixelArt/index.html)
+is used in this package to do 2x image magnification.
+It is implemented in a separate [Rust package](https://github.com/pierogis/mmpx-rs).
 
 <a name="issues-and-contributing"></a>
 ## issues and contributing
@@ -141,5 +155,3 @@ at least modules related to this package.
 
 If your paid derivative work adds marginal value to what is included in this package,
 the author reserves the right to go to great lengths to make a free (and better) alternative to your derivative work.
-
-The python implementation of this package was never called or published to pypi as `pyrogis`; that didn't happen.

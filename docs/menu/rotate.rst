@@ -52,4 +52,4 @@ arg                   description                            default       valid
 ``--resample-filter`` a filter to be used with resizing      ``'nearest'`` ``str``
 ===================== ====================================== ============= =======
 
-See: :py:class:`~pierogis.kitchen.menu.rotate_filling.RotateFilling`
+See: :py:class:`~pierogis.kitchen.menu.rotate_filling.RotateFilling`, :py:class:`~rotate.Rotate`

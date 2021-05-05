@@ -16,11 +16,13 @@ sort
 
    *very chill.*
 
-Use ``-l`` and ``-u`` as lower and upper thresholds
-where contiguous groups of pixels
+Use :py:class:`~sort.Sort` to sort a selection of contiguous pixels in order of their brightness.
+The pixels to sort are selected using :ref:`threshold`.
+
+``-l`` and ``-u`` serve as lower and upper thresholds
+where groups of pixels
 with brightness outside of the thresholds are sorted.
 Providing ``--inner`` sorts values between these thresholds.
-See :ref:`threshold`.
 
 Use ``-t``, ``-a``, ``--clockwise``, ``resample-filter`` to describe the direction of the sort.
 See :ref:`rotate`.

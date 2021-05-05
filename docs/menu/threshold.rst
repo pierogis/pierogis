@@ -36,4 +36,4 @@ arg                           description                                       
 ``--exclude``                 hex color to substitute for black                   ``'000000'`` ``0-3``
 ============================= =================================================== ============ =========
 
-See: :py:class:`~pierogis.kitchen.menu.threshold_filling.ThresholdFilling`
+See: :py:class:`~pierogis.kitchen.menu.threshold_filling.ThresholdFilling`, :py:class:`~threshold.Threshold`

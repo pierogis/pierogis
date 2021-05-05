@@ -50,6 +50,8 @@ on filters.
 When used in a :ref:`custom` recipe, scaling down at the beginning of a recipe
 and up at the end can lead to cool (and faster) results.
 
+Check out :ref:`mmpx` for an alternative resizing algorithm (only 2x scale).
+
 ===================== ===================================== ============= =====================
 arg                   description                           default       valid
 ===================== ===================================== ============= =====================
@@ -59,4 +61,4 @@ arg                   description                           default       valid
 ``--resample-filter`` a filter to be used with resizing     ``'nearest'`` see ``choices`` above
 ===================== ===================================== ============= =====================
 
-See: :py:class:`~pierogis.kitchen.menu.resize_filling.ResizeFilling`
+See: :py:class:`~pierogis.kitchen.menu.resize_filling.ResizeFilling`, :py:class:`~resize.Resize`

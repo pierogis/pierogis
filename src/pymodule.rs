@@ -1,3 +1,4 @@
+use image::{DynamicImage, RgbaImage, RgbImage};
 use ndarray::parallel::prelude::*;
 use numpy::{Ix1, Ix2, Ix3, PyArray, PyReadonlyArray, ToPyArray};
 use pyo3::{PyResult, Python};
@@ -7,11 +8,11 @@ use rayon::prelude::*;
 use crate::quantize;
 
 #[pymodule]
-fn algorithms(py: Python<'_>, m: &PyModule) -> PyResult<()> {
+fn algorithms(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     /// quantize(py_array, palette_size, /)
     /// --
     ///
-    /// This function adds two unsigned 64-bit integers.
+    /// quantize an image as a numpy array using rscolorq.
     #[pyfn(m, "quantize")]
     #[allow(clippy::too_many_arguments)]
     fn py_quantize<'py>(
@@ -99,89 +100,25 @@ fn algorithms(py: Python<'_>, m: &PyModule) -> PyResult<()> {
         pixels.to_pyarray(py).reshape(pixels_py_array.dims())
     }
 
-    // This alternate to the threshold uses ndarrays
-    // and was found to be about 3x slower than the slice threshold.
-    // I'm keeping it because that was still pretty fast
-    // and it's a good example of how to use ndarray and genrows with a pixels PyArray
+    #[pyfn(m, "mmpx")]
+    #[allow(clippy::too_many_arguments)]
+    fn py_mmpx<'py>(
+        py: Python<'py>,
+        pixels_py_array: &PyArray<u8, Ix3>,
+    ) -> PyResult<&'py PyArray<u8, Ix3>> {
+        let pixels = pixels_py_array.to_vec().unwrap();
+        let shape = pixels_py_array.shape();
+        let width = shape[0];
+        let height = shape[1];
 
-    // #[pyfn(ingredients_module, "athreshold")]
-    // fn py_arraythreshold<'py>(
-    //     py: Python<'py>,
-    //     array: &PyArray<f64, Ix3>,
-    //     upper_threshold: f64,
-    //     include_pixel: &PyArray<f64, Ix1>,
-    //     exclude_pixel: &PyArray<f64, Ix1>,
-    // ) -> PyResult<&'py PyArray<f64, Ix3>> {
-    //     let mut array = unsafe { array.as_array_mut() };
-    //     let include_pixel = unsafe { include_pixel.as_array_mut() };
-    //     let exclude_pixel = unsafe { exclude_pixel.as_array_mut() };
-    //
-    //     Zip::from(array
-    //         .genrows_mut())
-    //         .par_apply(|mut pixel| -> () {
-    //             let replacement =
-    //                 match (pixel[0] * 0.299 + pixel[1] * 0.587 + pixel[2] * 0.114) >= upper_threshold {
-    //                     true => &include_pixel,
-    //                     false => &exclude_pixel
-    //                 };
-    //
-    //             pixel[0] = replacement[0];
-    //             pixel[1] = replacement[1];
-    //             pixel[2] = replacement[2];
-    //         });
-    //
-    //     Ok(array.to_pyarray(py))
-    // }
-    // #[pyfn(ingredients_module, "sort")]
-    // fn sort_py_array<'py>(
-    //     py: Python<'py>,
-    //     py_array_pixels: &PyArray<f64, Ix3>,
-    //     py_array_mask: &PyArray<f64, Ix3>,
-    //     upper_threshold: f64,
-    // ) -> PyResult<&'py PyArray<f64, Ix3>> {
-    //     let mut pixels = unsafe { py_array_pixels.as_slice_mut() }?;
-    //
-    //     let (width, height, _) = py_array_pixels.shape();
-    //
-    //     // loop through rows in parallel to generate intervals
-    //     // loop through intervals in parallel to sort
-    //
-    //     for pixel in row {
-    //         if pixel
-    //     }
-    //     intervals.par_apply(|interval| {
-    //         interval.par_sort_unstable()
-    //     });
-    //
-    //     pixels.par_chunks_mut(3).collect().par_chunks_mut(height)
-    //         .for_each(|row| -> () {
-    //             row.for_each(|pixel| {
-    //                 if pixel == [255.0, 255.0, 255.0] {
-    //                     // add pixel to current interval
-    //                     pixel
-    //                 }
-    //             })
-    //             // let pixel = Pixel::from(pixel_array);
-    //
-    //
-    //
-    //             let replacement =
-    //                 match (pixel_array[0] * 0.299 + pixel_array[1] * 0.587 + pixel_array[2] * 0.114) >= upper_threshold {
-    //                     true => &include_pixel,
-    //                     false => &exclude_pixel,
-    //                 };
-    //
-    //             // pixel.brightness() >= upper_threshold
-    //             // pixel.replace(replacement)
-    //
-    //             pixel_array[0] = replacement[0];
-    //             pixel_array[1] = replacement[1];
-    //             pixel_array[2] = replacement[2];
-    //         });
-    //
-    //     println!("{}", py_array.shape()[0]);
-    //
-    //     pixels.to_pyarray(py).reshape(py_array.dims())
-    // }
+        let image = RgbaImage::from_raw(
+            height as u32, width as u32, pixels,
+        ).unwrap();
+
+        mmpx::magnify(&image)
+            .to_pyarray(py)
+            .reshape((width * 2, height * 2, 4))
+    }
+
     Ok(())
 }
