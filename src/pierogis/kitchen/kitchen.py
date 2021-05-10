@@ -11,7 +11,7 @@ from typing import Callable, List, Dict
 import imageio
 
 from . import menu
-from .chef import Cooker
+from .line_cook import Cooker
 from .menu import Filling
 from .order import Order
 from .ticket import Ticket

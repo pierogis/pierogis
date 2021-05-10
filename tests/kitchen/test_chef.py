@@ -5,7 +5,7 @@ import pytest
 from PIL import Image
 
 from pierogis.ingredients import Dish, Pierogi
-from pierogis.kitchen import Chef, menu
+from pierogis.kitchen import LineCook, menu
 from pierogis.kitchen.ticket import Ticket, PierogiDesc, IngredientDesc
 
 
@@ -52,7 +52,7 @@ def image_path(array: np.ndarray, tmp_path):
 
 @pytest.fixture
 def chef():
-    return Chef()
+    return LineCook()
 
 
 @pytest.fixture

@@ -1,0 +1,29 @@
+#drop-area {
+  height:500px;
+  width:500px;
+  background:lightgray;
+}
+
+#drop-area.highlight {
+  border-color: purple;
+}
+#image {
+  height: 100%;
+  vertical-align: middle;
+}
+.button {
+  display: inline-block;
+  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  background: white;
+  cursor: pointer;
+  border-radius: 5px;
+  border: 1px solid black;
+}
+.button:hover {
+  background: grey;
+}
+#item-input {
+  display: none;
+}

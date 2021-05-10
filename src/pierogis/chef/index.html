@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.17.0/full/pyodide.js"></script>
+    <script type="module" src="index.js"></script>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div align="center">
+      <div id="drop-area">
+        <img id="image"/>
+        <input id="image-input" type="file" accept="image/*" hidden>
+        <label id="input-button" class="button" for="image-input">image</label>
+      </div>
+      <br>
+
+      <input type="radio" id="sort" name="ingredient" value="sort">
+      <label for="sort">sort</label><br>
+      <input type="radio" id="threshold" name="ingredient" value="threshold">
+      <label for="threshold">threshold</label><br>
+      <br>
+      <input type="range" class="slider" id="upper-slider" min="0" max="255" value="150">
+      <label id="upper-display" for="upper-slider"></label><br>
+      <input type="range" class="slider" id="lower-slider" min="0" max="255" value="70">
+      <label id="lower-display" for="lower-slider"></label><br>
+
+      <button id="cook-button" type="button">cook</button>
+    </div>
+
+  </body>
+</html>

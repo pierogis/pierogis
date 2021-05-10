@@ -2,7 +2,7 @@ import multiprocessing as mp
 import sys
 from typing import Callable
 
-from .kitchen import Chef, Server, Kitchen
+from .kitchen import LineCook, Server, Kitchen
 from .restaurant import Restaurant
 
 
@@ -12,7 +12,7 @@ def run(args=None, report_callback: Callable = None):
 
     server = Server(report_callback)
 
-    kitchen = Kitchen(Chef())
+    kitchen = Kitchen(LineCook())
 
     server.take_order(
         args,

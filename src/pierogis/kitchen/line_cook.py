@@ -21,7 +21,7 @@ class Cooker(Protocol):
         pass
 
 
-class Chef(Cooker):
+class LineCook(Cooker):
     """gets dishes from tickets and cooks"""
 
     @classmethod

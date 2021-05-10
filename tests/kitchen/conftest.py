@@ -4,7 +4,7 @@ import imageio
 import numpy as np
 import pytest
 
-from pierogis.kitchen import Kitchen, Chef
+from pierogis.kitchen import Kitchen, LineCook
 
 
 @pytest.fixture
@@ -15,7 +15,7 @@ def array():
 
 @pytest.fixture
 def kitchen(tmp_path) -> Kitchen:
-    return Kitchen(Chef, cooked_dir=str(tmp_path / 'cooked'))
+    return Kitchen(LineCook, cooked_dir=str(tmp_path / 'cooked'))
 
 
 @pytest.fixture

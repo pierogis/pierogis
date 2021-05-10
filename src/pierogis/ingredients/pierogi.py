@@ -80,7 +80,7 @@ class Pierogi(Ingredient):
             raise Exception("one of pixels or loader must be provided")
 
     @classmethod
-    def from_path(cls, path: str, frame_index: int = 0) -> 'Pierogi':
+    def from_path(cls, path: str, frame_index: int = 0, format: str = None) -> 'Pierogi':
         """
         :param path: file path to load from
         :param frame_index: if path is a multiframe format (video),
@@ -88,7 +88,7 @@ class Pierogi(Ingredient):
         """
 
         def loader():
-            reader = imageio.get_reader(path)
+            reader = imageio.get_reader(path, format=format)
             reader.set_image_index(frame_index)
             return np.rot90(np.array(reader.get_next_data(), dtype='uint8')[:, :, :3], axes=(1, 0))
 
@@ -141,14 +141,14 @@ class Pierogi(Ingredient):
         """
         self.image.show()
 
-    def save(self, path: Union[str, Path], optimize: bool = False) -> None:
+    def save(self, path: Union[str, Path], format: str = 'PNG', optimize: bool = False) -> None:
         """
         save the image to the given path
         """
 
         output_filename = path
 
-        self.image.save(output_filename, optimize=optimize)
+        self.image.save(output_filename, format=format, optimize=optimize)
 
     def resize(self, width: int, height: int, resample: int = RESIZE_RESAMPLE):
         """
