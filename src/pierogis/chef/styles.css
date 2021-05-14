@@ -1,7 +1,7 @@
 #drop-area {
-  height:500px;
-  width:500px;
-  background:lightgray;
+  height: 500px;
+  width: 500px;
+  border: 2px dotted grey;
 }
 
 #drop-area.highlight {
