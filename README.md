@@ -1,10 +1,10 @@
 # pierogis
 
-[![version](https://img.shields.io/pypi/v/pierogis)](https://pypi.org/project/pierogis/)
-[![docs](https://img.shields.io/readthedocs/pierogis/stable)](https://docs.pierogis.live)
+[![version](https://img.shields.io/pypi/v/pierogis.svg)](https://pypi.org/project/pierogis/)
+[![docs](https://img.shields.io/readthedocs/pierogis/stable.svg)](https://docs.pierogis.live)
 
-[![discord](https://img.shields.io/badge/discord-flat?label=&logo=discord&logoColor=ffffff&color=7389D8)](https://discord.gg/9XpEjMw3Rx)
-[![twitter](https://img.shields.io/badge/twitter-flat?&logo=twitter&logoColor=ffffff&color=1DA1F2)](https://twitter.com/pierogis_chef)
+[![discord](https://img.shields.io/badge/discord-flat.svg?logo=discord&logoColor=ffffff&color=7389D8)](https://discord.gg/9XpEjMw3Rx)
+[![twitter](https://img.shields.io/badge/twitter-flat.svg?logo=twitter&logoColor=ffffff&color=1DA1F2)](https://twitter.com/pierogis_chef)
 
 `pierogis` is a framework for image and animation processing. Ingredients that describe image processing functions can be assembled
 into recipes and used to cook an image or animation.
@@ -16,7 +16,7 @@ pierogis custom teton.png "resize --width 768 --height 768; sort; quantize; resi
 pierogis custom teton.png recipe.txt -o output.png
 ```
 
-*recipe.txt*
+`recipe.txt`
 ```text
 resize --width 768 --height 768;
 sort;

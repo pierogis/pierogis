@@ -13,7 +13,7 @@ custom
    $ # or
    $ pierogis custom ./input.jpg recipe.txt
 
-*recipe.txt*
+``recipe.txt``
 
 .. code-block:: text
 
