@@ -80,15 +80,16 @@ class Pierogi(Ingredient):
             raise Exception("one of pixels or loader must be provided")
 
     @classmethod
-    def from_path(cls, path: str, frame_index: int = 0) -> 'Pierogi':
+    def from_path(cls, path: str, format: str = None, frame_index: int = 0) -> 'Pierogi':
         """
         :param path: file path to load from
+        :param format: str format to try to load path with
         :param frame_index: if path is a multiframe format (video),
             use this specified frame
         """
 
         def loader():
-            reader = imageio.get_reader(path)
+            reader = imageio.get_reader(path, format)
             reader.set_image_index(frame_index)
             return np.rot90(np.array(reader.get_next_data(), dtype='uint8')[:, :, :3], axes=(1, 0))
 

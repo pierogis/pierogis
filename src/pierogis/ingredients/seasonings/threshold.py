@@ -27,7 +27,7 @@ class Threshold(Seasoning):
             self,
             lower_threshold: int = None,
             upper_threshold: int = None,
-            inner: bool = False,
+            inner: bool = True,
             **kwargs
     ):
         """
@@ -35,12 +35,9 @@ class Threshold(Seasoning):
 
         calls Seasoning.prep with leftover kwargs
 
-        pixels lower than lower_threshold
-        or higher that upper_threshold
-        are true (include_pixel)
-
-        pixels with brightness >= upper_threshold
-            or <= lower_threshold are replaced by include pixel (white)
+        with inner = True (default):
+        pixels with brightness <= upper_threshold
+            and >= lower_threshold are replaced by include pixel (white)
         """
         # set include/exclude_pixel and target, if provided
         super().prep(**kwargs)
