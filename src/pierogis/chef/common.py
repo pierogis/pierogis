@@ -1,16 +1,15 @@
 import io
 from collections import namedtuple
-from typing import Dict, Any, Callable, TypeVar, List
+from typing import Dict, Any, Callable, List
 
 import idom
-from idom import Component
 from idom.widgets import Input, image
 
 from pierogis.ingredients import Pierogi
 
 
 @idom.component
-def SliderInput(label, value, set_value_callback, domain):
+def SliderInput(label: str, value, set_value_callback: Callable, domain):
     minimum, maximum, step = domain
     attrs = {'min': minimum, 'max': maximum, 'step': step}
 
@@ -21,11 +20,50 @@ def SliderInput(label, value, set_value_callback, domain):
         set_value_callback(value)
 
     return idom.html.div(
-        {'class': 'slider-input-container'},
+        {'class': 'input-container'},
         label,
         idom.html.br(),
-        Input(update_value, 'range', value, attributes=dict(attrs, **{'class': 'slider'}), cast=float),
+        Input(update_value, 'range', value, attributes=attrs, cast=float),
         Input(update_value, 'number', value, attributes=attrs, cast=float)
+    )
+
+
+@idom.component
+def CheckboxInput(label, checked: bool, set_checked_callback: Callable):
+    checked, set_checked = idom.hooks.use_state(checked)
+
+    def update_value(value: str):
+        set_checked(not checked)
+        set_checked_callback(not checked)
+
+    if checked:
+        checked_key = {'checked': True}
+    else:
+        checked_key = {'checked': ''}
+
+    return idom.html.div(
+        {'class': 'input-container'},
+        label,
+        idom.html.br(),
+        Input(update_value, 'checkbox', value='toggle', attributes=checked_key)
+    )
+
+
+def SelectInput(label, selected_option: str, options: List[str], set_selected_option_callback: Callable):
+    def update_selected_option(event: Dict[str, str]):
+        set_selected_option_callback(event['value'])
+
+    return idom.html.div(
+        {'class': 'input-container'},
+        label,
+        idom.html.br(),
+        idom.html.select(
+            {'onChange': update_selected_option},
+            [idom.html.option(
+                {'selected': selected_option == option},
+                option
+            ) for option in options]
+        )
     )
 
 
@@ -47,8 +85,7 @@ def ImageDropArea(set_image_bytes_callback, image_bytes: bytes):
     events = idom.Events()
 
     @events.on("change")
-    def on_change(event: Dict[str, Any], target) -> None:
-        print(target)
+    def on_change(event: Dict[str, Any]) -> None:
         value = event["target"]['result']
 
         update_image_bytes(value)
@@ -103,7 +140,7 @@ Option = namedtuple('Option', field_names=['name', 'node'])
 
 def SwitchableFieldset(selected_option: Option, options: List[Option],
                        set_selected_option: Callable[[Option], Any], **kwargs):
-    def update_selected_option(event):
+    async def update_selected_option(event):
         for option in options:
             if option.name == event['value']:
                 set_selected_option(option)
@@ -112,8 +149,8 @@ def SwitchableFieldset(selected_option: Option, options: List[Option],
     return idom.html.fieldset(
         idom.html.style(
             """
-            .slider-input-container {font-size: small; text-align:center}
-            .slider-input-container input.slider {width:60%;}
+            .input-container {font-size: small; text-align:center}
+            .input-container input[type="range"] {width:60%;}
             """
         ),
         idom.html.legend(
@@ -128,3 +165,26 @@ def SwitchableFieldset(selected_option: Option, options: List[Option],
         ),
         selected_option.node(**kwargs)
     )
+
+
+def Loader():
+    return idom.html.div(
+        {'style', {
+            'border': '16px solid',
+            'border-top': '16px solid',
+            'border-radius': '50 %',
+            'width': '120px',
+            'height': '120px',
+            'animation': 'spin 2s linear infinite'
+        }},
+        idom.html.style("""
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+        """)
+    )
+
+
+def ColorInput():
+    return None

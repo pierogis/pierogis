@@ -1,12 +1,65 @@
 import io
-from typing import Callable, Union, Any, Dict
+from typing import Callable, Union, Any
 
 import idom
 from idom.widgets import Input
 
-from pierogis.ingredients import Pierogi, Threshold, Sort, Resize, Rotate, Ingredient
-from .common import ImageDropArea, SliderInput, Option, SwitchableFieldset
+from pierogis.ingredients import Pierogi, Threshold, Sort, Resize, Rotate, Ingredient, MMPX, SpatialQuantize, Quantize
+from .common import ImageDropArea, SliderInput, Option, SwitchableFieldset, CheckboxInput, SelectInput, ColorInput
 from ..ingredients.seasonings import Seasoning
+
+
+def QuantizeInput(
+        set_ingredient_callback: Callable[[Union[Quantize, SpatialQuantize]], None],
+        ingredient: Union[Quantize, SpatialQuantize] = SpatialQuantize()
+):
+    dither = isinstance(ingredient, SpatialQuantize)
+
+    # def set_palette_size(palette_size: int):
+    #     ingredient.palette_size = palette_size
+    #     set_ingredient_callback(ingredient)
+
+    def set_dither(dither: bool):
+        if dither:
+            set_ingredient_callback(SpatialQuantize())
+        else:
+            set_ingredient_callback(Quantize())
+
+    inputs = [CheckboxInput('dither', dither, set_dither)]
+
+    return idom.html.div(
+        {'style': {'font-size': 'small', 'text-align': 'center'}},
+        SpatialQuantizeInput(set_ingredient_callback, ingredient)
+    )
+
+
+def SpatialQuantizeInput(set_ingredient_callback: Callable, ingredient: SpatialQuantize = SpatialQuantize()):
+    def set_palette_size(value: int):
+        ingredient.palette_size = value
+        set_ingredient_callback(ingredient)
+
+    inputs = [
+        idom.html.div(
+            {'style': {'font-size': 'small', 'text-align': 'center'}},
+            "palette size",
+            Input(set_palette_size, 'number', ingredient.palette_size, cast=int)
+        ),
+        ColorInput()
+    ]
+
+    return idom.html.div(
+        inputs
+    )
+
+
+# def PaletteQuantizeInput():
+#     def set_colors(value):
+#         ingredient.colors = value
+#         set_ingredient_callback()
+#
+#     return idom.html.div(
+#         ColorInput(set_colors)
+#     )
 
 
 def SortInput(set_ingredient_callback: Callable[[Sort], None], ingredient: Sort = Sort()):
@@ -26,12 +79,38 @@ def SortInput(set_ingredient_callback: Callable[[Sort], None], ingredient: Sort 
 
     return idom.html.div(
         ThresholdInput(set_seasoning, seasoning),
+        idom.html.hr(),
         RotateInput(set_rotate, ingredient.rotate)
     )
 
 
 def RotateInput(set_ingredient_callback: Callable[[Rotate], None], ingredient: Rotate = Rotate()):
-    return
+    def set_angle(angle):
+        ingredient.angle = angle
+        set_ingredient_callback(ingredient)
+
+    def set_turns(turns):
+        ingredient.turns = turns
+        set_ingredient_callback(ingredient)
+
+    def set_ccw(clockwise):
+        ingredient.clockwise = clockwise
+        set_ingredient_callback(ingredient)
+
+    def set_filter(option):
+        ingredient.filter = ingredient.FILTERS[option]
+        set_ingredient_callback(ingredient)
+
+    return idom.html.div(
+        SliderInput("angle", ingredient.angle, set_angle, (0, 360, 1)),
+        idom.html.div(
+            {'style': {'font-size': 'small', 'text-align': 'center'}},
+            "turns",
+            Input(set_turns, 'number', ingredient.turns, cast=float)
+        ),
+        CheckboxInput("clockwise", ingredient.clockwise, set_ccw),
+        SelectInput("filter", ingredient.resample, ingredient.FILTERS.keys(), set_filter)
+    )
 
 
 def ResizeInput(set_ingredient_callback: Callable[[Resize], None], ingredient: Resize = Resize()):
@@ -47,8 +126,12 @@ def ResizeInput(set_ingredient_callback: Callable[[Resize], None], ingredient: R
         ingredient.scale = scale
         set_ingredient_callback(ingredient)
 
+    def set_filter(option):
+        ingredient.filter = ingredient.FILTERS[option]
+        set_ingredient_callback(ingredient)
+
     inputs = [
-        "Height",
+        "height",
         Input(
             set_height,
             'number',
@@ -56,7 +139,7 @@ def ResizeInput(set_ingredient_callback: Callable[[Resize], None], ingredient: R
             attributes={'min': 0, 'step': 1},
             cast=int
         ),
-        "Width",
+        "width",
         Input(
             set_width,
             'number',
@@ -64,14 +147,15 @@ def ResizeInput(set_ingredient_callback: Callable[[Resize], None], ingredient: R
             attributes={'min': 0, 'step': 1},
             cast=int
         ),
-        "Scale",
+        "scale",
         Input(
             set_scale,
             'number',
             ingredient.scale,
             attributes={'min': 0, 'step': .05},
             cast=float
-        )
+        ),
+        SelectInput("filter", ingredient.resample, ingredient.FILTERS.keys(), set_filter)
     ]
 
     return idom.html.div(
@@ -94,37 +178,26 @@ def ThresholdInput(
 
     sliders = [
         SliderInput(
-            "Lower Threshold",
+            "lower",
             ingredient.lower_threshold,
             set_lower,
             (0, 255, 1),
         ),
         SliderInput(
-            "Upper Threshold",
+            "upper",
             ingredient.upper_threshold,
             set_upper,
             (0, 255, 1),
         )
     ]
 
-    def toggle_inner():
-        ingredient.inner = not ingredient.inner
+    def toggle_inner(value):
+        ingredient.inner = value
         set_ingredient_callback(ingredient)
 
-    events = idom.Events()
-
-    @events.on("change")
-    def on_click(event: Dict[str, Any]) -> None:
-        value = event["value"]
-        toggle_inner()
-
     return idom.html.div(
-        {'style': {'font-size': 'small', 'text-align': 'center'}},
         sliders,
-        "Inner",
-        idom.html.br(),
-        idom.html.input({'type': 'checkbox', 'checked': ingredient.inner}, event_handlers=events)
-        # Input(set_inner, 'checkbox', value="toggle", attributes={'checked': ingredient.inner})
+        CheckboxInput("inner", ingredient.inner, toggle_inner)
     )
 
 
@@ -146,22 +219,27 @@ def PierogiInput(set_ingredient_callback: Callable[[Pierogi], Pierogi], ingredie
     return idom.html.div(
         {'style': {'width': '200px'}},
         idom.html.fieldset(
-            [idom.html.legend({"style": {"font-size": "medium"}}, 'Pierogi')],
+            [idom.html.legend({"style": {"font-size": "medium"}}, 'pierogi')],
             ImageDropArea(set_image_bytes, image_bytes)
         )
     )
 
 
-threshold_option = Option(name='Threshold', node=ThresholdInput)
-sort_option = Option(name='Sort', node=SortInput)
-resize_option = Option(name='Resize', node=ResizeInput)
-rotate_option = Option(name='Rotate', node=RotateInput)
+threshold_option = Option(name='threshold', node=ThresholdInput)
+sort_option = Option(name='sort', node=SortInput)
+quantize_option = Option(name='quantize', node=QuantizeInput)
+resize_option = Option(name='resize', node=ResizeInput)
+rotate_option = Option(name='rotate', node=RotateInput)
+mmpx_option = Option(name='mmpx', node=lambda **kwargs: '')
 
 ingredient_options = {
     Threshold: threshold_option,
     Sort: sort_option,
     Resize: resize_option,
     Rotate: rotate_option,
+    MMPX: mmpx_option,
+    SpatialQuantize: quantize_option,
+    # Quantize: quantize_option,
 }
 
 

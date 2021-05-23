@@ -5,6 +5,7 @@ import idom
 from idom import VdomDict, Ref
 from idom.widgets.html import image
 
+from pierogis.chef.common import Loader
 from pierogis.ingredients import Threshold, Recipe, Dish, Ingredient
 from .nodes import IngredientNode, PierogiInput
 
@@ -37,6 +38,8 @@ def Chef():
 
     ingredients = idom.hooks.use_ref(list())
 
+    cooking, set_cooking = idom.hooks.use_state(False)
+
     def cook() -> VdomDict:
         pierogi = input_pierogi.current
         recipe = Recipe(ingredients=ingredients.current)
@@ -50,11 +53,21 @@ def Chef():
         buffer.seek(0)
         return image('png', buffer.getvalue())
 
+    async def update_output_image(event):
+        set_cooking(True)
+        set_output_image(cook())
+        set_cooking(False)
+
+    if cooking:
+        output = Loader()
+    else:
+        output = output_image
+
     return idom.html.div(
-        output_image,
+        output,
         PierogiInput(input_pierogi.set_current),
         IngredientNodes(ingredients),
-        idom.html.button({"onClick": lambda event: set_output_image(cook())}, "cook"),
+        idom.html.button({"onClick": update_output_image}, "cook"),
     )
 
 
@@ -92,10 +105,16 @@ def IngredientNodes(
         new_ingredients[i] = ingredient
         ingredients_ref.set_current(new_ingredients)
 
+    async def add_handler(event):
+        add_ingredient(len(ingredients_ref.current))
+
+    async def del_handler(event):
+        del_ingredient(len(ingredients_ref.current) - 1)
+
     return idom.html.div(
         *nodes,
-        idom.html.button({"onClick": lambda event: add_ingredient(len(ingredients_ref.current))}, "+"),
-        idom.html.button({"onClick": lambda event: del_ingredient(len(ingredients_ref.current) - 1)}, "-"),
+        idom.html.button({"onClick": add_handler}, "+"),
+        idom.html.button({"onClick": del_handler}, "-"),
     )
 
 

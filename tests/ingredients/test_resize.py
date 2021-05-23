@@ -125,3 +125,15 @@ def test_cook_height_width_scale_resample(array):
 
     assert cooked_array.shape[0] == width * scale
     assert cooked_array.shape[1] == height * scale
+
+
+def test_cook_height_resample_str(array):
+    """
+    provide height, width, scale, and resample
+    """
+    height = 200
+
+    resize = Resize(height=height, resample='bilinear')
+    cooked_array = resize.cook(array)
+
+    assert cooked_array.shape[1] == height

@@ -1,3 +1,5 @@
+from typing import List, Union, Tuple
+
 import numpy as np
 from PIL import ImageColor
 
@@ -10,12 +12,12 @@ class Quantize(Ingredient):
     """
 
     def prep(self,
-             colors=None, **kwargs):
+             colors: Union[List[Union[str, Tuple[int, int, int]]], np.ndarray] = None, **kwargs):
         """
         parameters for spatial color quantization
 
-        :param colors: colors to use. can be a list of str
-            or pixel array likes
+        :param colors: colors to use. can be a list or numpy array like of hex strings
+            or rgb pixel tuples
         """
 
         if colors is None:
@@ -33,7 +35,7 @@ class Quantize(Ingredient):
         else:
             colors = np.array(colors)
 
-        self.palette = colors.astype(np.dtype('uint8'))
+        self.colors = colors.astype(np.dtype('uint8'))
         """palette to use"""
 
     def cook(self, pixels: np.ndarray):
@@ -50,7 +52,7 @@ class Quantize(Ingredient):
         # for each color in the palette (n, 3)
         differences = (
                 np.expand_dims(pixels, axis=2)
-                - np.expand_dims(self.palette, axis=(0, 1))
+                - np.expand_dims(self.colors, axis=(0, 1))
         )
 
         # sum up the last axis (r + g + b)
@@ -65,7 +67,7 @@ class Quantize(Ingredient):
 
         # replace the min index identified with the corresponding color
         # -> (width, height, 3)
-        return self.palette[nearest_palette_index]
+        return self.colors[nearest_palette_index]
 
 
 class SpatialQuantize(Quantize):
@@ -138,7 +140,7 @@ class SpatialQuantize(Quantize):
         # rotating and unrotating because different orientation is expected
         cooked_pixels = np.rot90(quantize(
             np.ascontiguousarray(np.rot90(pixels), dtype=np.dtype('uint8')),
-            self.palette,
+            self.colors,
             palette_size=self.palette_size,
             iters_per_level=self.iterations,
             repeats_per_temp=self.repeats,

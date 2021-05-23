@@ -37,9 +37,9 @@ arg                           description                                       
 ``-u``, ``--upper-threshold`` pixels with intensity *>=* this value are sorted    ``180``       ``0-255``
 ``--inner``                   if provided, pixels between (inclusive) the
                               threshold values are included in the sort           ``False``     ``0-255``
-``-t``, ``--turns``           number of clockwise turns from sorting              ``0``         ``0-3``
+``-t``, ``--turns``           number of clockwise turns from sorting              ``1``         ``0-3``
                               bottom to top
-``-a``, ``--angle``           degrees to rotate through each turn                 ``90``        ``int``
+``-a``, ``--angle``           degrees to rotate through each turn                 ``0``        ``int``
 ``--ccw``                     if provided, ``turns`` will be applied              ``False``     flag
                               counter-clockwise instead
 ``--resample-filter``         a filter to be used with rotating                   ``'nearest'`` ``str``

@@ -11,8 +11,8 @@ class Resize(Ingredient):
     """
     resize using width, height, and scale
     """
+    DEFAULT_RESAMPLE = 'nearest'
     FILTERS = {
-        'default': Image.NEAREST,
         'nearest': Image.NEAREST,
         'box': Image.BOX,
         'bicubic': Image.BICUBIC,
@@ -26,7 +26,7 @@ class Resize(Ingredient):
             width: int = None,
             height: int = None,
             scale: int = 1,
-            resample: Union[int, str] = FILTERS['default'],
+            resample: Union[int, str] = FILTERS[DEFAULT_RESAMPLE],
             **kwargs
     ):
         """
@@ -51,9 +51,6 @@ class Resize(Ingredient):
         self.width = width
         self.height = height
         self.scale = scale
-
-        if resample in self.FILTERS:
-            resample = self.FILTERS[resample]
         self.resample = resample
 
     def cook(self, pixels: np.ndarray):
@@ -78,6 +75,10 @@ class Resize(Ingredient):
         width *= self.scale
         height *= self.scale
 
-        pierogi.resize(int(width), int(height), self.resample)
+        resample = self.resample
+        if isinstance(resample, str):
+            resample = self.FILTERS[resample]
+
+        pierogi.resize(int(width), int(height), resample)
 
         return pierogi.pixels

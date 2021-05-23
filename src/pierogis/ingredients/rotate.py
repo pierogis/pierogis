@@ -9,8 +9,8 @@ from .pierogi import Pierogi
 
 class Rotate(Ingredient):
     """rotate a pixel array"""
+    DEFAULT_RESAMPLE = 'nearest'
     FILTERS = {
-        'default': Image.NEAREST,
         'nearest': Image.NEAREST,
         'box': Image.BOX,
         'bicubic': Image.BICUBIC,
@@ -22,7 +22,7 @@ class Rotate(Ingredient):
     def prep(
             self,
             clockwise: bool = True, turns: int = 1, angle: int = 90,
-            resample: Union[int, str] = FILTERS['default'],
+            resample: Union[int, str] = FILTERS[DEFAULT_RESAMPLE],
             **kwargs
     ):
         """
@@ -46,7 +46,11 @@ class Rotate(Ingredient):
         if self.clockwise:
             angle *= -1
 
-        pierogi.rotate(angle, self.resample)
+        resample = self.resample
+        if (isinstance(resample, str)):
+            resample = self.FILTERS[resample]
+
+        pierogi.rotate(angle, resample)
 
         return pierogi.pixels
 

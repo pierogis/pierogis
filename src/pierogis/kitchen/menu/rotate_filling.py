@@ -24,7 +24,7 @@ class RotateFilling(Filling):
         parser.add_argument(
             '--resample-filter',
             dest='resample',
-            default=Rotate.FILTERS['default'],
+            default=Rotate.DEFAULT_RESAMPLE,
             choices=Rotate.FILTERS.keys(),
             help='resample filter for resize'
         )

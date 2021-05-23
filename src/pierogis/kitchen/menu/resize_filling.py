@@ -32,7 +32,7 @@ class ResizeFilling(Filling):
         parser.add_argument(
             '--resample-filter',
             dest='resample',
-            default=Resize.FILTERS['default'],
+            default=Resize.DEFAULT_RESAMPLE,
             choices=Resize.FILTERS.keys(),
             help='resample filter for resize'
         )

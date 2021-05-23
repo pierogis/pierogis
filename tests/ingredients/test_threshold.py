@@ -16,21 +16,21 @@ def test_cook(array):
 
     cooked_array = threshold.cook(array)
 
-    assert np.all(cooked_array[0, 0] == 255)
-    assert np.all(cooked_array[0, 1] == 255)
-    assert np.all(cooked_array[1, 0] == 0)
+    assert np.all(cooked_array[0, 0] == 0)
+    assert np.all(cooked_array[0, 1] == 0)
+    assert np.all(cooked_array[1, 0] == 255)
     assert np.all(cooked_array[1, 1] == 255)
 
 
 def test_cook_inner(array):
     """default cook parameters"""
-    threshold = Threshold(inner=True)
+    threshold = Threshold(inner=False)
 
     cooked_array = threshold.cook(array)
 
-    assert np.all(cooked_array[0, 0] == 0)
-    assert np.all(cooked_array[0, 1] == 0)
-    assert np.all(cooked_array[1, 0] == 255)
+    assert np.all(cooked_array[0, 0] == 255)
+    assert np.all(cooked_array[0, 1] == 255)
+    assert np.all(cooked_array[1, 0] == 0)
     assert np.all(cooked_array[1, 1] == 255)
 
 
@@ -44,10 +44,10 @@ def test_cook_upper(array):
 
     cooked_array = threshold.cook(array)
 
-    assert np.all(cooked_array[0, 0] == 255)
-    assert np.all(cooked_array[0, 1] == 0)
-    assert np.all(cooked_array[1, 0] == 255)
-    assert np.all(cooked_array[1, 1] == 0)
+    assert np.all(cooked_array[0, 0] == 0)
+    assert np.all(cooked_array[0, 1] == 255)
+    assert np.all(cooked_array[1, 0] == 0)
+    assert np.all(cooked_array[1, 1] == 255)
 
 
 def test_cook_lower(array):
@@ -60,10 +60,10 @@ def test_cook_lower(array):
 
     cooked_array = threshold.cook(array)
 
-    assert np.all(cooked_array[0, 0] == 0)
-    assert np.all(cooked_array[0, 1] == 255)
-    assert np.all(cooked_array[1, 0] == 0)
-    assert np.all(cooked_array[1, 1] == 255)
+    assert np.all(cooked_array[0, 0] == 255)
+    assert np.all(cooked_array[0, 1] == 0)
+    assert np.all(cooked_array[1, 0] == 255)
+    assert np.all(cooked_array[1, 1] == 0)
 
 
 def test_cook_lower_upper(array):
@@ -75,10 +75,10 @@ def test_cook_lower_upper(array):
 
     cooked_array = threshold.cook(array)
 
-    assert np.all(cooked_array[0, 0] == 255)
-    assert np.all(cooked_array[0, 1] == 255)
-    assert np.all(cooked_array[1, 0] == 255)
-    assert np.all(cooked_array[1, 1] == 0)
+    assert np.all(cooked_array[0, 0] == 0)
+    assert np.all(cooked_array[0, 1] == 0)
+    assert np.all(cooked_array[1, 0] == 0)
+    assert np.all(cooked_array[1, 1] == 255)
 
 
 def test_cook_include_exclude(array):
@@ -88,7 +88,8 @@ def test_cook_include_exclude(array):
 
     threshold = Threshold(
         include=include_pixel,
-        exclude=exclude_pixel
+        exclude=exclude_pixel,
+        inner=False
     )
 
     cooked_array = threshold.cook(array)
