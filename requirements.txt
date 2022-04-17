@@ -1,8 +1,8 @@
-Pillow==8.0.1
-numpy==1.19.4
-imageio==2.9.0
-imageio-ffmpeg==0.4.3
-natsort==7.1.1
+Pillow>=8.0.1
+numpy>=1.19.4
+imageio>=2.9.0
+imageio-ffmpeg>=0.4.3
+natsort>=7.1.1
 rich==10.1.0
 
 setuptools-rust>=0.11.6
