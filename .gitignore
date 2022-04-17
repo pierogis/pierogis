@@ -17,3 +17,5 @@ docs/source
 
 # rust
 target
+
+.DS_store
