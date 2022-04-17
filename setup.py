@@ -32,12 +32,12 @@ setup(
     package_dir={'': 'src'},
     include_package_data=True,
     install_requires=[
-        'Pillow>=8.0.1',
-        'numpy>=1.20.1',
-        'imageio>=2.9.0',
-        'imageio-ffmpeg>=0.4.3',
-        'natsort>=7.1.1',
-        'rich>=10.1.0'
+        'Pillow==8.0.1',
+        'numpy==1.20.1',
+        'imageio==2.9.0',
+        'imageio-ffmpeg==0.4.3',
+        'natsort==7.1.1',
+        'rich==10.1.0'
     ],
     setup_requires=setup_requires,
     extras_require={
